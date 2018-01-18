@@ -1,0 +1,44 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/dist/src/index.js",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        },
+        {
+            "name": "test-ava",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/ava/profile.js",
+            "stopOnEntry": false,
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "internalConsoleOptions": "openOnSessionStart",
+            "args": [
+              "--verbose",
+              "--fail-fast",
+              "--serial",
+              "${workspaceRoot}/dist/test/streamer-client-test.js",
+            ],
+            "env": {
+              "DEBUG": "r2:*",
+              "NODE_DEBUG": "1",
+              "NODE_ENV": "development"
+            },
+            "console": "internalConsole",
+            "sourceMaps": true,
+            "outFiles": [
+              "${workspaceRoot}/dist/**/*.js"
+            ]
+          },
+    ]
+}

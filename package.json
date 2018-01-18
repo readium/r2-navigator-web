@@ -1,0 +1,25 @@
+{
+  "name": "readium-ng",
+  "version": "0.0.1",
+  "description": "Readium Next Generation",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Readium"
+  ],
+  "author": "EvidentPoint Software",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^9.3.0",
+    "@types/jquery": "^3.2.18",
+    "ava": "^0.24.0",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "ta-json": "^2.3.1"
+  }
+}
