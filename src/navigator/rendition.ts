@@ -10,7 +10,7 @@ export class Rendition {
 
     private viewport: HTMLElement;
 
-    private reader: any;
+    reader: any;
 
     constructor(pub: Publication, viewport: HTMLElement) {
         this.pub = pub;
