@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig-common",
   "compilerOptions": {
-    "target": "es2017",
-    "module": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./build_temp",
+    "noImplicitAny": false,
+    "outDir": "./build_test_temp",
     "rootDir": "./",
     "rootDirs": [
       "./src/",
