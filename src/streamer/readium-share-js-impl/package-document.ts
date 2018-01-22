@@ -71,7 +71,7 @@ export class PackageDocument {
 
                 // R2: these data is lost 
                 rendition_viewport: viewport,
-                idref: '',
+                idref: pubSpineItem.Href,
                 manifest_id: '',
                 media_overlay_id: '',
                 properties: ''

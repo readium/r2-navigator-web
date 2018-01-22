@@ -15,22 +15,33 @@ export class Rendition {
     constructor(pub: Publication, viewport: HTMLElement) {
         this.pub = pub;
         this.viewport = viewport;
+
+        this.initReader();
     }
 
     getPublication(): Publication {
         return this.pub;
     }
 
-    open() {
+    render(): Promise<any> {
+        let packageDoc = new PackageDocument(this.pub);
+        let openBookData = Object.assign({}, packageDoc.getSharedJsPackageData());
+        this.reader.openBook(openBookData);
+
+        return new Promise((resolve: any) => {
+            let readium = (<any>window).ReadiumSDK;
+            this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
+                resolve();
+            });
+        });
+    }
+
+    private initReader() {
         let readerOptions: any = {};
         readerOptions.el = this.viewport;
         readerOptions.iframeLoader = new IFrameLoader(this.pub.baseUri);
         readerOptions.fonts = {};
 
-        let packageDoc = new PackageDocument(this.pub);
-        let openBookData = Object.assign({}, packageDoc.getSharedJsPackageData());
-
         this.reader = new ReaderView(readerOptions);
-        this.reader.openBook(openBookData);
     }
 }

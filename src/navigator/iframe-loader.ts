@@ -10,9 +10,6 @@ export class IFrameLoader {
     }
 
     loadIframe(iframe: HTMLIFrameElement, src: any, callback: any, context: any, attachedData: any) {
-
-        console.warn('src: ' + this.baseURI + src);
-
         iframe.setAttribute("data-baseUri", iframe.baseURI ? iframe.baseURI : '');
         iframe.setAttribute("data-src", src);
 
@@ -59,7 +56,7 @@ export class IFrameLoader {
         }
 
         iframe.onload = () => {
-            callback();
+            callback(true);
             if (!this.isIE) {
                 window.URL.revokeObjectURL(documentDataUri);
             }

@@ -14,7 +14,6 @@ export class ReadingSystem {
 
     openRendition(pub: Publication): Rendition {
         let rendition = new Rendition(pub, this.viewport);
-        rendition.open();
         return rendition;
     }
 }

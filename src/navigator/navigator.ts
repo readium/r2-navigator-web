@@ -13,11 +13,22 @@ export class Navigator {
         return 0;
     }
 
-    nextScreen() {
+    nextScreen(): Promise<any> {
         this.reader.openPageNext();
+        return this.paginationChangedPromise();
     }
 
-    previousScreen() {
-        this.reader.previousScreen();
+    previousScreen(): Promise<any> {
+        this.reader.openPagePrev();
+        return this.paginationChangedPromise();
+    }
+
+    private paginationChangedPromise() {
+        return new Promise((resolve: any) => {
+            let readium = (<any>window).ReadiumSDK;
+            this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
+                resolve();
+            });
+        });
     }
 }
