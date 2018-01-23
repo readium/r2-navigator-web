@@ -1,0 +1,491 @@
+{
+  "@context": "http://readium.org/webpub/default.jsonld",
+  "metadata": {
+    "@type": "http://schema.org/Book",
+    "title": "The War of the Worlds",
+    "identifier": "urn:uuid:aa74824e-1940-11e7-bcc0-4c72b9252ec6",
+    "author": {
+      "name": "H. G. Wells"
+    },
+    "publisher": {
+      "name": "Feedbooks"
+    },
+    "language": [
+      "en"
+    ],
+    "modified": "2018-01-20T00:24:31.774Z",
+    "description": "The War of the Worlds (1898), by H. G. Wells, is an early science fiction novel which describes an invasion of England by aliens from Mars. It is one of the earliest and best-known depictions of an alien invasion of Earth, and has influenced many others, as well as spawning several films, radio dramas, comic book adaptations, and a television series based on the story. The 1938 radio broadcast caused public outcry against the episode, as many listeners believed that an actual Martian invasion was in progress, a notable example of mass hysteria.",
+    "source": "Project Gutenberg",
+    "rights": "This work is available for countries where copyright is Life+70 and in the USA.",
+    "subject": [
+      {
+        "name": "Fiction"
+      },
+      {
+        "name": "Science Fiction"
+      },
+      {
+        "name": "War & Military"
+      }
+    ]
+  },
+  "links": [
+    {
+      "href": "http://localhost:9876/fixtures/publications/war-of-the-worlds/manifest.json",
+      "type": "application/webpub+json",
+      "templated": false,
+      "rel": "self"
+    }
+  ],
+  "spine": [
+    {
+      "href": "OPS/cover.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/title.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/about.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main0.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main1.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main2.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main3.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main4.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main5.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main6.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main7.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main8.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main9.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main10.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main11.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main12.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main13.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main14.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main15.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main16.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main17.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main18.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main19.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main20.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main21.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main22.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main23.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main24.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main25.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main26.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main27.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main28.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/main29.xml",
+      "type": "application/xhtml+xml"
+    },
+    {
+      "href": "OPS/feedbooks.xml",
+      "type": "application/xhtml+xml"
+    }
+  ],
+  "resources": [
+    {
+      "href": "OPS/css/page.css",
+      "type": "text/css"
+    },
+    {
+      "href": "OPS/css/feedbooks.css",
+      "type": "text/css"
+    },
+    {
+      "href": "OPS/css/title.css",
+      "type": "text/css"
+    },
+    {
+      "href": "OPS/css/about.css",
+      "type": "text/css"
+    },
+    {
+      "href": "OPS/css/main.css",
+      "type": "text/css"
+    },
+    {
+      "href": "OPS/css/footnotes.css",
+      "type": "text/css"
+    },
+    {
+      "href": "OPS/images/logo-feedbooks-tiny.png",
+      "type": "image/png"
+    },
+    {
+      "href": "OPS/images/logo-feedbooks.png",
+      "type": "image/png"
+    },
+    {
+      "href": "OPS/images/cover.png",
+      "type": "image/png",
+      "height": 800,
+      "width": 520,
+      "rel": "cover"
+    },
+    {
+      "href": "OPS/fb.ncx",
+      "type": "application/x-dtbncx+xml"
+    }
+  ],
+  "toc": [
+    {
+      "href": "OPS/title.xml",
+      "title": "Title"
+    },
+    {
+      "href": "OPS/about.xml",
+      "title": "About"
+    },
+    {
+      "href": "OPS/main1.xml",
+      "title": "Part 1 - The Coming of the Martians",
+      "children": [
+        {
+          "href": "OPS/main2.xml",
+          "title": "Chapter 1 - The Eve of the War"
+        },
+        {
+          "href": "OPS/main3.xml",
+          "title": "Chapter 2 - The Falling Star"
+        },
+        {
+          "href": "OPS/main4.xml",
+          "title": "Chapter 3 - On Horsell Common"
+        },
+        {
+          "href": "OPS/main5.xml",
+          "title": "Chapter 4 - The Cylinder Opens"
+        },
+        {
+          "href": "OPS/main6.xml",
+          "title": "Chapter 5 - The Heat Ray"
+        },
+        {
+          "href": "OPS/main7.xml",
+          "title": "Chapter 6 - The Heat-Ray in the Chobham Road"
+        },
+        {
+          "href": "OPS/main8.xml",
+          "title": "Chapter 7 - How I Reached Home"
+        },
+        {
+          "href": "OPS/main9.xml",
+          "title": "Chapter 8 - Friday Night"
+        },
+        {
+          "href": "OPS/main10.xml",
+          "title": "Chapter 9 - The Fighting Begins"
+        },
+        {
+          "href": "OPS/main11.xml",
+          "title": "Chapter 10 - In the Storm"
+        },
+        {
+          "href": "OPS/main12.xml",
+          "title": "Chapter 11 - At the Window"
+        },
+        {
+          "href": "OPS/main13.xml",
+          "title": "Chapter 12 - What I Saw of the Destruction of Weybridge and Shepperton"
+        },
+        {
+          "href": "OPS/main14.xml",
+          "title": "Chapter 13 - How I Fell in with the Curate"
+        },
+        {
+          "href": "OPS/main15.xml",
+          "title": "Chapter 14 - In London"
+        },
+        {
+          "href": "OPS/main16.xml",
+          "title": "Chapter 15 - What Had Happened in Surrey"
+        },
+        {
+          "href": "OPS/main17.xml",
+          "title": "Chapter 16 - The Exodus from London"
+        },
+        {
+          "href": "OPS/main18.xml",
+          "title": "Chapter 17 - The \"Thunder Child\""
+        }
+      ]
+    },
+    {
+      "href": "OPS/main19.xml",
+      "title": "Part 2 - The Earth Under the Martians",
+      "children": [
+        {
+          "href": "OPS/main20.xml",
+          "title": "Chapter 1 - Under Foot"
+        },
+        {
+          "href": "OPS/main21.xml",
+          "title": "Chapter 2 - What We Saw from the Ruined House"
+        },
+        {
+          "href": "OPS/main22.xml",
+          "title": "Chapter 3 - The Days of Imprisonment"
+        },
+        {
+          "href": "OPS/main23.xml",
+          "title": "Chapter 4 - The Death of the Curate"
+        },
+        {
+          "href": "OPS/main24.xml",
+          "title": "Chapter 5 - The Stillness"
+        },
+        {
+          "href": "OPS/main25.xml",
+          "title": "Chapter 6 - The Work of Fifteen Days"
+        },
+        {
+          "href": "OPS/main26.xml",
+          "title": "Chapter 7 - The Man on Putney Hill"
+        },
+        {
+          "href": "OPS/main27.xml",
+          "title": "Chapter 8 - Dead London"
+        },
+        {
+          "href": "OPS/main28.xml",
+          "title": "Chapter 9 - Wreckage"
+        },
+        {
+          "href": "OPS/main29.xml",
+          "title": "Chapter 10 - The Epilogue"
+        }
+      ]
+    }
+  ],
+  "landmarks": [
+    {
+      "href": "OPS/cover.xml",
+      "title": "Cover"
+    },
+    {
+      "href": "OPS/title.xml",
+      "title": "Title Page"
+    },
+    {
+      "href": "OPS/about.xml",
+      "title": "About"
+    },
+    {
+      "href": "OPS/main0.xml",
+      "title": "Main0"
+    },
+    {
+      "href": "OPS/main1.xml",
+      "title": "Main1"
+    },
+    {
+      "href": "OPS/main2.xml",
+      "title": "Main2"
+    },
+    {
+      "href": "OPS/main3.xml",
+      "title": "Main3"
+    },
+    {
+      "href": "OPS/main4.xml",
+      "title": "Main4"
+    },
+    {
+      "href": "OPS/main5.xml",
+      "title": "Main5"
+    },
+    {
+      "href": "OPS/main6.xml",
+      "title": "Main6"
+    },
+    {
+      "href": "OPS/main7.xml",
+      "title": "Main7"
+    },
+    {
+      "href": "OPS/main8.xml",
+      "title": "Main8"
+    },
+    {
+      "href": "OPS/main9.xml",
+      "title": "Main9"
+    },
+    {
+      "href": "OPS/main10.xml",
+      "title": "Main10"
+    },
+    {
+      "href": "OPS/main11.xml",
+      "title": "Main11"
+    },
+    {
+      "href": "OPS/main12.xml",
+      "title": "Main12"
+    },
+    {
+      "href": "OPS/main13.xml",
+      "title": "Main13"
+    },
+    {
+      "href": "OPS/main14.xml",
+      "title": "Main14"
+    },
+    {
+      "href": "OPS/main15.xml",
+      "title": "Main15"
+    },
+    {
+      "href": "OPS/main16.xml",
+      "title": "Main16"
+    },
+    {
+      "href": "OPS/main17.xml",
+      "title": "Main17"
+    },
+    {
+      "href": "OPS/main18.xml",
+      "title": "Main18"
+    },
+    {
+      "href": "OPS/main19.xml",
+      "title": "Main19"
+    },
+    {
+      "href": "OPS/main20.xml",
+      "title": "Main20"
+    },
+    {
+      "href": "OPS/main21.xml",
+      "title": "Main21"
+    },
+    {
+      "href": "OPS/main22.xml",
+      "title": "Main22"
+    },
+    {
+      "href": "OPS/main23.xml",
+      "title": "Main23"
+    },
+    {
+      "href": "OPS/main24.xml",
+      "title": "Main24"
+    },
+    {
+      "href": "OPS/main25.xml",
+      "title": "Main25"
+    },
+    {
+      "href": "OPS/main26.xml",
+      "title": "Main26"
+    },
+    {
+      "href": "OPS/main27.xml",
+      "title": "Main27"
+    },
+    {
+      "href": "OPS/main28.xml",
+      "title": "Main28"
+    },
+    {
+      "href": "OPS/main29.xml",
+      "title": "Main29"
+    },
+    {
+      "href": "OPS/feedbooks.xml",
+      "title": "Feedbooks"
+    }
+  ]
+}

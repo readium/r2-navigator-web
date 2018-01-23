@@ -3,8 +3,12 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['mocha', 'chai'],
     files: [
-      'build_test_temp/test_bundle.js'
+      'build_test_temp/test_bundle.js',
+      {pattern: 'test/fixtures/**/*.*',  watched: false, included: false, served: true, nocache: false},
     ],
+    proxies: {
+      "/fixtures/publications": "/base/test/fixtures/publications"
+    },
     reporters: ['progress'],
     port: 9876,
     colors: true,
