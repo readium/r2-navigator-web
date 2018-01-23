@@ -2,7 +2,7 @@ import { Publication } from '../streamer/publication';
 import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from './iframe-loader';
 
-import readiumSharedJs from 'readium-shared-js';
+import ReaderView from 'readium-shared-js';
 
 export class Rendition {
 
