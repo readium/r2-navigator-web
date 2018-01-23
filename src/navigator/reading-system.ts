@@ -5,16 +5,11 @@ export class ReadingSystem {
 
   private viewport: HTMLElement;
 
-  constructor(config: any) {
-  }
-
-  public initRenderer(viewport: HTMLElement) {
+  public initRenderer(viewport: HTMLElement): void {
     this.viewport = viewport;
   }
 
   public openRendition(pub: Publication): Rendition {
-    const rendition = new Rendition(pub, this.viewport);
-
-    return rendition;
+    return new Rendition(pub, this.viewport);
   }
 }

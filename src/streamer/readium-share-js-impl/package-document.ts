@@ -63,8 +63,6 @@ export class PackageDocument {
 
     return this.pub.Spine.map((pubSpineItem: Link) => {
 
-      let viewport;
-
       const spineItem = {
         href: pubSpineItem.Href,
         media_type: pubSpineItem.TypeLink,
@@ -72,7 +70,7 @@ export class PackageDocument {
         linear: 'yes',
 
         // R2: these data is lost
-        rendition_viewport: viewport,
+        rendition_viewport: undefined,
         idref: pubSpineItem.Href,
         manifest_id: '',
         media_overlay_id: '',

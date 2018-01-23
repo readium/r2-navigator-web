@@ -2,6 +2,7 @@ import { Publication } from '../streamer/publication';
 import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from './iframe-loader';
 
+// tslint:disable-next-line:import-name
 import ReaderView from 'readium-shared-js';
 
 export class Rendition {
@@ -22,12 +23,12 @@ export class Rendition {
     return this.pub;
   }
 
-  public render(): Promise<any> {
+  public render(): Promise<void> {
     const packageDoc = new PackageDocument(this.pub);
     const openBookData = { ...packageDoc.getSharedJsPackageData() };
     this.reader.openBook(openBookData);
 
-    return new Promise((resolve: any) => {
+    return new Promise<void>((resolve: any) => {
       const readium = (<any>window).ReadiumSDK;
       this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
         resolve();
@@ -35,7 +36,7 @@ export class Rendition {
     });
   }
 
-  private initReader() {
+  private initReader(): void {
     const readerOptions: any = {};
     readerOptions.el = this.viewport;
     readerOptions.iframeLoader = new IFrameLoader(this.pub.baseUri);
