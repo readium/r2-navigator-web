@@ -1,15 +1,15 @@
-import { IPropertyConverter, JsonValue } from "ta-json";
+import { IPropertyConverter, JsonValue } from 'ta-json';
 
 export class JsonStringConverter implements IPropertyConverter {
-    public serialize(property: string): JsonValue {
-        return property;
-    }
+  public serialize(property: string): JsonValue {
+    return property;
+  }
 
-    public deserialize(value: JsonValue): string {
-        return value as string;
-    }
+  public deserialize(value: JsonValue): string {
+    return <string> value;
+  }
 
-    public collapseArrayWithSingleItem(): boolean {
-        return true;
-    }
+  public collapseArrayWithSingleItem(): boolean {
+    return true;
+  }
 }

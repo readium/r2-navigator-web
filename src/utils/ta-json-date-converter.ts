@@ -1,15 +1,15 @@
-import { IPropertyConverter, JsonValue } from "ta-json";
+import { IPropertyConverter, JsonValue } from 'ta-json';
 
 export class JsonDateConverter implements IPropertyConverter {
-    public serialize(property: Date): JsonValue {
-        return property.toISOString();
-    }
+  public serialize(property: Date): JsonValue {
+    return property.toISOString();
+  }
 
-    public deserialize(value: JsonValue): Date {
-        return new Date(value as string);
-    }
+  public deserialize(value: JsonValue): Date {
+    return new Date(<string> value);
+  }
 
-    public collapseArrayWithSingleItem(): boolean {
-        return false;
-    }
+  public collapseArrayWithSingleItem(): boolean {
+    return false;
+  }
 }

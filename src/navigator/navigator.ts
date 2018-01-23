@@ -1,34 +1,37 @@
-import { Rendition } from './rendition'
+import { Rendition } from './rendition';
 
 export class Navigator {
 
-    private reader: any;
+  private reader: any;
 
-    constructor(rendition: Rendition) {
-        this.reader = rendition.reader;
-    }
+  constructor(rendition: Rendition) {
+    this.reader = rendition.reader;
+  }
 
-    getScreenCount(): number {
-        console.log('getScreenCount called!');
-        return 0;
-    }
+  public getScreenCount(): number {
+    console.log('getScreenCount called!');
 
-    nextScreen(): Promise<any> {
-        this.reader.openPageNext();
-        return this.paginationChangedPromise();
-    }
+    return 0;
+  }
 
-    previousScreen(): Promise<any> {
-        this.reader.openPagePrev();
-        return this.paginationChangedPromise();
-    }
+  public nextScreen(): Promise<any> {
+    this.reader.openPageNext();
 
-    private paginationChangedPromise() {
-        return new Promise((resolve: any) => {
-            let readium = (<any>window).ReadiumSDK;
-            this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
-                resolve();
-            });
-        });
-    }
+    return this.paginationChangedPromise();
+  }
+
+  public previousScreen(): Promise<any> {
+    this.reader.openPagePrev();
+
+    return this.paginationChangedPromise();
+  }
+
+  private paginationChangedPromise() {
+    return new Promise((resolve: any) => {
+      const readium = (<any>window).ReadiumSDK;
+      this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
+        resolve();
+      });
+    });
+  }
 }

@@ -2,3 +2,4 @@
 node_modules
 build_temp
 build_test_temp
+dist

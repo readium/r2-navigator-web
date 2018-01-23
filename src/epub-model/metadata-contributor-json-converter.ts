@@ -1,36 +1,37 @@
 import {
-    IPropertyConverter,
-    JSON as TAJSON,
-    JsonValue,
-} from "ta-json";
+  IPropertyConverter,
+  JSON as TAJSON,
+  JsonValue,
+} from 'ta-json';
 
-import { Contributor } from "./metadata-contributor";
+import { Contributor } from './metadata-contributor';
 
 export class JsonContributorConverter implements IPropertyConverter {
-    public serialize(property: Contributor): JsonValue {
-        // console.log("JsonContributorConverter.serialize()");
+  public serialize(property: Contributor): JsonValue {
+    // console.log("JsonContributorConverter.serialize()");
 
-        return TAJSON.serialize(property);
+    return TAJSON.serialize(property);
+  }
+
+  public deserialize(value: JsonValue): Contributor {
+    // console.log("JsonContributorConverter.deserialize()");
+
+    // if (value instanceof Array) {
+    //     return value.map((v) => {
+    //         return this.deserialize(v);
+    //     }) as Contributor[];
+    // } else
+    if (typeof value === 'string') {
+      const c = new Contributor();
+      c.Name = <string> value;
+
+      return c;
     }
 
-    public deserialize(value: JsonValue): Contributor {
-        // console.log("JsonContributorConverter.deserialize()");
+    return TAJSON.deserialize<Contributor>(value, Contributor);
+  }
 
-        // if (value instanceof Array) {
-        //     return value.map((v) => {
-        //         return this.deserialize(v);
-        //     }) as Contributor[];
-        // } else
-        if (typeof value === "string") {
-            const c = new Contributor();
-            c.Name = value as string;
-            return c;
-        } else {
-            return TAJSON.deserialize<Contributor>(value, Contributor);
-        }
-    }
-
-    public collapseArrayWithSingleItem(): boolean {
-        return true;
-    }
+  public collapseArrayWithSingleItem(): boolean {
+    return true;
+  }
 }

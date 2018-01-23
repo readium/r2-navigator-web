@@ -1,0 +1,17 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint-microsoft-contrib",
+    "tslint-config-airbnb"
+  ],
+  "jsRules": {},
+  "rules": {
+    "no-console": false,
+    "missing-jsdoc": false,
+    "no-relative-imports": false,
+    "export-name": false,
+    "typedef": [true, "call-signature", "parameter", "member-variable-declaration"],
+    "trailing-comma": [true, {"multiline": "always", "singleline": "never"}]
+  },
+  "rulesDirectory": []
+}

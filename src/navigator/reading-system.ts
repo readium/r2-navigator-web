@@ -1,19 +1,20 @@
-import { Publication } from '../streamer/publication'
-import { Rendition } from './rendition'
+import { Publication } from '../streamer/publication';
+import { Rendition } from './rendition';
 
 export class ReadingSystem {
 
-    private viewport: HTMLElement;
+  private viewport: HTMLElement;
 
-    constructor(config: any) {
-    }
+  constructor(config: any) {
+  }
 
-    initRenderer(viewport: HTMLElement) {
-        this.viewport = viewport;
-    }
+  public initRenderer(viewport: HTMLElement) {
+    this.viewport = viewport;
+  }
 
-    openRendition(pub: Publication): Rendition {
-        let rendition = new Rendition(pub, this.viewport);
-        return rendition;
-    }
+  public openRendition(pub: Publication): Rendition {
+    const rendition = new Rendition(pub, this.viewport);
+
+    return rendition;
+  }
 }

@@ -1,4 +1,4 @@
-import { Link } from "./publication-link";
+import { Link } from './publication-link';
 
 // import { IMeta } from "./metadata";
 
@@ -6,8 +6,8 @@ import { Link } from "./publication-link";
 ///// public OtherCollections: IPublicationCollection[];
 
 export interface IPublicationCollection {
-    Role: string;
-    // Metadata: IMeta[];
-    Links: Link[];
-    Children: IPublicationCollection[];
+  Role: string;
+  // Metadata: IMeta[];
+  Links: Link[];
+  Children: IPublicationCollection[];
 }

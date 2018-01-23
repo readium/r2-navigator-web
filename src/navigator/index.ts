@@ -1,3 +1,3 @@
-export {Navigator} from './navigator'
+export {Navigator} from './navigator';
 export {StreamerClient} from './streamer-client';
-export {ReadingSystem} from './reading-system'
+export {ReadingSystem} from './reading-system';

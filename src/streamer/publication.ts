@@ -1,16 +1,16 @@
-import {Publication as PublicationBase} from '../epub-model/publication'
+import { Publication as PublicationBase } from '../epub-model/publication';
 
 export class Publication extends PublicationBase {
-    private webpub: string;
+  public baseUri: string;
 
-    public baseUri: string;
+  private webpub: string;
 
-    constructor(webpub: string) {
-        super();
-        this.webpub = webpub;
-    }
+  constructor(webpub: string) {
+    super();
+    this.webpub = webpub;
+  }
 
-    getManifestJSON(): string {
-        return this.webpub;
-    }
+  public getManifestJSON(): string {
+    return this.webpub;
+  }
 }

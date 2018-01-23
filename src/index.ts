@@ -1,9 +1,9 @@
-import {readFileSync} from 'fs'
+import { readFileSync } from 'fs';
 
-import { StreamerClient } from './navigator/streamer-client'
+import { StreamerClient } from './navigator/streamer-client';
 
-let sc = new StreamerClient();
+const sc = new StreamerClient();
 
-let webpub = readFileSync('/Users/lilid/Documents/dev/ATB/bugs/manifest.json', 'utf8');
-let pub = sc.openPublicationFromJson(webpub);
+const webpub = readFileSync('/Users/lilid/Documents/dev/ATB/bugs/manifest.json', 'utf8');
+const pub = sc.openPublicationFromJson(webpub);
 console.log(pub.Context);
