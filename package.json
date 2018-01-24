@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "tsc --p tsconfig-test.json && webpack --config webpack-test.config.js && karma start karma.config.js",
+    "test:debug": "npm run test -- --singleRun=false",
     "lint": "tslint --project tsconfig-common.json -c tslint.json 'src/**/*.ts' 'test/**/*.ts'"
   },
   "keywords": [
