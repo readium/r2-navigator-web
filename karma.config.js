@@ -5,16 +5,24 @@ module.exports = function (config) {
     files: [
       'build_test_temp/test_bundle.js',
       {pattern: 'test/fixtures/**/*.*',  watched: false, included: false, served: true, nocache: false},
+      {pattern: 'lib/**/*.*',  watched: false, included: false, served: true, nocache: false},
     ],
     proxies: {
-      "/fixtures/publications": "/base/test/fixtures/publications"
+      "/fixtures/publications": "/base/test/fixtures/publications",
+      "/lib": "/base/lib"
+    },
+    customLaunchers: {
+      ChromeHeadlessWithSizeDefined: {
+        base: 'ChromeHeadless',
+        flags: ['--window-size=1024,768']
+      }
     },
     reporters: ['progress'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessWithSizeDefined'],
     singleRun: true,
     concurrency: Infinity
   })
