@@ -1,0 +1,11 @@
+* text eol=lf
+
+*.ts text
+*.json text
+*.html text
+*.css text
+*.ncx text
+
+*.jpg binary
+*.png binary
+*.ttf binary
