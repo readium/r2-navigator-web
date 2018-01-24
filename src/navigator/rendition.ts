@@ -3,7 +3,7 @@ import { PackageDocument } from '../streamer/readium-share-js-impl/package-docum
 import { IFrameLoader } from './iframe-loader';
 
 // tslint:disable-next-line:import-name
-import ReaderView from 'readium-shared-js';
+import { ReaderView } from 'readium-shared-js';
 
 export class Rendition {
 
