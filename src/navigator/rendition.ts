@@ -2,7 +2,7 @@ import { Publication } from '../streamer/publication';
 import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from './iframe-loader';
 
-// tslint:disable-next-line:import-name
+// tslint:disable-next-line:no-implicit-dependencies
 import { ReaderView } from 'readium-shared-js';
 
 export class Rendition {

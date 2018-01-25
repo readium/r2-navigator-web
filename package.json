@@ -4,7 +4,7 @@
   "description": "Readium Next Generation",
   "main": "module.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && rollup -c",
     "build:test": "tsc --p tsconfig-test.json && webpack --config webpack-test.config.js",
     "test": "npm run build:test && karma start karma.config.js",
     "test:debug": "npm run test -- --singleRun=false",

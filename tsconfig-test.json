@@ -3,7 +3,6 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "noImplicitAny": false,
     "outDir": "./build_test_temp",
     "rootDir": "./",
     "rootDirs": [
