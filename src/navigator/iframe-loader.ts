@@ -6,7 +6,8 @@ export class IFrameLoader {
 
   constructor(baseURI: string) {
     this.baseURI = baseURI;
-    this.isIE = (window.navigator.userAgent.indexOf('Trident') > 0 || window.navigator.userAgent.indexOf('Edge') > 0);
+    this.isIE = (window.navigator.userAgent.indexOf('Trident') > 0 ||
+                 window.navigator.userAgent.indexOf('Edge') > 0);
   }
 
   public loadIframe(iframe: HTMLIFrameElement, src: any, callback: any, context: any, attachedData: any) {
@@ -20,7 +21,7 @@ export class IFrameLoader {
     });
   }
 
-  public async fetchContentDocument(src: string) {
+  public async fetchContentDocument(src: string): Promise<string> {
     const resp = await fetch(src);
 
     return resp.text();
@@ -48,6 +49,7 @@ export class IFrameLoader {
       // so we're doing it manually. See:
       // https://github.com/MSOpenTech/winstore-jscompat/
       if ((<any>window).MSApp && (<any>window).MSApp.execUnsafeLocalFunction) {
+        // tslint:disable-next-line:no-disable-auto-sanitization
         (<any>window).MSApp.execUnsafeLocalFunction(() => {
           iframe.contentWindow.document.write(contentDocumentData);
         });

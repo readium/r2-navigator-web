@@ -39,6 +39,16 @@ export class Navigator {
     return this.paginationChangedPromise();
   }
 
+  public getScreenBegin(): Location | undefined | null {
+    return this.getCurrentLocation();
+  }
+
+  public getScreenEnd(): Location | undefined | null {
+    const cfi = this.reader.getLastVisibleCfi();
+
+    return cfi ? new Location(cfi.contentCFI, cfi.idref) : cfi;
+  }
+
   private paginationChangedPromise(): Promise<void> {
     return new Promise<void>((resolve: any) => {
       const readium = (<any>window).ReadiumSDK;

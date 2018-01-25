@@ -1,3 +1,5 @@
+// tslint:disable:no-non-null-assertion
+
 import { assert } from 'chai';
 import { Location } from '../src/navigator/location';
 import { Navigator } from '../src/navigator/navigator';
@@ -40,10 +42,9 @@ describe('Navigator', () => {
 
       assert(loc);
 
-      if (loc) {
-        assert.equal(loc.getLocation(), '/4/2[title-page]/2/1:0');
-        assert.equal(loc.getHref(), 'OEBPS/title-page.html');
-      }
+      assert.equal(loc!.getLocation(), '/4/2[title-page]/2/1:0');
+      assert.equal(loc!.getHref(), 'OEBPS/title-page.html');
+
     });
   });
 });
