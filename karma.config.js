@@ -14,7 +14,7 @@ module.exports = function (config) {
     customLaunchers: {
       ChromeHeadlessWithSizeDefined: {
         base: 'ChromeHeadless',
-        flags: ['--window-size=1024,768']
+        flags: ['--window-size=800,600']
       }
     },
     reporters: ['progress'],
