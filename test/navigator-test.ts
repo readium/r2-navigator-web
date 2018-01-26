@@ -90,11 +90,12 @@ describe('Navigator', () => {
       await navigator.nextScreen();
       await navigator.nextScreen();
 
-      assert.equal(navigator.getScreenCountSpine(), 13);
+      assert.equal(navigator.getScreenCountSpine(), 8);
 
-      await navigator.gotoScreen(5);
+      await navigator.gotoScreenSpine(5);
 
       assert.equal(navigator.isFirstScreenSpine(), false);
+      assert.equal(navigator.getCurrentScreenIndexSpine(), 5);
     });
   });
 });

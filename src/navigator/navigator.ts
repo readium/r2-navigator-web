@@ -62,7 +62,7 @@ export class Navigator {
     const info = this.reader.getPaginationInfo();
     const pageInfo = info.openPages[0];
 
-    console.log(JSON.stringify(info));
+    // console.log(JSON.stringify(info));
 
     return pageInfo.spineItemPageIndex === 0;
   }
@@ -81,10 +81,26 @@ export class Navigator {
     return Math.ceil(pageInfo.spineItemPageCount / info.openPages.length);
   }
 
-  public async gotoScreen(screenIndex: number): Promise<void> {
-    this.reader.openPageIndex(screenIndex);
+  public async gotoScreenSpine(screenIndex: number): Promise<void> {
+    const openPages = this.reader.getPaginationInfo().openPages;
+    if (!openPages || openPages.length === 0) {
+      return Promise.resolve();
+    }
+
+    if (screenIndex < 0 || screenIndex >= this.getScreenCountSpine()) {
+      return Promise.resolve();
+    }
+
+    this.reader.openPageIndex(screenIndex * openPages.length);
 
     return this.paginationChangedPromise();
+  }
+
+  public getCurrentScreenIndexSpine(): number {
+    const info = this.reader.getPaginationInfo();
+    const pageInfo = info.openPages[0];
+
+    return pageInfo.spineItemPageIndex / info.openPages.length;
   }
 
   private paginationChangedPromise(): Promise<void> {
