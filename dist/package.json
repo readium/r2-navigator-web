@@ -7,5 +7,6 @@
   "epub",
   "epub3"
  ],
- "main": "readium-ng.js"
+ "main": "readium-ng.js",
+ "types": "readium-ng.d.ts"
 }
