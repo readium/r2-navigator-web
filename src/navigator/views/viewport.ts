@@ -37,6 +37,14 @@ export class Viewport {
     this.render();
   }
 
+  public async nextScreen(): Promise<void> {
+    await this.renderAtOffset(this.contentViewOffset + this.viewportSize);
+  }
+
+  public async prevScreen(): Promise<void> {
+    await this.renderAtOffset(this.contentViewOffset - this.viewportSize);
+  }
+
   private render(): void {
     const containerElement = this.bookContentView.containerElement();
     containerElement.style.transform = `translateX(${-this.contentViewOffset}px)`;

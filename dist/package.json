@@ -1,0 +1,11 @@
+{
+ "name": "readium-ng",
+ "version": "0.0.1-alpha",
+ "description": "Readium NG",
+ "keywords": [
+  "readium",
+  "epub",
+  "epub3"
+ ],
+ "main": "readium-ng.js"
+}
