@@ -1,22 +1,30 @@
 import { Publication } from '../streamer/publication';
 import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from './iframe-loader';
-
-// tslint:disable-next-line:no-implicit-dependencies
-import { ReaderView } from 'readium-shared-js';
+import { LayoutView } from './views/layout-view';
+import { Viewport } from './views/viewport';
 
 export class Rendition {
 
-  public reader: any;
+  public viewport: Viewport;
 
   private pub: Publication;
-  private viewport: HTMLElement;
+
+  private pageWidth: number;
+  private pageHeight: number;
 
   constructor(pub: Publication, viewport: HTMLElement) {
     this.pub = pub;
-    this.viewport = viewport;
+    this.viewport = new Viewport(viewport);
+  }
 
-    this.initReader();
+  public setPageSize(pageWidth: number, pageHeight: number): void {
+    this.pageWidth = pageWidth;
+    this.pageHeight = pageHeight;
+  }
+
+  public getPageWidth(): number {
+    return this.pageWidth;
   }
 
   public getPublication(): Publication {
@@ -24,24 +32,11 @@ export class Rendition {
   }
 
   public render(): Promise<void> {
-    const packageDoc = new PackageDocument(this.pub);
-    const openBookData = { ...packageDoc.getSharedJsPackageData() };
-    this.reader.openBook(openBookData);
+    const bookView = new LayoutView(this.pub);
+    bookView.setPageSize(this.pageWidth, this.pageHeight);
 
-    return new Promise<void>((resolve: any) => {
-      const readium = (<any>window).ReadiumSDK;
-      this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
-        resolve();
-      });
-    });
-  }
+    this.viewport.setView(bookView);
 
-  private initReader(): void {
-    const readerOptions: any = {};
-    readerOptions.el = this.viewport;
-    readerOptions.iframeLoader = new IFrameLoader(this.pub.baseUri);
-    readerOptions.fonts = {};
-
-    this.reader = new ReaderView(readerOptions);
+    return Promise.resolve();
   }
 }

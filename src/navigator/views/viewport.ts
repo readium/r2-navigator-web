@@ -1,12 +1,15 @@
-import { LayoutView } from './layout-view';
+import { LayoutView, PaginationInfo } from './layout-view';
 import { View } from './view';
 
 export class Viewport {
-  private bookContentView: LayoutView;
+  private bookView: LayoutView;
 
   private viewportSize: number;
 
-  private contentViewOffset: number;
+  private viewOffset: number;
+
+  private startPos?: PaginationInfo;
+  private endPos?: PaginationInfo;
 
   private root: HTMLElement;
 
@@ -15,38 +18,67 @@ export class Viewport {
   }
 
   public setView(v: LayoutView): void {
-    this.bookContentView = v;
-    this.bookContentView.attatchToHost(this.root);
+    this.bookView = v;
+    this.bookView.attatchToHost(this.root);
+  }
+
+  public getViewportSize(): number {
+    return this.viewportSize;
   }
 
   public setViewportSize(size: number): void {
     this.viewportSize = size;
   }
 
+  public getStartPosition(): PaginationInfo | undefined {
+    return this.startPos;
+  }
+
+  public getEndPosition(): PaginationInfo | undefined {
+    return this.endPos;
+  }
+
   public async renderAtOffset(position: number): Promise<void> {
-    await this.bookContentView.ensureConentLoadedAtRange(position, position + this.viewportSize);
-    this.contentViewOffset = position;
+    await this.bookView.ensureConentLoadedAtRange(position, position + this.viewportSize);
+    this.viewOffset = position;
 
     this.render();
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
-    await this.bookContentView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
-    this.contentViewOffset = 0;
+    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
+    this.viewOffset = 0;
 
     this.render();
   }
 
   public async nextScreen(): Promise<void> {
-    await this.renderAtOffset(this.contentViewOffset + this.viewportSize);
+    await this.renderAtOffset(this.viewOffset + this.viewportSize);
   }
 
   public async prevScreen(): Promise<void> {
-    await this.renderAtOffset(this.contentViewOffset - this.viewportSize);
+    await this.renderAtOffset(this.viewOffset - this.viewportSize);
+  }
+
+  private updatePositions(): void {
+    const startInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
+    if (startInfo.length > 0) {
+      this.startPos = startInfo[startInfo.length - 1];
+    } else {
+      this.startPos = undefined;
+    }
+
+    const endInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset + this.viewportSize);
+    if (endInfo.length > 0) {
+      this.endPos = endInfo[0];
+    } else {
+      this.endPos = undefined;
+    }
   }
 
   private render(): void {
-    const containerElement = this.bookContentView.containerElement();
-    containerElement.style.transform = `translateX(${-this.contentViewOffset}px)`;
+    const containerElement = this.bookView.containerElement();
+    containerElement.style.transform = `translateX(${-this.viewOffset}px)`;
+    this.updatePositions();
   }
 }

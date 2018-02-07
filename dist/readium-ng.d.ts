@@ -21,6 +21,13 @@ export abstract class View {
   abstract attatchToHost(host: HTMLElement): void;
 }
 
+export class PaginationInfo {
+  spineItemIndex: number;
+  spineItemPageCount: number;
+  pageIndex: number;
+  contentCfi: string;
+}
+
 export class LayoutView extends View {
   private spineItemViewStatus;
   private host;
@@ -41,6 +48,7 @@ export class LayoutView extends View {
   getLoadedStartPostion(): number;
   getLoadedEndPosition(): number;
   isEmpty(): boolean;
+  getPaginationInfoAtOffset(offset: number): PaginationInfo[];
   ensureConentLoadedAtRange(start: number, end: number): Promise<void>;
   ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number): Promise<void>;
   private clearLoadedContent();
@@ -55,17 +63,53 @@ export class LayoutView extends View {
 }
 
 export class Viewport {
-  private bookContentView;
-  private viewportSize;
-  private contentViewOffset;
-  private root;
-  constructor(root: HTMLElement);
-  setView(v: LayoutView): void;
-  setViewportSize(size: number): void;
-  renderAtOffset(position: number): Promise<void>;
-  renderAtSpineItem(spineItemIndex: number): Promise<void>;
+    private bookView;
+    private viewportSize;
+    private viewOffset;
+    private startPos?;
+    private endPos?;
+    private root;
+    constructor(root: HTMLElement);
+    setView(v: LayoutView): void;
+    getViewportSize(): number;
+    setViewportSize(size: number): void;
+    getStartPosition(): PaginationInfo | undefined;
+    getEndPosition(): PaginationInfo | undefined;
+    renderAtOffset(position: number): Promise<void>;
+    renderAtSpineItem(spineItemIndex: number): Promise<void>;
+    nextScreen(): Promise<void>;
+    prevScreen(): Promise<void>;
+    private updatePositions();
+    private render();
+}
+
+export class Rendition {
+  viewport: Viewport;
+  private pub;
+  private pageWidth;
+  private pageHeight;
+  constructor(pub: Publication, viewport: HTMLElement);
+  setPageSize(pageWidth: number, pageHeight: number): void;
+  getPageWidth(): number;
+  getPublication(): Publication;
+  render(): Promise<void>;
+}
+
+export class Navigator {
+  private viewport;
+  private rendition;
+  private pub;
+  constructor(rendition: Rendition);
   nextScreen(): Promise<void>;
-  prevScreen(): Promise<void>;
-  private render();
+  previousScreen(): Promise<void>;
+  getCurrentLocation(): Location | undefined | null;
+  gotoLocation(loc: Location): Promise<void>;
+  getScreenBegin(): Location | undefined | null;
+  getScreenEnd(): Location | undefined | null;
+  isFirstScreen(): boolean;
+  isLastScreen(): boolean;
+  isFirstScreenSpine(): boolean;
+  isFinalScreenSpine(): boolean;
+  getScreenCountSpine(): number;
 }
 }

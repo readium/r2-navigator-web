@@ -9,6 +9,13 @@ import { View } from './view';
 // tslint:disable-next-line:no-implicit-dependencies
 import { Package as ReadiumPackage } from 'readium-shared-js';
 
+export class PaginationInfo {
+  public spineItemIndex: number;
+  public spineItemPageCount: number;
+  public pageIndex: number;
+  public contentCfi: string;
+}
+
 class SpineItemViewStatus {
   public view: SpineItemView;
   public viewContainer: HTMLElement;
@@ -88,6 +95,27 @@ export class LayoutView extends View {
 
   public isEmpty(): boolean {
     return this.loadedContentRange[0] === this.loadedContentRange[1];
+  }
+
+  public getPaginationInfoAtOffset(offset: number): PaginationInfo[] {
+    const res: PaginationInfo[] = [];
+    if (offset < this.getLoadedStartPostion() || offset > this.getLoadedEndPosition()) {
+      return res;
+    }
+
+    for (const siv of this.spineItemViewStatus) {
+      if (offset >= siv.offset &&
+          offset <= siv.offset + siv.view.getTotalPageCount() * this.pageWidth) {
+        res.push({
+          spineItemIndex: siv.spineItemIndex,
+          spineItemPageCount: siv.view.getTotalPageCount(),
+          pageIndex: Math.floor((offset - siv.offset) / this.pageWidth),
+          contentCfi: '',
+        });
+      }
+    }
+
+    return res;
   }
 
   public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {

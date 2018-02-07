@@ -1,36 +1,39 @@
+import { Publication } from '../streamer/publication';
 import { Location } from './location';
 import { Rendition } from './rendition';
+import { Viewport } from './views/viewport';
 
 export class Navigator {
 
-  private reader: any;
+  private rendition: Rendition;
+
+  private pub: Publication;
 
   constructor(rendition: Rendition) {
-    this.reader = rendition.reader;
+    this.rendition = rendition;
+    this.pub = rendition.getPublication();
   }
 
-  public nextScreen(): Promise<void> {
-    this.reader.openPageNext();
-
-    return this.paginationChangedPromise();
+  public async nextScreen(): Promise<void> {
+    await this.rendition.viewport.nextScreen();
   }
 
-  public previousScreen(): Promise<void> {
-    this.reader.openPagePrev();
-
-    return this.paginationChangedPromise();
+  public async previousScreen(): Promise<void> {
+    await this.rendition.viewport.prevScreen();
   }
 
   public getCurrentLocation(): Location | undefined | null {
-    const cfi = this.reader.getFirstVisibleCfi();
+    const pos = this.rendition.viewport.getStartPosition();
 
-    return cfi ? new Location(cfi.contentCFI, cfi.idref) : cfi;
+    return pos ? new Location(pos.contentCfi, this.pub.Spine[pos.spineItemIndex].Href) : pos;
   }
 
   public gotoLocation(loc: Location): Promise<void> {
-    this.reader.openSpineItemElementCfi(loc.getHref(), loc.getLocation());
+    // this.reader.openSpineItemElementCfi(loc.getHref(), loc.getLocation());
 
-    return this.paginationChangedPromise();
+    // return this.paginationChangedPromise();
+
+    return Promise.resolve();
   }
 
   public getScreenBegin(): Location | undefined | null {
@@ -38,77 +41,63 @@ export class Navigator {
   }
 
   public getScreenEnd(): Location | undefined | null {
-    const cfi = this.reader.getLastVisibleCfi();
+    const pos = this.rendition.viewport.getEndPosition();
 
-    return cfi ? new Location(cfi.contentCFI, cfi.idref) : cfi;
+    return pos ? new Location(pos.contentCfi, this.pub.Spine[pos.spineItemIndex].Href) : pos;
   }
 
   public isFirstScreen(): boolean {
-    const info = this.reader.getPaginationInfo();
-    const pageInfo = info.openPages[0];
+    const pos = this.rendition.viewport.getStartPosition();
+    if (!pos) {
+      return false;
+    }
 
-    return pageInfo.spineItemIndex === 0 && pageInfo.spineItemPageIndex === 0;
+    return pos.spineItemIndex === 0 && pos.pageIndex === 0;
   }
 
   public isLastScreen(): boolean {
-    const info = this.reader.getPaginationInfo();
-    const pageInfo = info.openPages[info.openPages.length - 1];
+    const pos = this.rendition.viewport.getEndPosition();
+    if (!pos) {
+      return false;
+    }
 
-    return pageInfo.spineItemIndex + 1 === pageInfo.spineItemCount &&
-           pageInfo.spineItemPageIndex + 1 === pageInfo.spineItemPageCount;
+    return pos.spineItemIndex >= this.pub.Spine.length &&
+           pos.pageIndex + 1 === pos.spineItemPageCount;
   }
 
   public isFirstScreenSpine(): boolean {
-    const info = this.reader.getPaginationInfo();
-    const pageInfo = info.openPages[0];
+    const pos = this.rendition.viewport.getStartPosition();
+    if (!pos) {
+      return false;
+    }
 
-    // console.log(JSON.stringify(info));
-
-    return pageInfo.spineItemPageIndex === 0;
+    return pos.pageIndex === 0;
   }
 
   public isFinalScreenSpine(): boolean {
-    const info = this.reader.getPaginationInfo();
-    const pageInfo = info.openPages[info.openPages.length - 1];
+    const pos = this.rendition.viewport.getEndPosition();
+    if (!pos) {
+      return false;
+    }
 
-    return pageInfo.spineItemPageIndex + 1 === pageInfo.spineItemPageCount;
+    return pos.pageIndex + 1 === pos.spineItemPageCount;
   }
 
   public getScreenCountSpine(): number {
-    const info = this.reader.getPaginationInfo();
-    const pageInfo = info.openPages[0];
+    // const pos = this.rendition.viewport.getStartPosition();
+    // if (!pos) {
+    //   return -1;
+    // }
 
-    return Math.ceil(pageInfo.spineItemPageCount / info.openPages.length);
+    // return pos.spineItemPageCount;
+    return -1;
   }
 
-  public async gotoScreenSpine(screenIndex: number): Promise<void> {
-    const openPages = this.reader.getPaginationInfo().openPages;
-    if (!openPages || openPages.length === 0) {
-      return Promise.resolve();
-    }
+  // public async gotoScreenSpine(screenIndex: number): Promise<void> {
+  //   return Promise.resolve();
+  // }
 
-    if (screenIndex < 0 || screenIndex >= this.getScreenCountSpine()) {
-      return Promise.resolve();
-    }
-
-    this.reader.openPageIndex(screenIndex * openPages.length);
-
-    return this.paginationChangedPromise();
-  }
-
-  public getCurrentScreenIndexSpine(): number {
-    const info = this.reader.getPaginationInfo();
-    const pageInfo = info.openPages[0];
-
-    return pageInfo.spineItemPageIndex / info.openPages.length;
-  }
-
-  private paginationChangedPromise(): Promise<void> {
-    return new Promise<void>((resolve: any) => {
-      const readium = (<any>window).ReadiumSDK;
-      this.reader.once(readium.Events.PAGINATION_CHANGED, () => {
-        resolve();
-      });
-    });
-  }
+  // public getCurrentScreenIndexSpine(): number {
+  //   return -1;
+  // }
 }
