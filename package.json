@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "jquery": "^3.2.1",
-    "ta-json": "^2.3.1"
+    "ta-json": "^2.3.1",
+    "readium-shared-js": "latest"
   }
 }
