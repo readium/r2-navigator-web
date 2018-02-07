@@ -2,9 +2,6 @@ import { Link } from '../../epub-model/publication-link';
 import { IFrameLoader } from '../iframe-loader';
 import { View } from './view';
 
-// tslint:disable-next-line:import-name
-import * as $ from 'jquery';
-
 // tslint:disable-next-line:no-implicit-dependencies
 import { ReflowableView, StyleCollection, ViewerSettings } from 'readium-shared-js';
 
@@ -43,7 +40,7 @@ export class SpineItemView extends View {
     this.spineItemIndex = this.spine.indexOf(spineItem);
 
     const readiumViewParams = {
-      $viewport: $(this.host),
+      $viewport: this.host,
       spine: this.rsjSpine,
       userStyles: new StyleCollection(),
       bookStyles: new StyleCollection(),
