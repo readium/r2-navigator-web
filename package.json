@@ -29,6 +29,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-mocha": "^1.3.0",
     "mocha": "^5.0.0",
+    "rollup": "^0.55.3",
     "tslint": "^5.9.1",
     "tslint-config-airbnb": "^5.4.2",
     "tslint-eslint-rules": "^4.1.1",
