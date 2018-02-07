@@ -2,7 +2,9 @@
   "name": "readium-ng",
   "version": "0.0.1",
   "description": "Readium Next Generation",
-  "main": "module.js",
+  "main": "dist/readium-ng.js",
+  "module": "dist/readium-ng.js",
+  "types": "dist/readium-ng.d.ts",
   "scripts": {
     "build": "tsc && rollup -c",
     "build:test": "tsc --p tsconfig-test.json && webpack --config webpack-test.config.js",
