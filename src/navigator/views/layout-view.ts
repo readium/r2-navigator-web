@@ -31,6 +31,7 @@ export class LayoutView extends View {
 
   private publication: Publication;
 
+  // tslint:disable-next-line:no-any
   private rsjPackage: any;
 
   private iframeLoader: IFrameLoader;
@@ -247,7 +248,6 @@ export class LayoutView extends View {
     const spineItemView = new SpineItemView(this.iframeLoader,
                                             this.publication.Spine,
                                             this.rsjPackage.spine);
-    // const spineItemView = new SpineItemViewMock(this.iframeLoader, this.publication.Spine);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
     spineItemViewContainer.style.position = 'absolute';

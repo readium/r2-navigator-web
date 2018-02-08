@@ -15,6 +15,9 @@ export class Viewport {
 
   constructor(root: HTMLElement) {
     this.root = root;
+
+    this.nextScreen = this.nextScreen.bind(this);
+    this.prevScreen = this.prevScreen.bind(this);
   }
 
   public setView(v: LayoutView): void {
@@ -39,10 +42,10 @@ export class Viewport {
   }
 
   public async renderAtOffset(position: number): Promise<void> {
-    await this.bookView.ensureConentLoadedAtRange(position, position + this.viewportSize);
     this.viewOffset = position;
-
     this.render();
+
+    await this.bookView.ensureConentLoadedAtRange(position, position + this.viewportSize);
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {

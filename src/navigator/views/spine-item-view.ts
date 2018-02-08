@@ -3,7 +3,8 @@ import { IFrameLoader } from '../iframe-loader';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
-import { ReflowableView, StyleCollection, ViewerSettings } from 'readium-shared-js';
+// tslint:disable-next-line:max-line-length
+import { PaginationChangedEventArgs, ReflowableView, StyleCollection, ViewerSettings } from 'readium-shared-js';
 
 export class SpineItemPaginationInfo {
   public spineItemPageIndex: number;
@@ -16,8 +17,10 @@ export class SpineItemView extends View {
   protected iframeLoader: IFrameLoader;
 
   protected spine: Link[];
+  // tslint:disable-next-line:no-any
   protected rsjSpine: any;
 
+  // tslint:disable-next-line:no-any
   protected rsjViewSettings: any = new ViewerSettings({ syntheticSpread: 'single' });
 
   protected spineItem: Link;
@@ -29,6 +32,7 @@ export class SpineItemView extends View {
   // tslint:disable-next-line:no-any
   protected contentViewImpl: any;
 
+  // tslint:disable-next-line:no-any
   public constructor(iframeLoader: IFrameLoader, spine: Link[], rsjSpine: any) {
     super();
     this.iframeLoader = iframeLoader;
@@ -104,8 +108,10 @@ export class SpineItemView extends View {
     });
   }
 
-  private paginationChangedHanlder(paras: any, handler: any, resolve: any):void  {
-    const readium = (<any>window).ReadiumSDK;
+  // tslint:disable-next-line:max-line-length
+  private paginationChangedHanlder(paras: PaginationChangedEventArgs, handler: (paras: PaginationChangedEventArgs) => void,
+                                   resolve: () => void):void  {
+    const readium = this.getReadium();
     const pageInfo = paras.paginationInfo.openPages[0];
     if (pageInfo.spineItemIndex === this.spineItemIndex) {
       this.contentViewImpl.removeListener(readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
@@ -117,12 +123,18 @@ export class SpineItemView extends View {
   }
 
   private paginationChangedPromise(): Promise<void> {
-    return new Promise<void>((resolve: any) => {
-      const readium = (<any>window).ReadiumSDK;
-      const handler = (paras: any) => {
+    return new Promise<void>((resolve: () => void) => {
+      const handler = (paras: PaginationChangedEventArgs) => {
         this.paginationChangedHanlder(paras, handler, resolve);
       };
-      this.contentViewImpl.on(readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED, handler);
+      this.contentViewImpl.on(this.getReadium().InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+                              handler);
     });
+  }
+
+  // tslint:disable-next-line:no-any
+  private getReadium(): any {
+    // tslint:disable-next-line:no-any
+    return (<any>window).ReadiumSDK;
   }
 }
