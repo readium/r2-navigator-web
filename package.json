@@ -2,9 +2,9 @@
   "name": "readium-ng",
   "version": "0.0.1",
   "description": "Readium Next Generation",
-  "main": "dist/readium-ng.umd.js",
-  "module": "dist/readium-ng.esm.js",
-  "types": "dist/readium-ng.d.ts",
+  "main": "./dist/readium-ng.umd.js",
+  "module": "./dist/readium-ng.esm.js",
+  "types": "./dist/readium-ng.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",

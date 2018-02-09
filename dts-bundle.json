@@ -1,5 +1,6 @@
 {
   "name": "readium-ng",
-  "main": "dist/navigator/index.d.ts",
-  "out": "../readium-ng.d.ts"
+  "main": "./dist/index.d.ts",
+  "out": "readium-ng.d.ts",
+  "outputAsModuleFolder": true
 }
