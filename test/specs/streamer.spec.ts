@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai';
 
-import { StreamerClient } from '../src/navigator/streamer-client';
-import { Publication } from '../src/streamer/publication';
+import { StreamerClient } from '../../src/navigator/streamer-client';
+import { Publication } from '../../src/streamer/publication';
 
 describe('StreamerClient', () => {
   describe('#openPublication()', () => {

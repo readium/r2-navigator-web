@@ -1,11 +1,11 @@
 // tslint:disable:no-non-null-assertion
 
 import { assert } from 'chai';
-import { Location } from '../src/navigator/location';
-import { Navigator } from '../src/navigator/navigator';
-import { Publication } from '../src/streamer/publication';
+import { Location } from '../../src/navigator/location';
+import { Navigator } from '../../src/navigator/navigator';
+import { Publication } from '../../src/streamer/publication';
 
-import { openRendition } from './helpers/reader-helper';
+import { openRendition } from '../helpers/reader-helper';
 
 describe('Navigator', () => {
 
@@ -18,7 +18,7 @@ describe('Navigator', () => {
     const head = document.querySelector('head');
     if (head) {
       head.innerHTML +=
-      '<link rel="stylesheet" type="text/css" href="lib/sdk.css">';
+      '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 

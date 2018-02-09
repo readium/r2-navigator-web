@@ -3,13 +3,11 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['mocha', 'chai'],
     files: [
-      'build_test_temp/test_bundle.js',
-      {pattern: 'test/fixtures/**/*.*',  watched: false, included: false, served: true, nocache: false},
-      {pattern: 'lib/**/*.*',  watched: false, included: false, served: true, nocache: false},
+      'dist/bundle.js',
+      {pattern: 'fixtures/**/*.*',  watched: false, included: false, served: true, nocache: false}
     ],
     proxies: {
-      "/fixtures/publications": "/base/test/fixtures/publications",
-      "/lib": "/base/lib"
+      "/fixtures": "/base/fixtures"
     },
     customLaunchers: {
       ChromeHeadlessWithSizeDefined: {

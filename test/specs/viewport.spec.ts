@@ -1,12 +1,12 @@
 import { assert } from 'chai';
-import { Location } from '../src/navigator/location';
-import { Navigator } from '../src/navigator/navigator';
-import { ReadingSystem } from '../src/navigator/reading-system';
-import { StreamerClient } from '../src/navigator/streamer-client';
-import { LayoutView } from '../src/navigator/views/layout-view';
-import { Viewport } from '../src/navigator/views/viewport';
-import { Publication } from '../src/streamer/publication';
-import { openRendition } from './helpers/reader-helper';
+import { Location } from '../../src/navigator/location';
+import { Navigator } from '../../src/navigator/navigator';
+import { ReadingSystem } from '../../src/navigator/reading-system';
+import { StreamerClient } from '../../src/navigator/streamer-client';
+import { LayoutView } from '../../src/navigator/views/layout-view';
+import { Viewport } from '../../src/navigator/views/viewport';
+import { Publication } from '../../src/streamer/publication';
+import { openRendition } from '../helpers/reader-helper';
 
 describe('Viewport', () => {
 
@@ -18,7 +18,7 @@ describe('Viewport', () => {
     const head = document.querySelector('head');
     if (head) {
       head.innerHTML +=
-      '<link rel="stylesheet" type="text/css" href="lib/sdk.css">';
+      '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
