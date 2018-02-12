@@ -13,6 +13,10 @@ export class Viewport {
 
   private root: HTMLElement;
 
+  private hasPendingAction: boolean = false;
+
+  private scrollEnabled: boolean = false;
+
   constructor(root: HTMLElement) {
     this.root = root;
 
@@ -23,6 +27,13 @@ export class Viewport {
   public setView(v: LayoutView): void {
     this.bookView = v;
     this.bookView.attatchToHost(this.root);
+  }
+
+  public enableScroll(e: boolean): void {
+    this.scrollEnabled = e;
+    if (this.scrollEnabled) {
+      this.initScrolling();
+    }
   }
 
   public getViewportSize(): number {
@@ -56,11 +67,34 @@ export class Viewport {
   }
 
   public async nextScreen(): Promise<void> {
+    this.hasPendingAction = true;
     await this.renderAtOffset(this.viewOffset + this.viewportSize);
+    this.hasPendingAction = false;
   }
 
   public async prevScreen(): Promise<void> {
+    this.hasPendingAction = true;
     await this.renderAtOffset(this.viewOffset - this.viewportSize);
+    this.hasPendingAction = false;
+  }
+
+  private initScrolling(): void {
+    this.root.style.overflowX = 'scroll';
+    this.root.style.overflowY = 'hidden';
+
+    this.root.addEventListener('scroll', async (e) => {
+      // console.log(this.root.scrollLeft);
+      this.viewOffset = this.root.scrollLeft;
+      if (this.hasPendingAction) {
+        return;
+      }
+
+      if (this.viewOffset + this.viewportSize >= this.bookView.loadedRangeLength()) {
+        await this.nextScreen();
+      } else if (this.viewOffset <= 0 && this.bookView.hasMoreBeforeStart()) {
+        await this.prevScreen();
+      }
+    });
   }
 
   private updatePositions(): void {
@@ -80,8 +114,13 @@ export class Viewport {
   }
 
   private render(): void {
-    const containerElement = this.bookView.containerElement();
-    containerElement.style.transform = `translateX(${-this.viewOffset}px)`;
+    if (this.scrollEnabled) {
+      this.root.scrollLeft = this.viewOffset;
+    } else {
+      const containerElement = this.bookView.containerElement();
+      containerElement.style.transform = `translateX(${-this.viewOffset}px)`;
+    }
+
     this.updatePositions();
   }
 }

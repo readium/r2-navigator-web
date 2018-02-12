@@ -55,6 +55,7 @@ export class LayoutView extends View {
   public setPageSize(width: number, height: number): void {
     this.pageWidth = width;
     this.pageHeight = height;
+    this.layoutRoot.style.height = `${height}px`;
   }
 
   public render(): void {
@@ -98,6 +99,10 @@ export class LayoutView extends View {
     return this.loadedContentRange[0] === this.loadedContentRange[1];
   }
 
+  public loadedRangeLength(): number {
+    return this.loadedContentRange[1] - this.loadedContentRange[0];
+  }
+
   public getPaginationInfoAtOffset(offset: number): PaginationInfo[] {
     const res: PaginationInfo[] = [];
     if (offset < this.getLoadedStartPostion() || offset > this.getLoadedEndPosition()) {
@@ -127,6 +132,8 @@ export class LayoutView extends View {
     while (start < this.getLoadedStartPostion() && this.hasMoreBeforeStart()) {
       await this.loadNewSpineItemAtStart();
     }
+
+    this.layoutRoot.style.width = `${this.loadedRangeLength()}px`;
   }
 
   // tslint:disable-next-line:max-line-length
@@ -168,7 +175,8 @@ export class LayoutView extends View {
   private initSpineItemViews(): void {
     this.layoutRoot = document.createElement('div');
     this.layoutRoot.setAttribute('id', 'layout-view-root');
-    this.layoutRoot.style.position = 'absolute';
+    this.layoutRoot.style.transform = 'translateX(0px)';
+    // this.layoutRoot.style.position = 'absolute';
   }
 
   private startViewStatus(): SpineItemViewStatus {
