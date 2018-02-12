@@ -20,18 +20,17 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "ts-loader"
       },
-
-      // Not used until 'readium-shared-js' has a source map
-      // // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      // {
-      //   enforce: "pre",
-      //   test: /\.js$/,
-      //   loader: "source-map-loader",
-      //   exclude: [
-      //     // this package has issues with this loader
-      //     path.resolve(__dirname,"../node_modules/ta-json")
-      //   ]
-      // }
+      
+      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+      {
+        enforce: "pre",
+        test: /\.js$/,
+        loader: "source-map-loader",
+        exclude: [
+          // this package has issues with this loader
+          path.resolve(__dirname,"../node_modules/ta-json")
+        ]
+      }
     ]
   }
 };
