@@ -2,16 +2,18 @@ import { Link } from '../../epub-model/publication-link';
 import { IFrameLoader } from '../iframe-loader';
 import { View } from './view';
 
-// tslint:disable-next-line:no-implicit-dependencies
-// tslint:disable-next-line:max-line-length
-import { PaginationChangedEventArgs, ReflowableView, StyleCollection, ViewerSettings } from 'readium-shared-js';
+import {
+  PaginationChangedEventArgs,
+  ReflowableView,
+  StyleCollection,
+  ViewerSettings,
+} from 'readium-shared-js';
 
 export class SpineItemPaginationInfo {
   public spineItemPageIndex: number;
 }
 
 export class SpineItemView extends View {
-
   protected host: HTMLElement;
 
   protected iframeLoader: IFrameLoader;
@@ -54,7 +56,7 @@ export class SpineItemView extends View {
 
     const reader = {
       fonts: {},
-      viewerSettings: () => {return this.rsjViewSettings; },
+      viewerSettings: () => this.rsjViewSettings,
     };
     this.contentViewImpl = new ReflowableView(readiumViewParams, reader);
 
@@ -109,13 +111,18 @@ export class SpineItemView extends View {
   }
 
   // tslint:disable-next-line:max-line-length
-  private paginationChangedHanlder(paras: PaginationChangedEventArgs, handler: (paras: PaginationChangedEventArgs) => void,
-                                   resolve: () => void):void  {
+  private paginationChangedHanlder(
+    paras: PaginationChangedEventArgs,
+    handler: (paras: PaginationChangedEventArgs) => void,
+    resolve: () => void,
+  ): void {
     const readium = this.getReadium();
     const pageInfo = paras.paginationInfo.openPages[0];
     if (pageInfo.spineItemIndex === this.spineItemIndex) {
-      this.contentViewImpl.removeListener(readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
-                                          handler);
+      this.contentViewImpl.removeListener(
+        readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+        handler,
+      );
       this.spineItemPageCount = pageInfo.spineItemPageCount;
       console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
       resolve();
@@ -127,8 +134,10 @@ export class SpineItemView extends View {
       const handler = (paras: PaginationChangedEventArgs) => {
         this.paginationChangedHanlder(paras, handler, resolve);
       };
-      this.contentViewImpl.on(this.getReadium().InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
-                              handler);
+      this.contentViewImpl.on(
+        this.getReadium().InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+        handler,
+      );
     });
   }
 

@@ -1,16 +1,25 @@
 export class IFrameLoader {
-
   private baseURI: string;
 
   private isIE: boolean;
 
   constructor(baseURI: string) {
     this.baseURI = baseURI;
-    this.isIE = (window.navigator.userAgent.indexOf('Trident') > 0 ||
-                 window.navigator.userAgent.indexOf('Edge') > 0);
+    this.isIE =
+      window.navigator.userAgent.indexOf('Trident') > 0 ||
+      window.navigator.userAgent.indexOf('Edge') > 0;
   }
 
-  public loadIframe(iframe: HTMLIFrameElement, src: any, callback: any, context: any, attachedData: any) {
+  public loadIframe(
+    iframe: HTMLIFrameElement,
+    src: string,
+    // tslint:disable-next-line:no-any
+    callback: any,
+    // tslint:disable-next-line:no-any
+    context: any,
+    // tslint:disable-next-line:no-any
+    attachedData: any,
+  ): void {
     iframe.setAttribute('data-baseUri', iframe.baseURI ? iframe.baseURI : '');
     iframe.setAttribute('data-src', src);
 
@@ -27,8 +36,15 @@ export class IFrameLoader {
     return resp.text();
   }
 
-  private loadIframeWithDocument(iframe: HTMLIFrameElement, contentDocumentData: string, attachedData: any, callback: any) {
 
+  private loadIframeWithDocument(
+    iframe: HTMLIFrameElement,
+    contentDocumentData: string,
+    // tslint:disable-next-line:no-any
+    attachedData: any,
+    // tslint:disable-next-line:no-any
+    callback: any,
+  ): void {
     let documentDataUri: string = '';
     if (!this.isIE) {
       let contentType = 'text/html';
@@ -41,16 +57,20 @@ export class IFrameLoader {
       );
     } else {
       // Internet Explorer doesn't handle loading documents from Blobs correctly.
-      // TODO: Currently using the document.write() approach only for IE, as it breaks CSS selectors
+      // Currently using the document.write() approach only for IE, as it breaks CSS selectors
       // with namespaces for some reason (e.g. the childrens-media-query sample EPUB)
       iframe.contentWindow.document.open();
+
+      // tslint:disable-next-line:no-any
+      const MSApp = (<any>window).MSApp;
 
       // Currently not handled automatically by winstore-jscompat,
       // so we're doing it manually. See:
       // https://github.com/MSOpenTech/winstore-jscompat/
-      if ((<any>window).MSApp && (<any>window).MSApp.execUnsafeLocalFunction) {
+
+      if (MSApp && MSApp.execUnsafeLocalFunction) {
         // tslint:disable-next-line:no-disable-auto-sanitization
-        (<any>window).MSApp.execUnsafeLocalFunction(() => {
+        MSApp.execUnsafeLocalFunction(() => {
           iframe.contentWindow.document.write(contentDocumentData);
         });
       } else {

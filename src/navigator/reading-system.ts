@@ -2,7 +2,6 @@ import { Publication } from '../streamer/publication';
 import { Rendition } from './rendition';
 
 export class ReadingSystem {
-
   private viewport: HTMLElement;
 
   public initRenderer(viewport: HTMLElement): void {

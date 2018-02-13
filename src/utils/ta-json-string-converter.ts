@@ -6,7 +6,7 @@ export class JsonStringConverter implements IPropertyConverter {
   }
 
   public deserialize(value: JsonValue): string {
-    return <string> value;
+    return <string>value;
   }
 
   public collapseArrayWithSingleItem(): boolean {

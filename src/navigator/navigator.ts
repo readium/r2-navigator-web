@@ -4,7 +4,6 @@ import { Rendition } from './rendition';
 import { Viewport } from './views/viewport';
 
 export class Navigator {
-
   private rendition: Rendition;
 
   private pub: Publication;

@@ -13,5 +13,10 @@
     "typedef": [true, "call-signature", "parameter", "member-variable-declaration"],
     "trailing-comma": [true, {"multiline": "always", "singleline": "never"}]
   },
-  "rulesDirectory": []
+  "rulesDirectory": [],
+  "linterOptions": {
+      "exclude": [
+          "src/epub-model/**"
+      ]
+  }
 }

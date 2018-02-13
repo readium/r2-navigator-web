@@ -14,7 +14,7 @@
     "test:start": "cd test && karma start karma.config.js",
     "test:debug": "npm run test:start -- --singleRun=false",
     "test:watch": "echo \"not implemented\"",
-    "lint": "tslint --project tsconfig-common.json -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
     "watch": "npm-run-all --parallel watch:**",
     "watch:scripts": "tsc -w",
     "watch:bundle": "npm run build -- -w"

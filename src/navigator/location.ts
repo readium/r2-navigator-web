@@ -3,7 +3,7 @@ export class Location {
   private href: string;
   private isPrecise: boolean;
 
-  constructor(cfi: string, href: string, isPrecise:boolean = true) {
+  constructor(cfi: string, href: string, isPrecise: boolean = true) {
     this.cfi = cfi;
     this.href = href;
     this.isPrecise = isPrecise;

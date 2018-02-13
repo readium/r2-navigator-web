@@ -1,3 +1,4 @@
+// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { Location } from '../../src/navigator/location';
 import { Navigator } from '../../src/navigator/navigator';
@@ -8,7 +9,6 @@ import { Publication } from '../../src/streamer/publication';
 import { openRendition } from '../helpers/reader-helper';
 
 describe('LayoutView', () => {
-
   let viewportDiv: HTMLElement;
   let layoutView: LayoutView;
 
@@ -16,7 +16,7 @@ describe('LayoutView', () => {
     const head = document.querySelector('head');
     if (head) {
       head.innerHTML +=
-      '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -34,13 +34,13 @@ describe('LayoutView', () => {
       rs.initRenderer(viewport);
     }
 
-    // tslint:disable-next-line:max-line-length
-    const publication = await streamerClient.openPublicationFromUrl('/fixtures/publications/metamorphosis/manifest.json');
+    const publication = await streamerClient.openPublicationFromUrl(
+      '/fixtures/publications/metamorphosis/manifest.json',
+    );
     layoutView = new LayoutView(publication);
 
     layoutView.setPageSize(200, 400);
     layoutView.attatchToHost(viewportDiv);
-
   });
 
   afterEach(() => {
@@ -68,7 +68,6 @@ describe('LayoutView', () => {
 
       assert.equal(layoutView.getLoadedStartPostion(), -400);
       assert.equal(layoutView.getLoadedEndPosition(), 400);
-
     });
   });
 });

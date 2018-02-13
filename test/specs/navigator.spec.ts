@@ -1,5 +1,6 @@
 // tslint:disable:no-non-null-assertion
 
+// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { Location } from '../../src/navigator/location';
 import { Navigator } from '../../src/navigator/navigator';
@@ -8,7 +9,6 @@ import { Publication } from '../../src/streamer/publication';
 import { openRendition } from '../helpers/reader-helper';
 
 describe('Navigator', () => {
-
   let viewportDiv: HTMLElement;
   let navigator: Navigator;
 
@@ -18,7 +18,7 @@ describe('Navigator', () => {
     const head = document.querySelector('head');
     if (head) {
       head.innerHTML +=
-      '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -51,7 +51,6 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '');
       assert.equal(loc!.getHref(), 'OEBPS/title-page.html');
-
     });
   });
 
@@ -64,7 +63,6 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
-
     });
 
     it('prevScreen()', async () => {
@@ -77,7 +75,6 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
-
     });
 
     it('screen check functions', () => {

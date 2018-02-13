@@ -5,7 +5,6 @@ import { LayoutView } from './views/layout-view';
 import { Viewport } from './views/viewport';
 
 export class Rendition {
-
   public viewport: Viewport;
 
   private pub: Publication;

@@ -2,13 +2,13 @@ import { Link } from '../../epub-model/publication-link';
 import { Publication } from '../publication';
 
 export class PackageDocument {
-
   private pub: Publication;
 
   constructor(pub: Publication) {
     this.pub = pub;
   }
 
+  // tslint:disable-next-line:no-any
   public getSharedJsPackageData(): any {
     return {
       rootUrl: '',
@@ -25,6 +25,7 @@ export class PackageDocument {
     };
   }
 
+  // tslint:disable-next-line:no-any
   private getDefaultMediaOverlay(): any {
     return {
       duration: 0,
@@ -32,16 +33,70 @@ export class PackageDocument {
       activeClass: '',
       playbackActiveClass: '',
       smil_models: [],
-      skippables: ['sidebar', 'practice', 'marginalia', 'annotation', 'help', 'note', 'footnote',
+      skippables: [
+        'sidebar',
+        'practice',
+        'marginalia',
+        'annotation',
+        'help',
+        'note',
+        'footnote',
         'rearnote',
-        'table', 'table-row', 'table-cell', 'list', 'list-item', 'pagebreak'],
-      escapables: ['sidebar', 'bibliography', 'toc', 'loi', 'appendix', 'landmarks', 'lot', 'index',
-        'colophon', 'epigraph', 'conclusion', 'afterword', 'warning', 'epilogue', 'foreword',
-        'introduction', 'prologue', 'preface', 'preamble', 'notice', 'errata', 'copyright-page',
-        'acknowledgments', 'other-credits', 'titlepage', 'imprimatur', 'contributors', 'halftitlepage',
-        'dedication', 'help', 'annotation', 'marginalia', 'practice', 'note', 'footnote', 'rearnote',
-        'footnotes', 'rearnotes', 'bridgehead', 'page-list', 'table', 'table-row', 'table-cell', 'list',
-        'list-item', 'glossary'],
+        'table',
+        'table-row',
+        'table-cell',
+        'list',
+        'list-item',
+        'pagebreak',
+      ],
+      escapables: [
+        'sidebar',
+        'bibliography',
+        'toc',
+        'loi',
+        'appendix',
+        'landmarks',
+        'lot',
+        'index',
+        'colophon',
+        'epigraph',
+        'conclusion',
+        'afterword',
+        'warning',
+        'epilogue',
+        'foreword',
+        'introduction',
+        'prologue',
+        'preface',
+        'preamble',
+        'notice',
+        'errata',
+        'copyright-page',
+        'acknowledgments',
+        'other-credits',
+        'titlepage',
+        'imprimatur',
+        'contributors',
+        'halftitlepage',
+        'dedication',
+        'help',
+        'annotation',
+        'marginalia',
+        'practice',
+        'note',
+        'footnote',
+        'rearnote',
+        'footnotes',
+        'rearnotes',
+        'bridgehead',
+        'page-list',
+        'table',
+        'table-row',
+        'table-cell',
+        'list',
+        'list-item',
+        'glossary',
+      ],
     };
   }
 
@@ -49,7 +104,6 @@ export class PackageDocument {
     const pageProgressionDirection: string = this.pub.Metadata.Direction;
     if (pageProgressionDirection === 'rtl') {
       return 'rtl';
-
     }
 
     if (pageProgressionDirection === 'default') {
@@ -60,10 +114,8 @@ export class PackageDocument {
   }
 
   private getSharedJsSpine(): object {
-
     return this.pub.Spine.map((pubSpineItem: Link) => {
-
-      const spineItem = {
+      return {
         href: pubSpineItem.Href,
         media_type: pubSpineItem.TypeLink,
         // assuming that the order of spine items in webpub indicates that they are linear
@@ -76,8 +128,6 @@ export class PackageDocument {
         media_overlay_id: '',
         properties: '',
       };
-
-      return spineItem;
     });
   }
 }
