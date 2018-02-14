@@ -1,10 +1,10 @@
 export class IFrameLoader {
-  private baseURI: string;
+  private publicationURI: string;
 
   private isIE: boolean;
 
-  constructor(baseURI: string) {
-    this.baseURI = baseURI;
+  constructor(publicationURI: string) {
+    this.publicationURI = publicationURI;
     this.isIE =
       window.navigator.userAgent.indexOf('Trident') > 0 ||
       window.navigator.userAgent.indexOf('Edge') > 0;
@@ -23,10 +23,10 @@ export class IFrameLoader {
     iframe.setAttribute('data-baseUri', iframe.baseURI ? iframe.baseURI : '');
     iframe.setAttribute('data-src', src);
 
-    const contentUri = this.baseURI + src;
+    const contentUri = this.publicationURI + src;
 
     this.fetchContentDocument(contentUri).then((contentData: string) => {
-      this.loadIframeWithDocument(iframe, contentData, attachedData, callback);
+      this.loadIframeWithDocument(iframe, contentUri, contentData, attachedData, callback);
     });
   }
 
@@ -36,9 +36,23 @@ export class IFrameLoader {
     return resp.text();
   }
 
+  private injectBaseHref(contentSrc: string, contentType: string, href: string): string {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(contentSrc, contentType);
+    const baseElement = doc.createElement('base');
+    baseElement.href = href;
+    doc.head.insertBefore(baseElement, doc.head.firstChild);
+
+    if (contentType.includes('xml')) {
+      return new XMLSerializer().serializeToString(doc);
+    }
+
+    return doc.documentElement.outerHTML;
+  }
 
   private loadIframeWithDocument(
     iframe: HTMLIFrameElement,
+    contentDocumentURI: string,
     contentDocumentData: string,
     // tslint:disable-next-line:no-any
     attachedData: any,
@@ -51,9 +65,13 @@ export class IFrameLoader {
       if (attachedData.spineItem.media_type && attachedData.spineItem.media_type.length) {
         contentType = attachedData.spineItem.media_type;
       }
-
+      const basedContentData = this.injectBaseHref(
+        contentDocumentData,
+        contentType,
+        new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
+      );
       documentDataUri = window.URL.createObjectURL(
-        new Blob([contentDocumentData], { type: contentType }),
+        new Blob([basedContentData], { type: contentType }),
       );
     } else {
       // Internet Explorer doesn't handle loading documents from Blobs correctly.
