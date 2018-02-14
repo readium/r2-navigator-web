@@ -31,6 +31,7 @@ describe('Navigator', () => {
     const rendition = await openRendition('/fixtures/publications/metamorphosis/manifest.json');
     rendition.setPageSize(400, 800);
     rendition.viewport.setViewportSize(600);
+    rendition.viewport.enableScroll(false);
 
     await rendition.render();
 

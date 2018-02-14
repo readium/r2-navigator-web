@@ -71,6 +71,7 @@ export class Viewport {
     this.render();
 
     await this.bookView.ensureConentLoadedAtRange(position, position + this.viewportSize);
+    this.updatePositions();
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {

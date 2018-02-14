@@ -12,7 +12,7 @@ export class Rendition {
   private pageWidth: number;
   private pageHeight: number;
 
-  private viewAsVertical: boolean;
+  private viewAsVertical: boolean = false;
 
   constructor(pub: Publication, viewport: HTMLElement) {
     this.pub = pub;
