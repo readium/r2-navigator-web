@@ -51,6 +51,7 @@ export class SpineItemView extends View {
       userStyles: new StyleCollection(),
       bookStyles: new StyleCollection(),
       iframeLoader: this.iframeLoader,
+      expandDocumentFullWidth: true,
     };
     this.isEmpty = false;
 
