@@ -39,7 +39,12 @@ export class Viewport {
 
     this.scrollEnabled = e;
     if (this.scrollEnabled) {
-      this.root.style.overflowX = 'scroll';
+      if (this.bookView.isVerticalLayout()) {
+        this.root.style.overflowY = 'scroll';
+      } else {
+        this.root.style.overflowX = 'scroll';
+      }
+
       // tslint:disable-next-line:no-any
       (<any>this.root.style).webkitOverflowScrolling = 'touch';
     }
@@ -94,7 +99,7 @@ export class Viewport {
       }
 
       // console.log(this.root.scrollLeft);
-      this.viewOffset = this.root.scrollLeft;
+      this.viewOffset = this.scrollOffset();
       if (this.hasPendingAction) {
         return;
       }
@@ -125,12 +130,28 @@ export class Viewport {
 
   private render(): void {
     if (this.scrollEnabled) {
-      this.root.scrollLeft = this.viewOffset;
+      this.updateViewOffsetFromScroll();
     } else {
       const containerElement = this.bookView.containerElement();
-      containerElement.style.transform = `translateX(${-this.viewOffset}px)`;
+      if (this.bookView.isVerticalLayout()) {
+        containerElement.style.transform = `translateY(${-this.viewOffset}px)`;
+      } else {
+        containerElement.style.transform = `translateX(${-this.viewOffset}px)`;
+      }
     }
 
     this.updatePositions();
+  }
+
+  private scrollOffset(): number {
+    return this.bookView.isVerticalLayout() ? this.root.scrollTop : this.root.scrollLeft;
+  }
+
+  private updateViewOffsetFromScroll(): void {
+    if (this.bookView.isVerticalLayout()) {
+      this.root.scrollTop = this.viewOffset;
+    } else {
+      this.root.scrollLeft = this.viewOffset;
+    }
   }
 }

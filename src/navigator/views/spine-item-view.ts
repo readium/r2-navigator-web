@@ -3,6 +3,7 @@ import { IFrameLoader } from '../iframe-loader';
 import { View } from './view';
 
 import {
+  OnePageView,
   PaginationChangedEventArgs,
   ReflowableView,
   StyleCollection,
@@ -31,15 +32,21 @@ export class SpineItemView extends View {
 
   protected isEmpty: boolean = true;
 
+  protected isVertical: boolean = true;
+
+  protected contentHeight: number = 0;
+
   // tslint:disable-next-line:no-any
   protected contentViewImpl: any;
 
   // tslint:disable-next-line:no-any
-  public constructor(iframeLoader: IFrameLoader, spine: Link[], rsjSpine: any) {
+  public constructor(iframeLoader: IFrameLoader, spine: Link[], rsjSpine: any,
+                     isVertical: boolean) {
     super();
     this.iframeLoader = iframeLoader;
     this.spine = spine;
     this.rsjSpine = rsjSpine;
+    this.isVertical = isVertical;
   }
 
   public loadSpineItem(spineItem: Link): Promise<void> {
@@ -59,15 +66,13 @@ export class SpineItemView extends View {
       fonts: {},
       viewerSettings: () => this.rsjViewSettings,
     };
-    this.contentViewImpl = new ReflowableView(readiumViewParams, reader);
 
-    this.contentViewImpl.render();
+    if (this.isVertical) {
+      return this.loadSpineItemOnePageView(readiumViewParams, reader);
+    }
 
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
-
-    this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
-
-    return this.paginationChangedPromise();
+    return this.isVertical ? this.loadSpineItemOnePageView(readiumViewParams, reader) :
+                             this.laodSpineItemReflowableView(readiumViewParams, reader);
   }
 
   public unloadSpineItem(): void {
@@ -93,22 +98,51 @@ export class SpineItemView extends View {
     return this.spineItemPageCount;
   }
 
-  private getRSJSpine(): object[] {
-    return this.spine.map((pubSpineItem: Link) => {
-      return {
-        href: pubSpineItem.Href,
-        media_type: pubSpineItem.TypeLink,
-        // assuming that the order of spine items in webpub indicates that they are linear
-        linear: 'yes',
+  public getTotalSize(pageWidth: number): number {
+    return this.isVertical ? this.contentHeight : this.spineItemPageCount * pageWidth;
+  }
 
-        // R2: these data is lost
-        rendition_viewport: undefined,
-        idref: pubSpineItem.Href,
-        manifest_id: '',
-        media_overlay_id: '',
-        properties: '',
-      };
+  // tslint:disable-next-line:no-any
+  private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
+    this.contentViewImpl = new OnePageView(params,
+                                           ['content-doc-frame'],
+                                           false,
+                                           reader);
+
+    this.contentViewImpl.render();
+
+    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
+
+    this.host.appendChild(this.contentViewImpl.element()[0]);
+
+    return new Promise((resolve: () => void) => {
+      this.contentViewImpl.loadSpineItem(this.rsjSpine.items[this.spineItemIndex],
+                                         (success:  boolean) => {
+                                           if (success) {
+                                             this.onSpineItemOnePageViewLoaded();
+                                             resolve();
+                                           }
+                                         });
     });
+  }
+
+  private onSpineItemOnePageViewLoaded(): void {
+    this.spineItemPageCount = 1;
+    this.contentViewImpl.resizeIFrameToContent();
+    this.contentHeight = this.contentViewImpl.getCalculatedPageHeight();
+  }
+
+  // tslint:disable-next-line:no-any
+  private laodSpineItemReflowableView(params: any, reader: any): Promise<void> {
+    this.contentViewImpl = new ReflowableView(params, reader);
+
+    this.contentViewImpl.render();
+
+    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
+
+    this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
+
+    return this.paginationChangedPromise();
   }
 
   // tslint:disable-next-line:max-line-length

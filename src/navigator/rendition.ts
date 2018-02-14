@@ -12,6 +12,8 @@ export class Rendition {
   private pageWidth: number;
   private pageHeight: number;
 
+  private viewAsVertical: boolean;
+
   constructor(pub: Publication, viewport: HTMLElement) {
     this.pub = pub;
     this.viewport = new Viewport(viewport);
@@ -20,6 +22,10 @@ export class Rendition {
   public setPageSize(pageWidth: number, pageHeight: number): void {
     this.pageWidth = pageWidth;
     this.pageHeight = pageHeight;
+  }
+
+  public setVeiwAsVertical(v: boolean): void {
+    this.viewAsVertical = v;
   }
 
   public getPageWidth(): number {
@@ -33,6 +39,7 @@ export class Rendition {
   public render(): Promise<void> {
     const bookView = new LayoutView(this.pub);
     bookView.setPageSize(this.pageWidth, this.pageHeight);
+    bookView.setVerticalLayout(this.viewAsVertical);
 
     this.viewport.setView(bookView);
 

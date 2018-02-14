@@ -41,6 +41,8 @@ export class LayoutView extends View {
   private pageWidth: number = 600;
   private pageHeight: number = 800;
 
+  private isVertical: boolean = false;
+
   public constructor(pub: Publication) {
     super();
     this.publication = pub;
@@ -55,7 +57,17 @@ export class LayoutView extends View {
   public setPageSize(width: number, height: number): void {
     this.pageWidth = width;
     this.pageHeight = height;
-    this.layoutRoot.style.height = `${height}px`;
+    if (!this.isVertical) {
+      this.layoutRoot.style.height = `${height}px`;
+    }
+  }
+
+  public setVerticalLayout(v: boolean): void {
+    this.isVertical = v;
+  }
+
+  public isVerticalLayout(): boolean {
+    return this.isVertical;
   }
 
   public render(): void {
@@ -111,7 +123,7 @@ export class LayoutView extends View {
 
     for (const siv of this.spineItemViewStatus) {
       if (offset >= siv.offset &&
-          offset <= siv.offset + siv.view.getTotalPageCount() * this.pageWidth) {
+          offset <= siv.offset + siv.view.getTotalSize(this.pageWidth)) {
         res.push({
           spineItemIndex: siv.spineItemIndex,
           spineItemPageCount: siv.view.getTotalPageCount(),
@@ -210,15 +222,15 @@ export class LayoutView extends View {
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
     this.spineItemViewStatus.forEach((vs: SpineItemViewStatus) => {
-      newViewStatus.offset += vs.view.getTotalPageCount() * this.pageWidth;
+      newViewStatus.offset += vs.view.getTotalSize(this.pageWidth);
     });
 
-    newViewStatus.viewContainer.style.transform = `translateX(${newViewStatus.offset}px)`;
+    newViewStatus.viewContainer.style.transform = this.cssTranslateValue(newViewStatus.offset);
 
     this.spineItemViewStatus.push(newViewStatus);
 
     this.loadedContentRange[1] = newViewStatus.offset +
-                                 newViewStatus.view.getTotalPageCount() * this.pageWidth;
+                                 newViewStatus.view.getTotalSize(this.pageWidth);
   }
 
   private async loadNewSpineItemAtStart(): Promise<void> {
@@ -243,24 +255,27 @@ export class LayoutView extends View {
     // RTL change
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
-    newViewStatus.offset -= newViewStatus.view.getTotalPageCount() * this.pageWidth;
+    newViewStatus.offset -= newViewStatus.view.getTotalSize(this.pageWidth);
 
     this.spineItemViewStatus.push(newViewStatus);
 
     this.loadedContentRange[0] = newViewStatus.offset;
 
-    newViewStatus.viewContainer.style.transform = `translateX(${newViewStatus.offset}px)`;
+    newViewStatus.viewContainer.style.transform = this.cssTranslateValue(newViewStatus.offset);
   }
 
   private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
     const spineItemView = new SpineItemView(this.iframeLoader,
                                             this.publication.Spine,
-                                            this.rsjPackage.spine);
+                                            this.rsjPackage.spine,
+                                            this.isVertical);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
     spineItemViewContainer.style.position = 'absolute';
     spineItemViewContainer.style.width = `${this.pageWidth}px`;
-    spineItemViewContainer.style.height = `${this.pageHeight}px`;
+    if (!this.isVertical) {
+      spineItemViewContainer.style.height = `${this.pageHeight}px`;
+    }
     spineItemView.attatchToHost(spineItemViewContainer);
 
     // RTL change
@@ -274,6 +289,10 @@ export class LayoutView extends View {
       spineItemIndex: index,
       view: spineItemView,
     };
+  }
+
+  private cssTranslateValue(offset: number): string {
+    return this.isVertical ? `translateY(${offset}px)` : `translateX(${offset}px)`;
   }
 
 }
