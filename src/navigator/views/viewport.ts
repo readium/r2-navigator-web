@@ -22,6 +22,8 @@ export class Viewport {
 
     this.nextScreen = this.nextScreen.bind(this);
     this.prevScreen = this.prevScreen.bind(this);
+
+    this.bindEvents();
   }
 
   public setView(v: LayoutView): void {
@@ -30,9 +32,16 @@ export class Viewport {
   }
 
   public enableScroll(e: boolean): void {
+    this.root.style.overflowX = 'hidden';
+    this.root.style.overflowY = 'hidden';
+    // tslint:disable-next-line:no-any
+    (<any>this.root.style).webkitOverflowScrolling = 'auto';
+
     this.scrollEnabled = e;
     if (this.scrollEnabled) {
-      this.initScrolling();
+      this.root.style.overflowX = 'scroll';
+      // tslint:disable-next-line:no-any
+      (<any>this.root.style).webkitOverflowScrolling = 'touch';
     }
   }
 
@@ -78,11 +87,12 @@ export class Viewport {
     this.hasPendingAction = false;
   }
 
-  private initScrolling(): void {
-    this.root.style.overflowX = 'scroll';
-    this.root.style.overflowY = 'hidden';
-
+  private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
+      if (!this.scrollEnabled) {
+        return;
+      }
+
       // console.log(this.root.scrollLeft);
       this.viewOffset = this.root.scrollLeft;
       if (this.hasPendingAction) {
