@@ -36,12 +36,21 @@ export class IFrameLoader {
     return resp.text();
   }
 
-  private injectBaseHref(contentSrc: string, contentType: string, href: string): string {
+  private injectBaseHref(sourceText: string, contentType: string, href: string): string {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(contentSrc, contentType);
+    const doc = parser.parseFromString(sourceText, contentType);
+
     const baseElement = doc.createElement('base');
     baseElement.href = href;
-    doc.head.insertBefore(baseElement, doc.head.firstChild);
+
+    const headElement = doc.querySelector('head');
+    if (!headElement) {
+      // No head element.. not a valid (X)HTML document?
+      // Then just return the original source
+      return sourceText;
+    }
+
+    headElement.insertBefore(baseElement, headElement.firstChild);
 
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
