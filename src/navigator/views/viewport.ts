@@ -5,6 +5,7 @@ export class Viewport {
   private bookView: LayoutView;
 
   private viewportSize: number;
+  private prefetchSize: number = 0;
 
   private viewOffset: number;
 
@@ -58,6 +59,10 @@ export class Viewport {
     this.viewportSize = size;
   }
 
+  public setPrefetchSize(size: number): void {
+    this.prefetchSize = size;
+  }
+
   public getStartPosition(): PaginationInfo | undefined {
     return this.startPos;
   }
@@ -66,12 +71,18 @@ export class Viewport {
     return this.endPos;
   }
 
-  public async renderAtOffset(position: number): Promise<void> {
-    this.viewOffset = position;
+  public async renderAtOffset(pos: number): Promise<void> {
+    this.hasPendingAction = true;
+
+    this.viewOffset = pos;
     this.render();
 
-    await this.bookView.ensureConentLoadedAtRange(position, position + this.viewportSize);
+    const start = pos - this.prefetchSize;
+    const end = pos + this.viewportSize + this.prefetchSize;
+    await this.bookView.ensureConentLoadedAtRange(start, end);
     this.updatePositions();
+
+    this.hasPendingAction = false;
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
@@ -82,15 +93,30 @@ export class Viewport {
   }
 
   public async nextScreen(): Promise<void> {
-    this.hasPendingAction = true;
-    await this.renderAtOffset(this.viewOffset + this.viewportSize);
-    this.hasPendingAction = false;
+    let newPos = this.viewOffset + this.viewportSize;
+    const loadedEndPos = this.bookView.getLoadedEndPosition();
+    if (newPos > loadedEndPos && !this.bookView.hasMoreAfterEnd()) {
+      newPos = loadedEndPos;
+    }
+
+    if (newPos !== this.viewOffset &&
+        (newPos <= loadedEndPos || this.bookView.hasMoreAfterEnd())) {
+      await this.renderAtOffset(this.viewOffset + this.viewportSize);
+    }
   }
 
   public async prevScreen(): Promise<void> {
-    this.hasPendingAction = true;
-    await this.renderAtOffset(this.viewOffset - this.viewportSize);
-    this.hasPendingAction = false;
+    let newPos = this.viewOffset - this.viewportSize;
+    const loadedStartPos = this.bookView.getLoadedStartPostion();
+    // Ensure not to go beyond begining of the book
+    if (newPos < loadedStartPos && !this.bookView.hasMoreBeforeStart()) {
+      newPos = loadedStartPos;
+    }
+
+    if (newPos !== this.viewOffset &&
+        (newPos >= loadedStartPos || this.bookView.hasMoreBeforeStart())) {
+      await this.renderAtOffset(newPos);
+    }
   }
 
   private bindEvents(): void {
@@ -99,18 +125,26 @@ export class Viewport {
         return;
       }
 
-      // console.log(this.root.scrollLeft);
       this.viewOffset = this.scrollOffset();
+      // console.log(`offset: ${this.viewOffset}`);
       if (this.hasPendingAction) {
         return;
       }
 
-      if (this.viewOffset + this.viewportSize >= this.bookView.loadedRangeLength()) {
-        await this.nextScreen();
-      } else if (this.viewOffset <= 0 && this.bookView.hasMoreBeforeStart()) {
-        await this.prevScreen();
+      const start = this.viewOffset - this.prefetchSize;
+      const end = this.viewOffset + this.viewportSize + this.prefetchSize;
+      if (end >= this.bookView.loadedRangeLength() && this.bookView.hasMoreAfterEnd()) {
+        await this.ensureConentLoadedAtRange(this.viewOffset, end);
+      } else if (start <= 0 && this.bookView.hasMoreBeforeStart()) {
+        await this.ensureConentLoadedAtRange(start, this.viewOffset);
       }
     });
+  }
+
+  private async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
+    this.hasPendingAction = true;
+    await this.bookView.ensureConentLoadedAtRange(start, end);
+    this.hasPendingAction = false;
   }
 
   private updatePositions(): void {
@@ -131,7 +165,7 @@ export class Viewport {
 
   private render(): void {
     if (this.scrollEnabled) {
-      this.updateViewOffsetFromScroll();
+      this.updateScrollFromViewOffset();
     } else {
       const containerElement = this.bookView.containerElement();
       if (this.bookView.isVerticalLayout()) {
@@ -148,7 +182,7 @@ export class Viewport {
     return this.bookView.isVerticalLayout() ? this.root.scrollTop : this.root.scrollLeft;
   }
 
-  private updateViewOffsetFromScroll(): void {
+  private updateScrollFromViewOffset(): void {
     if (this.bookView.isVerticalLayout()) {
       this.root.scrollTop = this.viewOffset;
     } else {
