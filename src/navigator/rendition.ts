@@ -1,6 +1,5 @@
 import { Publication } from '../streamer/publication';
 import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
-import { IFrameLoader } from './iframe-loader';
 import { LayoutView } from './views/layout-view';
 import { Viewport } from './views/viewport';
 

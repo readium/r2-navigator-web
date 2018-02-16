@@ -145,7 +145,6 @@ export class SpineItemView extends View {
     return this.paginationChangedPromise();
   }
 
-  // tslint:disable-next-line:max-line-length
   private paginationChangedHanlder(
     paras: PaginationChangedEventArgs,
     handler: (paras: PaginationChangedEventArgs) => void,
