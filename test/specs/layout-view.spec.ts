@@ -67,7 +67,7 @@ describe('LayoutView', () => {
       await layoutView.ensureConentLoadedAtRange(-100, 100);
 
       assert.equal(layoutView.getLoadedStartPostion(), -400);
-      assert.equal(layoutView.getLoadedEndPosition(), 400);
+      assert.equal(layoutView.getLoadedEndPosition(), 200);
     });
   });
 });

@@ -37,6 +37,7 @@ export class LayoutView extends View {
   private iframeLoader: IFrameLoader;
 
   private loadedContentRange: [number, number] = [0, 0];
+  private paginatedRange: [number, number] = [0, 0];
 
   private pageWidth: number = 600;
   private pageHeight: number = 800;
@@ -59,6 +60,8 @@ export class LayoutView extends View {
     this.pageHeight = height;
     if (!this.isVertical) {
       this.layoutRoot.style.height = `${height}px`;
+    } else {
+      this.layoutRoot.style.width = `${width}px`;
     }
   }
 
@@ -115,6 +118,10 @@ export class LayoutView extends View {
     return this.loadedContentRange[1] - this.loadedContentRange[0];
   }
 
+  public paginatedLength(): number {
+    return this.paginatedRange[1] - this.paginatedRange[0];
+  }
+
   public getPaginationInfoAtOffset(offset: number): PaginationInfo[] {
     const res: PaginationInfo[] = [];
     if (offset < this.getLoadedStartPostion() || offset > this.getLoadedEndPosition()) {
@@ -137,6 +144,8 @@ export class LayoutView extends View {
   }
 
   public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
+    this.removeOutOfRangeSpineItems(start, end);
+
     while (end > this.getLoadedEndPosition() && this.hasMoreAfterEnd()) {
       await this.loadNewSpineItemAtEnd();
     }
@@ -145,7 +154,14 @@ export class LayoutView extends View {
       await this.loadNewSpineItemAtStart();
     }
 
-    this.layoutRoot.style.width = `${this.loadedRangeLength()}px`;
+    this.paginatedRange[0] = Math.min(this.paginatedRange[0], this.loadedContentRange[0]);
+    this.paginatedRange[1] = Math.max(this.paginatedRange[1], this.loadedContentRange[1]);
+
+    if (this.isVertical) {
+      this.layoutRoot.style.height = `${this.paginatedLength()}px`;
+    } else {
+      this.layoutRoot.style.width = `${this.paginatedLength()}px`;
+    }
   }
 
   // tslint:disable-next-line:max-line-length
@@ -227,7 +243,7 @@ export class LayoutView extends View {
 
     newViewStatus.viewContainer.style.transform = this.cssTranslateValue(newViewStatus.offset);
 
-    this.spineItemViewStatus.push(newViewStatus);
+    this.addNewViewStatus(newViewStatus);
 
     this.loadedContentRange[1] = newViewStatus.offset +
                                  newViewStatus.view.getTotalSize(this.pageWidth);
@@ -257,7 +273,7 @@ export class LayoutView extends View {
                            0 : this.spineItemViewStatus[0].offset;
     newViewStatus.offset -= newViewStatus.view.getTotalSize(this.pageWidth);
 
-    this.spineItemViewStatus.push(newViewStatus);
+    this.addNewViewStatus(newViewStatus);
 
     this.loadedContentRange[0] = newViewStatus.offset;
 
@@ -293,6 +309,46 @@ export class LayoutView extends View {
 
   private cssTranslateValue(offset: number): string {
     return this.isVertical ? `translateY(${offset}px)` : `translateX(${offset}px)`;
+  }
+
+  private addNewViewStatus(vs: SpineItemViewStatus): void {
+    this.spineItemViewStatus.push(vs);
+    this.spineItemViewStatus.sort((a: SpineItemViewStatus, b: SpineItemViewStatus) => {
+      return a.offset - b.offset;
+    });
+  }
+
+  private removeOutOfRangeSpineItems(start: number, end: number): void {
+    let newStart: number = this.loadedContentRange[1];
+    let newEnd: number = this.loadedContentRange[0];
+    let hasAnyRemoved: boolean = false;
+    for (const vs of this.spineItemViewStatus) {
+      const viewEnd = vs.offset + vs.view.getTotalSize(this.pageWidth);
+      if (viewEnd < start || vs.offset > end) {
+        vs.view.unloadSpineItem();
+        this.layoutRoot.removeChild(vs.viewContainer);
+        hasAnyRemoved = true;
+      } else {
+        if (!newStart || vs.offset < newStart) {
+          newStart = vs.offset;
+        }
+        if (!newEnd || viewEnd > newEnd) {
+          newEnd = viewEnd;
+        }
+      }
+    }
+
+    if (hasAnyRemoved) {
+      if (newStart >= newEnd) {
+        this.loadedContentRange = [0, 0];
+      } else {
+        this.loadedContentRange = [newStart, newEnd];
+      }
+
+      this.spineItemViewStatus = this.spineItemViewStatus.filter((vs: SpineItemViewStatus) => {
+        return vs.view.hasSpineItemLoaded();
+      });
+    }
   }
 
 }

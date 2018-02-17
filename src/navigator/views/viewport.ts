@@ -18,6 +18,8 @@ export class Viewport {
 
   private scrollEnabled: boolean = false;
 
+  private scrollFromInternal: boolean = false;
+
   constructor(root: HTMLElement) {
     this.root = root;
 
@@ -73,16 +75,23 @@ export class Viewport {
 
   public async renderAtOffset(pos: number): Promise<void> {
     this.hasPendingAction = true;
+    this.scrollFromInternal = true;
 
     this.viewOffset = pos;
     this.render();
 
     const start = pos - this.prefetchSize;
     const end = pos + this.viewportSize + this.prefetchSize;
-    await this.bookView.ensureConentLoadedAtRange(start, end);
+    await this.ensureConentLoadedAtRange(start, end);
     this.updatePositions();
 
     this.hasPendingAction = false;
+    this.scrollFromInternal = false;
+
+    // This call is important since the viewoffset and
+    // scroller position may out of sync if additonal
+    // spine item is loaded
+    this.render();
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
@@ -121,7 +130,7 @@ export class Viewport {
 
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
-      if (!this.scrollEnabled) {
+      if (!this.scrollEnabled || this.scrollFromInternal) {
         return;
       }
 
@@ -133,10 +142,11 @@ export class Viewport {
 
       const start = this.viewOffset - this.prefetchSize;
       const end = this.viewOffset + this.viewportSize + this.prefetchSize;
-      if (end >= this.bookView.loadedRangeLength() && this.bookView.hasMoreAfterEnd()) {
-        await this.ensureConentLoadedAtRange(this.viewOffset, end);
-      } else if (start <= 0 && this.bookView.hasMoreBeforeStart()) {
-        await this.ensureConentLoadedAtRange(start, this.viewOffset);
+      if (end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) {
+        await this.ensureConentLoadedAtRange(start, end);
+      } else if (start <= this.bookView.getLoadedStartPostion() &&
+                 this.bookView.hasMoreBeforeStart()) {
+        await this.ensureConentLoadedAtRange(start, end);
       }
     });
   }
