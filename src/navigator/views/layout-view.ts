@@ -80,10 +80,6 @@ export class LayoutView extends View {
     return this.isVertical;
   }
 
-  public canLoadMore(): boolean {
-    return !this.hasUnknownSizeSpineItemLoading;
-  }
-
   public render(): void {
     return;
   }
@@ -98,19 +94,11 @@ export class LayoutView extends View {
   }
 
   public hasMoreAfterEnd(): boolean {
-    if (this.spineItemViewStatus.length === 0) {
-      return this.publication.Spine.length > 0;
-    }
-
-    return this.endViewStatus().spineItemIndex + 1 < this.publication.Spine.length;
+    return this.nextIndexAfterEnd() < this.publication.Spine.length;
   }
 
   public hasMoreBeforeStart(): boolean {
-    if (this.spineItemViewStatus.length === 0) {
-      return this.publication.Spine.length > 0;
-    }
-
-    return this.startViewStatus().spineItemIndex > 0;
+    return this.nextIndexBeforeStart() >= 0;
   }
 
   public getLoadedStartPostion(): number {
@@ -157,6 +145,21 @@ export class LayoutView extends View {
   public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
     this.removeOutOfRangeSpineItems(start, end);
 
+    // first try to load spine items with known size
+    while (end > this.getLoadedEndPosition() && this.hasMoreKnownSizeAfterEnd()) {
+      await this.loadNewSpineItemAtEnd();
+    }
+
+    while (start < this.getLoadedStartPostion() && this.hasMoreKnowSizeBeforeStart()) {
+      await this.loadNewSpineItemAtStart();
+    }
+
+    this.updatePaginatedRange();
+
+    if (this.hasUnknownSizeSpineItemLoading) {
+      return;
+    }
+
     while (end > this.getLoadedEndPosition() && this.hasMoreAfterEnd()) {
       await this.loadNewSpineItemAtEnd();
     }
@@ -165,14 +168,7 @@ export class LayoutView extends View {
       await this.loadNewSpineItemAtStart();
     }
 
-    this.paginatedRange[0] = Math.min(this.paginatedRange[0], this.loadedContentRange[0]);
-    this.paginatedRange[1] = Math.max(this.paginatedRange[1], this.loadedContentRange[1]);
-
-    if (this.isVertical) {
-      this.layoutRoot.style.height = `${this.paginatedLength()}px`;
-    } else {
-      this.layoutRoot.style.width = `${this.paginatedLength()}px`;
-    }
+    this.updatePaginatedRange();
   }
 
   // tslint:disable-next-line:max-line-length
@@ -224,6 +220,47 @@ export class LayoutView extends View {
 
   private endViewStatus(): SpineItemViewStatus {
     return this.spineItemViewStatus[this.spineItemViewStatus.length - 1];
+  }
+
+  private nextIndexAfterEnd(): number {
+    let nextIndex = 0;
+    if (this.spineItemViewStatus.length > 0) {
+      nextIndex = this.endViewStatus().spineItemIndex + 1;
+    }
+
+    return nextIndex;
+  }
+
+  private nextIndexBeforeStart(): number {
+    let nextIndex = 0;
+    if (this.spineItemViewStatus.length > 0) {
+      nextIndex = this.startViewStatus().spineItemIndex - 1;
+    }
+
+    return nextIndex;
+  }
+
+  private hasMoreKnownSizeAfterEnd(): boolean {
+    const nextIndex = this.nextIndexAfterEnd();
+
+    return nextIndex < this.spineItemViewSizes.length && this.spineItemViewSizes[nextIndex] > 0;
+  }
+
+  private hasMoreKnowSizeBeforeStart(): boolean {
+    const nextIndex = this.nextIndexBeforeStart();
+
+    return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
+  }
+
+  private updatePaginatedRange(): void {
+    this.paginatedRange[0] = Math.min(this.paginatedRange[0], this.loadedContentRange[0]);
+    this.paginatedRange[1] = Math.max(this.paginatedRange[1], this.loadedContentRange[1]);
+
+    if (this.isVertical) {
+      this.layoutRoot.style.height = `${this.paginatedLength()}px`;
+    } else {
+      this.layoutRoot.style.width = `${this.paginatedLength()}px`;
+    }
   }
 
   private async loadNewSpineItemAtEnd(): Promise<void> {

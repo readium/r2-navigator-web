@@ -136,9 +136,6 @@ export class Viewport {
 
       this.viewOffset = this.scrollOffset();
       // console.log(`offset: ${this.viewOffset}`);
-      if (!this.bookView.canLoadMore()) {
-        return;
-      }
 
       const start = this.viewOffset - this.prefetchSize;
       const end = this.viewOffset + this.viewportSize + this.prefetchSize;
