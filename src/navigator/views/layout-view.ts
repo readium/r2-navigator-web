@@ -21,10 +21,12 @@ class SpineItemViewStatus {
   public viewContainer: HTMLElement;
   public spineItemIndex: number;
   public offset: number;
+  public viewSize: number;
 }
 
 export class LayoutView extends View {
   private spineItemViewStatus: SpineItemViewStatus[] = [];
+  private spineItemViewSizes: number[] = [];
 
   private host: HTMLElement;
   private layoutRoot: HTMLElement;
@@ -44,11 +46,16 @@ export class LayoutView extends View {
 
   private isVertical: boolean = false;
 
+  private hasUnknownSizeSpineItemLoading: boolean = false;
+
   public constructor(pub: Publication) {
     super();
     this.publication = pub;
     this.iframeLoader = new IFrameLoader(this.publication.baseUri);
     this.initSpineItemViews();
+
+    // tslint:disable-next-line:prefer-array-literal
+    this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
 
     const packageDoc = new PackageDocument(this.publication);
     this.rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });
@@ -71,6 +78,10 @@ export class LayoutView extends View {
 
   public isVerticalLayout(): boolean {
     return this.isVertical;
+  }
+
+  public canLoadMore(): boolean {
+    return !this.hasUnknownSizeSpineItemLoading;
   }
 
   public render(): void {
@@ -238,7 +249,7 @@ export class LayoutView extends View {
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
     this.spineItemViewStatus.forEach((vs: SpineItemViewStatus) => {
-      newViewStatus.offset += vs.view.getTotalSize(this.pageWidth);
+      newViewStatus.offset += vs.viewSize;
     });
 
     newViewStatus.viewContainer.style.transform = this.cssTranslateValue(newViewStatus.offset);
@@ -246,7 +257,7 @@ export class LayoutView extends View {
     this.addNewViewStatus(newViewStatus);
 
     this.loadedContentRange[1] = newViewStatus.offset +
-                                 newViewStatus.view.getTotalSize(this.pageWidth);
+                                 newViewStatus.viewSize;
   }
 
   private async loadNewSpineItemAtStart(): Promise<void> {
@@ -271,7 +282,7 @@ export class LayoutView extends View {
     // RTL change
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
-    newViewStatus.offset -= newViewStatus.view.getTotalSize(this.pageWidth);
+    newViewStatus.offset -= newViewStatus.viewSize;
 
     this.addNewViewStatus(newViewStatus);
 
@@ -297,13 +308,25 @@ export class LayoutView extends View {
     // RTL change
     this.layoutRoot.appendChild(spineItemViewContainer);
 
-    await spineItemView.loadSpineItem(this.publication.Spine[index]);
+    let viewLength: number;
+    if (this.spineItemViewSizes[index] > 0) {
+      viewLength = this.spineItemViewSizes[index];
+      spineItemView.loadSpineItem(this.publication.Spine[index]);
+    } else {
+      this.hasUnknownSizeSpineItemLoading = true;
+      await spineItemView.loadSpineItem(this.publication.Spine[index]);
+      this.hasUnknownSizeSpineItemLoading = false;
+
+      viewLength = spineItemView.getTotalSize(this.pageWidth);
+      this.spineItemViewSizes[index] = viewLength;
+    }
 
     return {
       offset: 0,
       viewContainer: spineItemViewContainer,
       spineItemIndex: index,
       view: spineItemView,
+      viewSize: viewLength,
     };
   }
 

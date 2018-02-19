@@ -136,7 +136,7 @@ export class Viewport {
 
       this.viewOffset = this.scrollOffset();
       // console.log(`offset: ${this.viewOffset}`);
-      if (this.hasPendingAction) {
+      if (!this.bookView.canLoadMore()) {
         return;
       }
 
@@ -152,9 +152,9 @@ export class Viewport {
   }
 
   private async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
-    this.hasPendingAction = true;
+    // this.hasPendingAction = true;
     await this.bookView.ensureConentLoadedAtRange(start, end);
-    this.hasPendingAction = false;
+    // this.hasPendingAction = false;
   }
 
   private updatePositions(): void {
