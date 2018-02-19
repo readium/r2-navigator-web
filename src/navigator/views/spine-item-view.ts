@@ -39,9 +39,13 @@ export class SpineItemView extends View {
   // tslint:disable-next-line:no-any
   protected contentViewImpl: any;
 
-  // tslint:disable-next-line:no-any
-  public constructor(iframeLoader: IFrameLoader, spine: Link[], rsjSpine: any,
-                     isVertical: boolean) {
+  public constructor(
+    iframeLoader: IFrameLoader,
+    spine: Link[],
+    // tslint:disable-next-line:no-any
+    rsjSpine: any,
+    isVertical: boolean,
+  ) {
     super();
     this.iframeLoader = iframeLoader;
     this.spine = spine;
@@ -71,8 +75,9 @@ export class SpineItemView extends View {
       return this.loadSpineItemOnePageView(readiumViewParams, reader);
     }
 
-    return this.isVertical ? this.loadSpineItemOnePageView(readiumViewParams, reader) :
-                             this.laodSpineItemReflowableView(readiumViewParams, reader);
+    return this.isVertical
+      ? this.loadSpineItemOnePageView(readiumViewParams, reader)
+      : this.laodSpineItemReflowableView(readiumViewParams, reader);
   }
 
   public unloadSpineItem(): void {
@@ -104,10 +109,7 @@ export class SpineItemView extends View {
 
   // tslint:disable-next-line:no-any
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
-    this.contentViewImpl = new OnePageView(params,
-                                           ['content-doc-frame'],
-                                           false,
-                                           reader);
+    this.contentViewImpl = new OnePageView(params, ['content-doc-frame'], false, reader);
 
     this.contentViewImpl.render();
 
@@ -116,13 +118,15 @@ export class SpineItemView extends View {
     this.host.appendChild(this.contentViewImpl.element()[0]);
 
     return new Promise((resolve: () => void) => {
-      this.contentViewImpl.loadSpineItem(this.rsjSpine.items[this.spineItemIndex],
-                                         (success:  boolean) => {
-                                           if (success) {
-                                             this.onSpineItemOnePageViewLoaded();
-                                             resolve();
-                                           }
-                                         });
+      this.contentViewImpl.loadSpineItem(
+        this.rsjSpine.items[this.spineItemIndex],
+        (success: boolean) => {
+          if (success) {
+            this.onSpineItemOnePageViewLoaded();
+            resolve();
+          }
+        },
+      );
     });
   }
 
