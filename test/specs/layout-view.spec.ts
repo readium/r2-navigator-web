@@ -69,5 +69,14 @@ describe('LayoutView', () => {
       assert.equal(layoutView.getLoadedStartPostion(), -400);
       assert.equal(layoutView.getLoadedEndPosition(), 200);
     });
+
+    it('resize()', async () => {
+      await layoutView.ensureConentLoadedAtRange(0, 400);
+
+      layoutView.setPageSize(400, 400);
+
+      assert.equal(layoutView.getLoadedStartPostion(), 0);
+      assert.equal(layoutView.getLoadedEndPosition(), 800);
+    });
   });
 });

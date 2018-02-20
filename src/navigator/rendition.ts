@@ -6,6 +6,8 @@ import { Viewport } from './views/viewport';
 export class Rendition {
   public viewport: Viewport;
 
+  private bookView: LayoutView;
+
   private pub: Publication;
 
   private pageWidth: number;
@@ -21,6 +23,10 @@ export class Rendition {
   public setPageSize(pageWidth: number, pageHeight: number): void {
     this.pageWidth = pageWidth;
     this.pageHeight = pageHeight;
+
+    if (this.bookView) {
+      this.bookView.setPageSize(this.pageWidth, this.pageHeight);
+    }
   }
 
   public setVeiwAsVertical(v: boolean): void {
@@ -36,11 +42,11 @@ export class Rendition {
   }
 
   public render(): Promise<void> {
-    const bookView = new LayoutView(this.pub);
-    bookView.setPageSize(this.pageWidth, this.pageHeight);
-    bookView.setVerticalLayout(this.viewAsVertical);
+    this.bookView = new LayoutView(this.pub);
+    this.bookView.setPageSize(this.pageWidth, this.pageHeight);
+    this.bookView.setVerticalLayout(this.viewAsVertical);
 
-    this.viewport.setView(bookView);
+    this.viewport.setView(this.bookView);
 
     return Promise.resolve();
   }

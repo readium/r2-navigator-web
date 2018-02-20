@@ -70,6 +70,8 @@ export class LayoutView extends View {
     } else {
       this.layoutRoot.style.width = `${width}px`;
     }
+
+    this.resize();
   }
 
   public setVerticalLayout(v: boolean): void {
@@ -250,6 +252,36 @@ export class LayoutView extends View {
     const nextIndex = this.nextIndexBeforeStart();
 
     return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
+  }
+
+  private resize(): void {
+    this.spineItemViewSizes.fill(-1);
+
+    if (this.spineItemViewStatus.length === 0) {
+      return;
+    }
+
+    let offset = this.startViewStatus().offset;
+    this.loadedContentRange[0] = this.paginatedRange[0] = offset;
+    for (const vs of this.spineItemViewStatus) {
+      vs.viewContainer.style.width = `${this.pageWidth}px`;
+      if (!this.isVertical) {
+        vs.viewContainer.style.height = `${this.pageHeight}px`;
+      }
+
+      vs.view.resize();
+
+      vs.viewSize = vs.view.getTotalSize(this.pageWidth);
+      vs.offset = offset;
+      vs.viewContainer.style.transform = this.cssTranslateValue(offset);
+
+      offset += vs.viewSize;
+      this.spineItemViewSizes[vs.spineItemIndex] = vs.viewSize;
+    }
+
+    this.loadedContentRange[1] = this.paginatedRange[1] = offset;
+
+    this.updatePaginatedRange();
   }
 
   private updatePaginatedRange(): void {

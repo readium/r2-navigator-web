@@ -91,6 +91,13 @@ export class SpineItemView extends View {
     return !this.isEmpty;
   }
 
+  public resize(): void {
+    this.contentViewImpl.onViewportResize();
+
+    const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
+    this.spineItemPageCount = pageInfo.spineItemPageCount;
+  }
+
   public render(): void {
     this.contentViewImpl.render();
   }
