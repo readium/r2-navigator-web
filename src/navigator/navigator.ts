@@ -21,6 +21,10 @@ export class Navigator {
     await this.rendition.viewport.prevScreen();
   }
 
+  public async ensureLoaded(): Promise<void> {
+    await this.rendition.viewport.ensureLoaded();
+  }
+
   public getCurrentLocation(): Location | undefined | null {
     const pos = this.rendition.viewport.getStartPosition();
 

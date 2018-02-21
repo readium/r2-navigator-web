@@ -17,7 +17,7 @@ class ReflowableViewMock {
 
 export class SpineItemViewMock extends SpineItemView {
   public loadSpineItem(spineItem: Link): Promise<void> {
-    this.isEmpty = false;
+    this.isInUse = true;
     this.contentViewImpl = new ReflowableViewMock(spineItem, this.host);
 
     return Promise.resolve();

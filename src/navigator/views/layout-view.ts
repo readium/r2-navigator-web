@@ -144,6 +144,12 @@ export class LayoutView extends View {
     return res;
   }
 
+  public async ensureLoaded(): Promise<void> {
+    for (const siv of this.spineItemViewStatus) {
+      await siv.view.ensureContentLoaded();
+    }
+  }
+
   public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
     this.removeOutOfRangeSpineItems(start, end);
 
@@ -438,7 +444,7 @@ export class LayoutView extends View {
       }
 
       this.spineItemViewStatus = this.spineItemViewStatus.filter((vs: SpineItemViewStatus) => {
-        return vs.view.hasSpineItemLoaded();
+        return vs.view.isSpineItemInUse();
       });
     }
   }

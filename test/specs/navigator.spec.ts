@@ -59,6 +59,8 @@ describe('Navigator', () => {
     it('nextScreen()', async () => {
       await navigator.nextScreen();
 
+      await navigator.ensureLoaded();
+
       const loc = navigator.getCurrentLocation();
 
       assert(loc);
@@ -71,10 +73,12 @@ describe('Navigator', () => {
       await navigator.nextScreen();
       await navigator.previousScreen();
 
+      await navigator.ensureLoaded();
+
       const loc = navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), null);
+      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 

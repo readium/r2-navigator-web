@@ -128,6 +128,11 @@ export class Viewport {
     }
   }
 
+  public async ensureLoaded(): Promise<void> {
+    await this.bookView.ensureLoaded();
+    this.updatePositions();
+  }
+
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {

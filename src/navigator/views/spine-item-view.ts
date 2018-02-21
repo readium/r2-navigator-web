@@ -10,8 +10,10 @@ import {
   ViewerSettings,
 } from 'readium-shared-js';
 
-export class SpineItemPaginationInfo {
-  public spineItemPageIndex: number;
+export enum ContentLoadingStatus {
+  NotLoaded,
+  Loading,
+  Loaded,
 }
 
 export class SpineItemView extends View {
@@ -30,7 +32,9 @@ export class SpineItemView extends View {
   protected spineItemIndex: number;
   protected spineItemPageCount: number = 0;
 
-  protected isEmpty: boolean = true;
+  protected isInUse: boolean = true;
+
+  protected contentStatus: ContentLoadingStatus = ContentLoadingStatus.NotLoaded;
 
   protected isVertical: boolean = true;
 
@@ -64,7 +68,8 @@ export class SpineItemView extends View {
       iframeLoader: this.iframeLoader,
       expandDocumentFullWidth: true,
     };
-    this.isEmpty = false;
+
+    this.contentStatus = ContentLoadingStatus.Loading;
 
     const reader = {
       fonts: {},
@@ -84,11 +89,23 @@ export class SpineItemView extends View {
     while (this.host.firstChild) {
       this.host.removeChild(this.host.firstChild);
     }
-    this.isEmpty = true;
+    this.isInUse = false;
   }
 
-  public hasSpineItemLoaded(): boolean {
-    return !this.isEmpty;
+  public isSpineItemInUse(): boolean {
+    return this.isInUse;
+  }
+
+  public ensureContentLoaded(): Promise<void> {
+    if (this.contentStatus === ContentLoadingStatus.Loaded) {
+      return Promise.resolve();
+    }
+
+    if (this.contentStatus === ContentLoadingStatus.Loading) {
+      return this.paginationChangedPromise();
+    }
+
+    return Promise.reject('Not loaded');
   }
 
   public resize(): void {
@@ -178,6 +195,7 @@ export class SpineItemView extends View {
         handler,
       );
       this.spineItemPageCount = pageInfo.spineItemPageCount;
+      this.contentStatus = ContentLoadingStatus.Loaded;
       console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
       resolve();
     }
