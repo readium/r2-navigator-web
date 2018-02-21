@@ -136,7 +136,7 @@ export class LayoutView extends View {
           spineItemIndex: siv.spineItemIndex,
           spineItemPageCount: siv.view.getTotalPageCount(),
           pageIndex: Math.floor((offset - siv.offset) / this.pageWidth),
-          contentCfi: '',
+          contentCfi: siv.view.getCfi(offset - siv.offset, 0),
         });
       }
     }

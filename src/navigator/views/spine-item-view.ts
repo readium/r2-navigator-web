@@ -114,6 +114,15 @@ export class SpineItemView extends View {
     return this.isVertical ? this.contentHeight : this.spineItemPageCount * pageWidth;
   }
 
+  public getCfi(offsetMain: number, offset2nd: number): string {
+    const navLogic = this.contentViewImpl.getNavigationLogic();
+
+    const visOffset = this.isVertical ? { top: offsetMain, left: offset2nd } :
+                                        { top: offset2nd, left: offsetMain };
+
+    return navLogic.getFirstVisibleCfi(visOffset);
+  }
+
   // tslint:disable-next-line:no-any
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new OnePageView(params, ['content-doc-frame'], false, reader);

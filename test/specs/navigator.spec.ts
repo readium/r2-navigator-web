@@ -50,7 +50,7 @@ describe('Navigator', () => {
       const loc = navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), '');
+      assert.equal(loc!.getLocation(), '/4/2[title-page]/2/1:0');
       assert.equal(loc!.getHref(), 'OEBPS/title-page.html');
     });
   });
@@ -62,7 +62,7 @@ describe('Navigator', () => {
       const loc = navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), '');
+      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 
@@ -74,7 +74,7 @@ describe('Navigator', () => {
       const loc = navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), '');
+      assert.equal(loc!.getLocation(), null);
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 
