@@ -13,7 +13,8 @@ export class PaginationInfo {
   public spineItemIndex: number;
   public spineItemPageCount: number;
   public pageIndex: number;
-  public contentCfi: string;
+  public view: SpineItemView;
+  public offsetInView: number;
 }
 
 class SpineItemViewStatus {
@@ -136,7 +137,8 @@ export class LayoutView extends View {
           spineItemIndex: siv.spineItemIndex,
           spineItemPageCount: siv.view.getTotalPageCount(),
           pageIndex: Math.floor((offset - siv.offset) / this.pageWidth),
-          contentCfi: siv.view.getCfi(offset - siv.offset, 0),
+          view: siv.view,
+          offsetInView: offset - siv.offset,
         });
       }
     }

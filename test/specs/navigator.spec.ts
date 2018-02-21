@@ -12,7 +12,7 @@ describe('Navigator', () => {
   let viewportDiv: HTMLElement;
   let navigator: Navigator;
 
-  let bookInitLocation: Location;
+  let bookInitLocation: Location | undefined | null;
 
   before(() => {
     const head = document.querySelector('head');
@@ -38,7 +38,7 @@ describe('Navigator', () => {
     await rendition.viewport.renderAtOffset(0);
 
     navigator = new Navigator(rendition);
-    bookInitLocation = navigator.getCurrentLocation()!;
+    bookInitLocation = await navigator.getCurrentLocation()!;
   });
 
   afterEach(() => {
@@ -47,7 +47,7 @@ describe('Navigator', () => {
 
   describe('#rendition', () => {
     it('render()', async () => {
-      const loc = navigator.getCurrentLocation();
+      const loc = await navigator.getCurrentLocation();
 
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2[title-page]/2/1:0');
@@ -59,9 +59,7 @@ describe('Navigator', () => {
     it('nextScreen()', async () => {
       await navigator.nextScreen();
 
-      await navigator.ensureLoaded();
-
-      const loc = navigator.getCurrentLocation();
+      const loc = await navigator.getCurrentLocation();
 
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
@@ -73,9 +71,7 @@ describe('Navigator', () => {
       await navigator.nextScreen();
       await navigator.previousScreen();
 
-      await navigator.ensureLoaded();
-
-      const loc = navigator.getCurrentLocation();
+      const loc = await navigator.getCurrentLocation();
 
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');

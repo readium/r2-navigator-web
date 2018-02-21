@@ -1,6 +1,7 @@
 import { Publication } from '../streamer/publication';
 import { Location } from './location';
 import { Rendition } from './rendition';
+import { PaginationInfo } from './views/layout-view';
 import { Viewport } from './views/viewport';
 
 export class Navigator {
@@ -25,10 +26,10 @@ export class Navigator {
     await this.rendition.viewport.ensureLoaded();
   }
 
-  public getCurrentLocation(): Location | undefined | null {
+  public async getCurrentLocation(): Promise<Location | undefined | null> {
     const pos = this.rendition.viewport.getStartPosition();
 
-    return pos ? new Location(pos.contentCfi, this.pub.Spine[pos.spineItemIndex].Href) : pos;
+    return this.locationFromPagination(pos);
   }
 
   public gotoLocation(loc: Location): Promise<void> {
@@ -39,14 +40,14 @@ export class Navigator {
     return Promise.resolve();
   }
 
-  public getScreenBegin(): Location | undefined | null {
+  public getScreenBegin(): Promise<Location | undefined | null> {
     return this.getCurrentLocation();
   }
 
-  public getScreenEnd(): Location | undefined | null {
+  public async getScreenEnd(): Promise<Location | undefined | null> {
     const pos = this.rendition.viewport.getEndPosition();
 
-    return pos ? new Location(pos.contentCfi, this.pub.Spine[pos.spineItemIndex].Href) : pos;
+    return this.locationFromPagination(pos);
   }
 
   public isFirstScreen(): boolean {
@@ -103,4 +104,15 @@ export class Navigator {
   // public getCurrentScreenIndexSpine(): number {
   //   return -1;
   // }
+
+  private async locationFromPagination(pos?: PaginationInfo): Promise<Location | undefined | null> {
+    if (!pos) {
+      return pos;
+    }
+
+    await pos.view.ensureContentLoaded();
+
+    return new Location(pos.view.getCfi(pos.offsetInView, 0),
+                        this.pub.Spine[pos.spineItemIndex].Href);
+  }
 }
