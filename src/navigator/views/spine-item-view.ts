@@ -74,6 +74,7 @@ export class SpineItemView extends View {
     const reader = {
       fonts: {},
       viewerSettings: () => this.rsjViewSettings,
+      needsFixedLayoutScalerWorkAround: () => false,
     };
 
     if (this.isVertical) {
@@ -132,7 +133,7 @@ export class SpineItemView extends View {
   }
 
   public getCfi(offsetMain: number, offset2nd: number): string {
-    const navLogic = this.contentViewImpl.getNavigationLogic();
+    const navLogic = this.contentViewImpl.getNavigator();
 
     const visOffset = this.isVertical ? { top: offsetMain, left: offset2nd } :
                                         { top: offset2nd, left: offsetMain };
