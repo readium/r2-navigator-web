@@ -8,19 +8,17 @@ export class Navigator {
 
   private pub: Publication;
 
-  private hasPendingAction: boolean = false;
-
   constructor(rendition: Rendition) {
     this.rendition = rendition;
     this.pub = rendition.getPublication();
   }
 
   public async nextScreen(): Promise<void> {
-    await this.executeAsyncAction(this.rendition.viewport.nextScreen);
+    await this.rendition.viewport.nextScreen();
   }
 
   public async previousScreen(): Promise<void> {
-    await this.executeAsyncAction(this.rendition.viewport.prevScreen);
+    await this.rendition.viewport.prevScreen();
   }
 
   public getCurrentLocation(): Location | undefined | null {
@@ -101,14 +99,4 @@ export class Navigator {
   // public getCurrentScreenIndexSpine(): number {
   //   return -1;
   // }
-
-  private async executeAsyncAction(action: () => Promise<void>): Promise<void> {
-    if (this.hasPendingAction) {
-      return Promise.resolve();
-    }
-
-    this.hasPendingAction = true;
-    await action();
-    this.hasPendingAction = false;
-  }
 }

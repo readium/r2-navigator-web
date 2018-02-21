@@ -131,7 +131,7 @@ export class LayoutView extends View {
 
     for (const siv of this.spineItemViewStatus) {
       if (offset >= siv.offset &&
-          offset <= siv.offset + siv.view.getTotalSize(this.pageWidth)) {
+          offset <= siv.offset + siv.viewSize) {
         res.push({
           spineItemIndex: siv.spineItemIndex,
           spineItemPageCount: siv.view.getTotalPageCount(),
