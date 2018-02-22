@@ -1,4 +1,4 @@
-import { Link } from '../../epub-model/publication-link';
+import { PublicationLink } from "r2-shared-js";
 import { Publication } from '../publication';
 
 export class PackageDocument {
@@ -114,7 +114,7 @@ export class PackageDocument {
   }
 
   private getSharedJsSpine(): object {
-    return this.pub.Spine.map((pubSpineItem: Link) => {
+    return this.pub.Spine.map((pubSpineItem: PublicationLink) => {
       return {
         href: pubSpineItem.Href,
         media_type: pubSpineItem.TypeLink,

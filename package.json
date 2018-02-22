@@ -52,7 +52,7 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
-    "readium-shared-js": "latest",
-    "ta-json": "^2.3.1"
+    "r2-shared-js": "github:edrlab/r2-shared-js-dist#develop",
+    "readium-shared-js": "latest"
   }
 }

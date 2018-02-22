@@ -1,4 +1,4 @@
-import { Link } from '../../epub-model/publication-link';
+import { PublicationLink } from 'r2-shared-js';
 import { IFrameLoader } from '../iframe-loader';
 import { View } from './view';
 
@@ -21,14 +21,14 @@ export class SpineItemView extends View {
 
   protected iframeLoader: IFrameLoader;
 
-  protected spine: Link[];
+  protected spine: PublicationLink[];
   // tslint:disable-next-line:no-any
   protected rsjSpine: any;
 
   // tslint:disable-next-line:no-any
   protected rsjViewSettings: any = new ViewerSettings({ syntheticSpread: 'single' });
 
-  protected spineItem: Link;
+  protected spineItem: PublicationLink;
   protected spineItemIndex: number;
   protected spineItemPageCount: number = 0;
 
@@ -45,7 +45,7 @@ export class SpineItemView extends View {
 
   public constructor(
     iframeLoader: IFrameLoader,
-    spine: Link[],
+    spine: PublicationLink[],
     // tslint:disable-next-line:no-any
     rsjSpine: any,
     isVertical: boolean,
@@ -57,7 +57,7 @@ export class SpineItemView extends View {
     this.isVertical = isVertical;
   }
 
-  public loadSpineItem(spineItem: Link): Promise<void> {
+  public loadSpineItem(spineItem: PublicationLink): Promise<void> {
     this.spineItemIndex = this.spine.indexOf(spineItem);
 
     const readiumViewParams = {

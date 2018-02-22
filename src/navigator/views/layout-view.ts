@@ -1,9 +1,7 @@
-import { Link } from '../../epub-model/publication-link';
 import { Publication } from '../../streamer/publication';
 import { PackageDocument } from '../../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from '../iframe-loader';
 import { SpineItemView } from './spine-item-view';
-import { SpineItemViewMock } from './spine-item-view-mock';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies

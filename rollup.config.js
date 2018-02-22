@@ -6,7 +6,8 @@ const pkg = require('./package.json');
 
 export default {
   input: './src/navigator/index.ts',
-  output: [{
+  output: [
+    {
       file: pkg.module,
       format: 'es',
       sourcemap: true,
@@ -17,15 +18,15 @@ export default {
       name: 'readiumNg',
       sourcemap: true,
       globals: {
-        'readium-shared-js': 'readiumSharedJs'
+        'readium-shared-js': 'readiumSharedJs',
+        'r2-shared-js': 'r2SharedJs'
       }
     }
   ],
-  external: ['readium-shared-js'],
-  // 'ta-json' is not made external because of the "dependencies" for the 'globals' in UMD output.
-  //   Someone importing this UMD module with the 'globals' option
-  //   would find it hard to include 'ta-json'
-  //   because it only publishes itself as CommonJS at this time.
+  external: [
+    'readium-shared-js',
+    'r2-shared-js'
+  ],
   plugins: [
     resolve(),
     typescript2(),

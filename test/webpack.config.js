@@ -20,16 +20,12 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "ts-loader"
       },
-      
+
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       {
         enforce: "pre",
         test: /\.js$/,
-        loader: "source-map-loader",
-        exclude: [
-          // this package has issues with this loader
-          path.resolve(__dirname,"../node_modules/ta-json")
-        ]
+        loader: "source-map-loader"
       }
     ]
   }

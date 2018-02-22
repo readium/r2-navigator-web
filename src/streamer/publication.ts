@@ -1,4 +1,4 @@
-import { Publication as PublicationBase } from '../epub-model/publication';
+import { Publication as PublicationBase } from 'r2-shared-js';
 
 export class Publication extends PublicationBase {
   public baseUri: string;

@@ -1,6 +1,4 @@
-import { JSON as TAJSON } from 'ta-json';
-
-import { Publication as PublicationBase } from '../epub-model/publication';
+import { Publication as PublicationBase } from 'r2-shared-js';
 import { Publication } from '../streamer/publication';
 
 export class StreamerClient {
@@ -19,7 +17,7 @@ export class StreamerClient {
   }
 
   public openPublicationFromJson(webpub: string): Publication {
-    const basePub = TAJSON.parse<PublicationBase>(webpub, PublicationBase);
+    const basePub = PublicationBase.parse(webpub);
 
     const pub = new Publication(webpub);
     Object.assign(pub, basePub);
