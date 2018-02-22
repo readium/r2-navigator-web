@@ -110,6 +110,10 @@ export class SpineItemView extends View {
   }
 
   public resize(): void {
+    if (this.isVertical) {
+      return;
+    }
+
     this.contentViewImpl.onViewportResize();
 
     const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
