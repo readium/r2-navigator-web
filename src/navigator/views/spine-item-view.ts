@@ -120,6 +120,12 @@ export class SpineItemView extends View {
     this.spineItemPageCount = pageInfo.spineItemPageCount;
   }
 
+  public updateViewSettings(data: object): void {
+    this.rsjViewSettings.update(data);
+
+    this.contentViewImpl.setViewSettings(this.rsjViewSettings);
+  }
+
   public render(): void {
     this.contentViewImpl.render();
   }

@@ -70,7 +70,11 @@ export class LayoutView extends View {
       this.layoutRoot.style.width = `${width}px`;
     }
 
-    this.resize();
+    this.rePaginate();
+  }
+
+  public updateViewSettings(viewSetting: object): void {
+    this.rePaginate(viewSetting);
   }
 
   public setVerticalLayout(v: boolean): void {
@@ -260,7 +264,7 @@ export class LayoutView extends View {
     return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
   }
 
-  private resize(): void {
+  private rePaginate(viewSetting?: object): void {
     this.spineItemViewSizes.fill(-1);
 
     if (this.spineItemViewStatus.length === 0) {
@@ -270,12 +274,16 @@ export class LayoutView extends View {
     let offset = this.startViewStatus().offset;
     this.loadedContentRange[0] = this.paginatedRange[0] = offset;
     for (const vs of this.spineItemViewStatus) {
-      vs.viewContainer.style.width = `${this.pageWidth}px`;
-      if (!this.isVertical) {
-        vs.viewContainer.style.height = `${this.pageHeight}px`;
-      }
+      if (!viewSetting) {
+        vs.viewContainer.style.width = `${this.pageWidth}px`;
+        if (!this.isVertical) {
+          vs.viewContainer.style.height = `${this.pageHeight}px`;
+        }
 
-      vs.view.resize();
+        vs.view.resize();
+      } else {
+        vs.view.updateViewSettings(viewSetting);
+      }
 
       vs.viewSize = vs.view.getTotalSize(this.pageWidth);
       vs.offset = offset;

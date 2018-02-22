@@ -29,6 +29,12 @@ export class Rendition {
     }
   }
 
+  public updateViewSettings(viewSettings: object): void {
+    if (this.bookView) {
+      this.bookView.updateViewSettings(viewSettings);
+    }
+  }
+
   public setVeiwAsVertical(v: boolean): void {
     this.viewAsVertical = v;
   }
