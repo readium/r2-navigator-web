@@ -29,9 +29,9 @@ export class Rendition {
     }
   }
 
-  public updateViewSettings(viewSettings: object): void {
+  public async updateViewSettings(viewSettings: object): Promise<void> {
     if (this.bookView) {
-      this.bookView.updateViewSettings(viewSettings);
+      await this.bookView.updateViewSettings(viewSettings);
     }
   }
 

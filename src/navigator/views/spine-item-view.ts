@@ -26,7 +26,7 @@ export class SpineItemView extends View {
   protected rsjSpine: any;
 
   // tslint:disable-next-line:no-any
-  protected rsjViewSettings: any = new ViewerSettings({ syntheticSpread: 'single' });
+  protected rsjViewSettings: any;
 
   protected spineItem: PublicationLink;
   protected spineItemIndex: number;
@@ -48,12 +48,15 @@ export class SpineItemView extends View {
     spine: PublicationLink[],
     // tslint:disable-next-line:no-any
     rsjSpine: any,
+    // tslint:disable-next-line:no-any
+    rsjViewSetting: any,
     isVertical: boolean,
   ) {
     super();
     this.iframeLoader = iframeLoader;
     this.spine = spine;
     this.rsjSpine = rsjSpine;
+    this.rsjViewSettings = rsjViewSetting;
     this.isVertical = isVertical;
   }
 
@@ -76,10 +79,6 @@ export class SpineItemView extends View {
       viewerSettings: () => this.rsjViewSettings,
       needsFixedLayoutScalerWorkAround: () => false,
     };
-
-    if (this.isVertical) {
-      return this.loadSpineItemOnePageView(readiumViewParams, reader);
-    }
 
     return this.isVertical
       ? this.loadSpineItemOnePageView(readiumViewParams, reader)
@@ -120,10 +119,12 @@ export class SpineItemView extends View {
     this.spineItemPageCount = pageInfo.spineItemPageCount;
   }
 
-  public updateViewSettings(data: object): void {
-    this.rsjViewSettings.update(data);
+  public setViewSettings(viewSetting: object): Promise<void> {
+    this.rsjViewSettings = viewSetting;
 
     this.contentViewImpl.setViewSettings(this.rsjViewSettings);
+
+    return this.paginationChangedPromise();
   }
 
   public render(): void {

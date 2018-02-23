@@ -78,5 +78,17 @@ describe('LayoutView', () => {
       assert.equal(layoutView.getLoadedStartPostion(), 0);
       assert.equal(layoutView.getLoadedEndPosition(), 800);
     });
+
+    it('changeFontSize()', async () => {
+      await layoutView.ensureContentLoadedAtSpineItemRange(3, 4);
+
+      assert.equal(layoutView.getLoadedStartPostion(), 0);
+      assert.equal(layoutView.getLoadedEndPosition(), 17000);
+
+      await layoutView.updateViewSettings({ fontSize: 60 });
+
+      assert.equal(layoutView.getLoadedStartPostion(), 0);
+      assert.equal(layoutView.getLoadedEndPosition(), 6200);
+    });
   });
 });

@@ -5,7 +5,7 @@ import { SpineItemView } from './spine-item-view';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
-import { Package as ReadiumPackage } from 'readium-shared-js';
+import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
 
 export class PaginationInfo {
   public spineItemIndex: number;
@@ -35,6 +35,10 @@ export class LayoutView extends View {
   // tslint:disable-next-line:no-any
   private rsjPackage: any;
 
+  // tslint:disable-next-line:no-any
+  private rsjViewSettings: any = new ViewerSettings({ syntheticSpread: 'single' });
+  private isViewSettingChanged: boolean = false;
+
   private iframeLoader: IFrameLoader;
 
   private loadedContentRange: [number, number] = [0, 0];
@@ -42,6 +46,7 @@ export class LayoutView extends View {
 
   private pageWidth: number = 600;
   private pageHeight: number = 800;
+  private isPageSizeChanged: boolean = false;
 
   private isVertical: boolean = false;
 
@@ -69,12 +74,19 @@ export class LayoutView extends View {
     } else {
       this.layoutRoot.style.width = `${width}px`;
     }
+    this.isPageSizeChanged = true;
 
     this.rePaginate();
+
+    this.isPageSizeChanged = false;
   }
 
-  public updateViewSettings(viewSetting: object): void {
-    this.rePaginate(viewSetting);
+  public async updateViewSettings(viewSetting: object): Promise<void> {
+    this.rsjViewSettings.update(viewSetting);
+    this.isViewSettingChanged = true;
+
+    await this.rePaginate();
+    this.isViewSettingChanged = false;
   }
 
   public setVerticalLayout(v: boolean): void {
@@ -264,7 +276,7 @@ export class LayoutView extends View {
     return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
   }
 
-  private rePaginate(viewSetting?: object): void {
+  private async rePaginate(): Promise<void> {
     this.spineItemViewSizes.fill(-1);
 
     if (this.spineItemViewStatus.length === 0) {
@@ -274,15 +286,17 @@ export class LayoutView extends View {
     let offset = this.startViewStatus().offset;
     this.loadedContentRange[0] = this.paginatedRange[0] = offset;
     for (const vs of this.spineItemViewStatus) {
-      if (!viewSetting) {
+      if (this.isViewSettingChanged) {
+        await vs.view.setViewSettings(this.rsjViewSettings);
+      }
+
+      if (this.isPageSizeChanged) {
         vs.viewContainer.style.width = `${this.pageWidth}px`;
         if (!this.isVertical) {
           vs.viewContainer.style.height = `${this.pageHeight}px`;
         }
 
         vs.view.resize();
-      } else {
-        vs.view.updateViewSettings(viewSetting);
       }
 
       vs.viewSize = vs.view.getTotalSize(this.pageWidth);
@@ -378,6 +392,7 @@ export class LayoutView extends View {
     const spineItemView = new SpineItemView(this.iframeLoader,
                                             this.publication.Spine,
                                             this.rsjPackage.spine,
+                                            this.rsjViewSettings,
                                             this.isVertical);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
