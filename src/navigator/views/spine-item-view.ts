@@ -124,7 +124,7 @@ export class SpineItemView extends View {
 
     this.contentViewImpl.setViewSettings(this.rsjViewSettings);
 
-    return this.paginationChangedPromise();
+    return this.isVertical ? this.contentSizeChangedPromise() : this.paginationChangedPromise();
   }
 
   public render(): void {
@@ -154,7 +154,7 @@ export class SpineItemView extends View {
 
   // tslint:disable-next-line:no-any
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
-    this.contentViewImpl = new OnePageView(params, ['content-doc-frame'], false, reader);
+    this.contentViewImpl = new OnePageView(params, ['content-doc-frame'], true, reader);
 
     this.contentViewImpl.render();
 
@@ -220,6 +220,36 @@ export class SpineItemView extends View {
       };
       this.contentViewImpl.on(
         this.getReadium().InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+        handler,
+      );
+    });
+  }
+
+  // tslint:disable-next-line:no-any
+  private contentSizeChangedHandler(iframe: any, spineItem: any, handler: any,
+                                    resolve: () => void): void {
+    if (this.rsjSpine.items[this.spineItemIndex] !== spineItem) {
+      return;
+    }
+
+    this.contentViewImpl.resizeIFrameToContent();
+    this.contentHeight = this.contentViewImpl.getCalculatedPageHeight();
+
+    this.contentViewImpl.removeListener(
+      OnePageView.Events.CONTENT_SIZE_CHANGED,
+      handler,
+    );
+    resolve();
+  }
+
+  private contentSizeChangedPromise(): Promise<void> {
+    return new Promise<void>((resolve: () => void) => {
+      // tslint:disable-next-line:no-any
+      const handler = (iframe: any, spineItem: any) => {
+        this.contentSizeChangedHandler(iframe, spineItem, handler, resolve);
+      };
+      this.contentViewImpl.on(
+        OnePageView.Events.CONTENT_SIZE_CHANGED,
         handler,
       );
     });
