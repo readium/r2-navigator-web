@@ -38,6 +38,8 @@ export class SpineItemView extends View {
 
   protected isVertical: boolean = true;
 
+  protected isFixedLayout: boolean = false;
+
   protected contentHeight: number = 0;
 
   // tslint:disable-next-line:no-any
@@ -51,6 +53,7 @@ export class SpineItemView extends View {
     // tslint:disable-next-line:no-any
     rsjViewSetting: any,
     isVertical: boolean,
+    isFixedLayout: boolean,
   ) {
     super();
     this.iframeLoader = iframeLoader;
@@ -58,6 +61,7 @@ export class SpineItemView extends View {
     this.rsjSpine = rsjSpine;
     this.rsjViewSettings = rsjViewSetting;
     this.isVertical = isVertical;
+    this.isFixedLayout = isFixedLayout;
   }
 
   public loadSpineItem(spineItem: PublicationLink): Promise<void> {
@@ -80,7 +84,7 @@ export class SpineItemView extends View {
       needsFixedLayoutScalerWorkAround: () => false,
     };
 
-    return this.isVertical
+    return this.isVertical || this.isFixedLayout
       ? this.loadSpineItemOnePageView(readiumViewParams, reader)
       : this.laodSpineItemReflowableView(readiumViewParams, reader);
   }
@@ -94,6 +98,10 @@ export class SpineItemView extends View {
 
   public isSpineItemInUse(): boolean {
     return this.isInUse;
+  }
+
+  public fixedLayout(): boolean {
+    return this.isFixedLayout;
   }
 
   public ensureContentLoaded(): Promise<void> {
@@ -117,6 +125,17 @@ export class SpineItemView extends View {
 
     const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
     this.spineItemPageCount = pageInfo.spineItemPageCount;
+  }
+
+  public resizePageToFit(pageWidth: number, pageHeight: number): void {
+    if (!this.isFixedLayout) {
+      return;
+    }
+
+    const hScale = pageWidth / this.contentViewImpl.meta_width();
+    const vScale = pageHeight / this.contentViewImpl.meta_height();
+    const scale = this.isVertical ? hScale : Math.min(hScale, vScale);
+    this.contentViewImpl.transformContentImmediate(scale, 0, 0);
   }
 
   public setViewSettings(viewSetting: object): Promise<void> {
@@ -154,7 +173,10 @@ export class SpineItemView extends View {
 
   // tslint:disable-next-line:no-any
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
-    this.contentViewImpl = new OnePageView(params, ['content-doc-frame'], true, reader);
+    this.contentViewImpl = new OnePageView(params,
+                                           ['content-doc-frame'],
+                                           !this.isFixedLayout,
+                                           reader);
 
     this.contentViewImpl.render();
 

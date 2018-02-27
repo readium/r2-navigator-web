@@ -389,11 +389,13 @@ export class LayoutView extends View {
   }
 
   private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
+    const isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
     const spineItemView = new SpineItemView(this.iframeLoader,
                                             this.publication.Spine,
                                             this.rsjPackage.spine,
                                             this.rsjViewSettings,
-                                            this.isVertical);
+                                            this.isVertical,
+                                            isFixedLayout);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
     spineItemViewContainer.style.position = 'absolute';
@@ -409,7 +411,9 @@ export class LayoutView extends View {
     let viewLength: number;
     if (this.spineItemViewSizes[index] > 0) {
       viewLength = this.spineItemViewSizes[index];
-      spineItemView.loadSpineItem(this.publication.Spine[index]);
+      spineItemView.loadSpineItem(this.publication.Spine[index]).then(() => {
+        this.onSpineItemLoaded(spineItemView);
+      });
     } else {
       this.hasUnknownSizeSpineItemLoading = true;
       await spineItemView.loadSpineItem(this.publication.Spine[index]);
@@ -417,6 +421,8 @@ export class LayoutView extends View {
 
       viewLength = spineItemView.getTotalSize(this.pageWidth);
       this.spineItemViewSizes[index] = viewLength;
+
+      this.onSpineItemLoaded(spineItemView);
     }
 
     return {
@@ -426,6 +432,12 @@ export class LayoutView extends View {
       view: spineItemView,
       viewSize: viewLength,
     };
+  }
+
+  private onSpineItemLoaded(siv: SpineItemView): void {
+    if (siv.fixedLayout()) {
+      siv.resizePageToFit(this.pageWidth, this.pageHeight);
+    }
   }
 
   private cssTranslateValue(offset: number): string {
