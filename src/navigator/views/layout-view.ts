@@ -419,10 +419,10 @@ export class LayoutView extends View {
       await spineItemView.loadSpineItem(this.publication.Spine[index]);
       this.hasUnknownSizeSpineItemLoading = false;
 
+      this.onSpineItemLoaded(spineItemView);
+
       viewLength = spineItemView.getTotalSize(this.pageWidth);
       this.spineItemViewSizes[index] = viewLength;
-
-      this.onSpineItemLoaded(spineItemView);
     }
 
     return {

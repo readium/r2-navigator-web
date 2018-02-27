@@ -39,6 +39,7 @@ export class SpineItemView extends View {
   protected isVertical: boolean = true;
 
   protected isFixedLayout: boolean = false;
+  protected scale: number = 1;
 
   protected contentHeight: number = 0;
 
@@ -127,6 +128,19 @@ export class SpineItemView extends View {
     this.spineItemPageCount = pageInfo.spineItemPageCount;
   }
 
+  public getScale(): number {
+    return this.scale;
+  }
+
+  public setScale(scale: number): void {
+    if (!this.isFixedLayout) {
+      return;
+    }
+
+    this.scale = scale;
+    this.contentViewImpl.transformContentImmediate(scale, 0, 0);
+  }
+
   public resizePageToFit(pageWidth: number, pageHeight: number): void {
     if (!this.isFixedLayout) {
       return;
@@ -135,7 +149,7 @@ export class SpineItemView extends View {
     const hScale = pageWidth / this.contentViewImpl.meta_width();
     const vScale = pageHeight / this.contentViewImpl.meta_height();
     const scale = this.isVertical ? hScale : Math.min(hScale, vScale);
-    this.contentViewImpl.transformContentImmediate(scale, 0, 0);
+    this.setScale(scale);
   }
 
   public setViewSettings(viewSetting: object): Promise<void> {
@@ -159,7 +173,15 @@ export class SpineItemView extends View {
   }
 
   public getTotalSize(pageWidth: number): number {
-    return this.isVertical ? this.contentHeight : this.spineItemPageCount * pageWidth;
+    if (this.isVertical) {
+      if (this.isFixedLayout) {
+        return this.contentViewImpl.meta_height() * this.scale;
+      }
+
+      return this.contentHeight;
+    }
+
+    return this.spineItemPageCount * pageWidth;
   }
 
   public getCfi(offsetMain: number, offset2nd: number): string {
