@@ -1,5 +1,6 @@
 import { PublicationLink } from 'r2-shared-js';
 import { IFrameLoader } from '../iframe-loader';
+import { ZoomOptions } from './types';
 import { View } from './view';
 
 import {
@@ -39,6 +40,7 @@ export class SpineItemView extends View {
   protected isVertical: boolean = true;
 
   protected isFixedLayout: boolean = false;
+  protected scaleOption: ZoomOptions = ZoomOptions.FitByPage;
   protected scale: number = 1;
 
   protected contentHeight: number = 0;
@@ -117,39 +119,43 @@ export class SpineItemView extends View {
     return Promise.reject('Not loaded');
   }
 
-  public resize(): void {
-    if (this.isVertical) {
-      return;
+  public resize(pageWidth: number, pageHeight: number): void {
+    if (this.isFixedLayout) {
+      this.resizeFixedLayoutPage(this.scaleOption, pageWidth, pageHeight);
+    } else if (!this.isVertical) {
+      this.contentViewImpl.onViewportResize();
+
+      const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
+      this.spineItemPageCount = pageInfo.spineItemPageCount;
     }
-
-    this.contentViewImpl.onViewportResize();
-
-    const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
-    this.spineItemPageCount = pageInfo.spineItemPageCount;
   }
 
   public getScale(): number {
     return this.scale;
   }
 
-  public setScale(scale: number): void {
-    if (!this.isFixedLayout) {
-      return;
-    }
-
-    this.scale = scale;
-    this.contentViewImpl.transformContentImmediate(scale, 0, 0);
+  public setZoomOption(option: ZoomOptions): void {
+    this.scaleOption = option;
   }
 
-  public resizePageToFit(pageWidth: number, pageHeight: number): void {
-    if (!this.isFixedLayout) {
+  public resizeFixedLayoutPage(option: ZoomOptions, pageWidth: number, pageHeight: number): void {
+    if (option === ZoomOptions.Free) {
       return;
     }
+
+    this.scaleOption = option;
 
     const hScale = pageWidth / this.contentViewImpl.meta_width();
     const vScale = pageHeight / this.contentViewImpl.meta_height();
-    const scale = this.isVertical ? hScale : Math.min(hScale, vScale);
-    this.setScale(scale);
+    if (this.scaleOption === ZoomOptions.FitByPage) {
+      this.scale = this.isVertical ? hScale : Math.min(hScale, vScale);
+    } else if (this.scaleOption === ZoomOptions.FitByWidth) {
+      this.scale = hScale;
+    } else if (this.scaleOption === ZoomOptions.FitByHeight) {
+      this.scale = vScale;
+    }
+
+    this.updateScale();
   }
 
   public setViewSettings(viewSetting: object): Promise<void> {
@@ -157,7 +163,8 @@ export class SpineItemView extends View {
 
     this.contentViewImpl.setViewSettings(this.rsjViewSettings);
 
-    return this.isVertical ? this.contentSizeChangedPromise() : this.paginationChangedPromise();
+    return this.isVertical || this.isFixedLayout
+      ? this.contentSizeChangedPromise() : this.paginationChangedPromise();
   }
 
   public render(): void {
@@ -179,6 +186,10 @@ export class SpineItemView extends View {
       }
 
       return this.contentHeight;
+    }
+
+    if (this.isFixedLayout) {
+      return this.contentViewImpl.meta_width() * this.scale;
     }
 
     return this.spineItemPageCount * pageWidth;
@@ -303,5 +314,13 @@ export class SpineItemView extends View {
   private getReadium(): any {
     // tslint:disable-next-line:no-any
     return (<any>window).ReadiumSDK;
+  }
+
+  private updateScale(): void {
+    if (!this.isFixedLayout) {
+      return;
+    }
+
+    this.contentViewImpl.transformContentImmediate(this.scale, 0, 0);
   }
 }

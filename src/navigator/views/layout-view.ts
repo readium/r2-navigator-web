@@ -2,6 +2,7 @@ import { Publication } from '../../streamer/publication';
 import { PackageDocument } from '../../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from '../iframe-loader';
 import { SpineItemView } from './spine-item-view';
+import { ZoomOptions } from './types';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
@@ -52,6 +53,10 @@ export class LayoutView extends View {
 
   private hasUnknownSizeSpineItemLoading: boolean = false;
 
+  private isFixedLayout: boolean = false;
+  private zoomOption: ZoomOptions = ZoomOptions.FitByPage;
+  private zoomScale: number = 1;
+
   public constructor(pub: Publication) {
     super();
     this.publication = pub;
@@ -64,20 +69,23 @@ export class LayoutView extends View {
     const packageDoc = new PackageDocument(this.publication);
     this.rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });
     this.rsjPackage.spine.handleLinear(true);
+
+    if (this.publication.Metadata.Rendition) {
+      this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
+    }
   }
 
   public setPageSize(width: number, height: number): void {
     this.pageWidth = width;
     this.pageHeight = height;
     if (!this.isVertical) {
-      this.layoutRoot.style.height = `${height}px`;
+      this.layoutRoot.style.height = `${this.visualPageHeight()}px`;
     } else {
-      this.layoutRoot.style.width = `${width}px`;
+      this.layoutRoot.style.width = `${this.visualPageWidth()}px`;
     }
+
     this.isPageSizeChanged = true;
-
     this.rePaginate();
-
     this.isPageSizeChanged = false;
   }
 
@@ -87,6 +95,27 @@ export class LayoutView extends View {
 
     await this.rePaginate();
     this.isViewSettingChanged = false;
+  }
+
+  public zoom(scale: number): void {
+    if (!this.isFixedLayout) {
+      return;
+    }
+
+    this.zoomScale = scale;
+
+    this.isPageSizeChanged = true;
+    this.rePaginate();
+    this.isPageSizeChanged = false;
+  }
+
+  public setZoomOption(option: ZoomOptions): void {
+    if (!this.isFixedLayout || this.zoomOption === option) {
+      return;
+    }
+
+    this.zoomOption = option;
+    this.zoom(1);
   }
 
   public setVerticalLayout(v: boolean): void {
@@ -231,6 +260,14 @@ export class LayoutView extends View {
     this.loadedContentRange = [0, 0];
   }
 
+  private visualPageWidth(): number {
+    return this.pageWidth * this.zoomScale;
+  }
+
+  private visualPageHeight(): number {
+    return this.pageHeight * this.zoomScale;
+  }
+
   private initSpineItemViews(): void {
     this.layoutRoot = document.createElement('div');
     this.layoutRoot.setAttribute('id', 'layout-view-root');
@@ -291,12 +328,13 @@ export class LayoutView extends View {
       }
 
       if (this.isPageSizeChanged) {
-        vs.viewContainer.style.width = `${this.pageWidth}px`;
+        vs.viewContainer.style.width = `${this.visualPageWidth()}px`;
         if (!this.isVertical) {
-          vs.viewContainer.style.height = `${this.pageHeight}px`;
+          vs.viewContainer.style.height = `${this.visualPageHeight()}px`;
         }
 
-        vs.view.resize();
+        vs.view.setZoomOption(this.zoomOption);
+        vs.view.resize(this.visualPageWidth(), this.visualPageHeight());
       }
 
       vs.viewSize = vs.view.getTotalSize(this.pageWidth);
@@ -389,13 +427,12 @@ export class LayoutView extends View {
   }
 
   private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
-    const isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
     const spineItemView = new SpineItemView(this.iframeLoader,
                                             this.publication.Spine,
                                             this.rsjPackage.spine,
                                             this.rsjViewSettings,
                                             this.isVertical,
-                                            isFixedLayout);
+                                            this.isFixedLayout);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
     spineItemViewContainer.style.position = 'absolute';
@@ -436,7 +473,9 @@ export class LayoutView extends View {
 
   private onSpineItemLoaded(siv: SpineItemView): void {
     if (siv.fixedLayout()) {
-      siv.resizePageToFit(this.pageWidth, this.pageHeight);
+      siv.resizeFixedLayoutPage(this.zoomOption,
+                                this.visualPageWidth(),
+                                this.visualPageHeight());
     }
   }
 

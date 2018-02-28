@@ -1,6 +1,7 @@
 import { Publication } from '../streamer/publication';
 import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
 import { LayoutView } from './views/layout-view';
+import { ZoomOptions } from './views/types';
 import { Viewport } from './views/viewport';
 
 export class Rendition {
@@ -32,6 +33,18 @@ export class Rendition {
   public async updateViewSettings(viewSettings: object): Promise<void> {
     if (this.bookView) {
       await this.bookView.updateViewSettings(viewSettings);
+    }
+  }
+
+  public zoom(scale: number): void {
+    if (this.bookView) {
+      this.bookView.zoom(scale);
+    }
+  }
+
+  public setZoomOption(option: ZoomOptions): void {
+    if (this.bookView) {
+      this.bookView.setZoomOption(option);
     }
   }
 
