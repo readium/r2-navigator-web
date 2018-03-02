@@ -1,10 +1,7 @@
 import { Publication } from '../../streamer/publication';
 import { PackageDocument } from '../../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from '../iframe-loader';
-import { Location } from '../location';
 import { SpineItemView } from './spine-item-view';
-import { ZoomOptions } from './types';
-import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
@@ -25,18 +22,15 @@ export class SpineItemViewFactory {
   private isVertical: boolean = false;
 
   // tslint:disable-next-line:no-any
-  public constructor(pub: Publication, rsjViewSettings: any) {
+  public constructor(pub: Publication, rsjViewSettings: any, isFixedLayout: boolean) {
     this.publication = pub;
     this.rsjViewSettings = rsjViewSettings;
+    this.isFixedLayout = isFixedLayout;
     this.iframeLoader = new IFrameLoader(this.publication.baseUri);
 
     const packageDoc = new PackageDocument(this.publication);
     this.rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });
     this.rsjPackage.spine.handleLinear(true);
-
-    if (this.publication.Metadata.Rendition) {
-      this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
-    }
   }
 
   public setVerticalLayout(v: boolean): void {

@@ -1,6 +1,4 @@
 import { Publication } from '../../streamer/publication';
-import { PackageDocument } from '../../streamer/readium-share-js-impl/package-document';
-import { IFrameLoader } from '../iframe-loader';
 import { Location } from '../location';
 import { SpineItemView } from './spine-item-view';
 import { SpineItemViewFactory } from './spine-item-view-factory';
@@ -8,7 +6,7 @@ import { ZoomOptions } from './types';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
-import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
+import { ViewerSettings } from 'readium-shared-js';
 
 export class PaginationInfo {
   public spineItemIndex: number;
@@ -61,7 +59,13 @@ export class LayoutView extends View {
     this.publication = pub;
     this.initSpineItemViews();
 
-    this.spineItemViewFactory = new SpineItemViewFactory(pub, this.rsjViewSettings);
+    if (this.publication.Metadata.Rendition) {
+      this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
+    }
+
+    this.spineItemViewFactory = new SpineItemViewFactory(pub,
+                                                         this.rsjViewSettings,
+                                                         this.isFixedLayout);
 
     // tslint:disable-next-line:prefer-array-literal
     this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
