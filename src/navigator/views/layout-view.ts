@@ -3,6 +3,7 @@ import { PackageDocument } from '../../streamer/readium-share-js-impl/package-do
 import { IFrameLoader } from '../iframe-loader';
 import { Location } from '../location';
 import { SpineItemView } from './spine-item-view';
+import { SpineItemViewFactory } from './spine-item-view-factory';
 import { ZoomOptions } from './types';
 import { View } from './view';
 
@@ -35,13 +36,8 @@ export class LayoutView extends View {
   private publication: Publication;
 
   // tslint:disable-next-line:no-any
-  private rsjPackage: any;
-
-  // tslint:disable-next-line:no-any
   private rsjViewSettings: any = new ViewerSettings({ syntheticSpread: 'single' });
   private isViewSettingChanged: boolean = false;
-
-  private iframeLoader: IFrameLoader;
 
   private loadedContentRange: [number, number] = [0, 0];
   private paginatedRange: [number, number] = [0, 0];
@@ -58,22 +54,17 @@ export class LayoutView extends View {
   private zoomOption: ZoomOptions = ZoomOptions.FitByPage;
   private zoomScale: number = 1;
 
+  private spineItemViewFactory: SpineItemViewFactory;
+
   public constructor(pub: Publication) {
     super();
     this.publication = pub;
-    this.iframeLoader = new IFrameLoader(this.publication.baseUri);
     this.initSpineItemViews();
+
+    this.spineItemViewFactory = new SpineItemViewFactory(pub, this.rsjViewSettings);
 
     // tslint:disable-next-line:prefer-array-literal
     this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
-
-    const packageDoc = new PackageDocument(this.publication);
-    this.rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });
-    this.rsjPackage.spine.handleLinear(true);
-
-    if (this.publication.Metadata.Rendition) {
-      this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
-    }
   }
 
   public findSpineItemIndexByHref(href: string): number {
@@ -125,6 +116,7 @@ export class LayoutView extends View {
 
   public setVerticalLayout(v: boolean): void {
     this.isVertical = v;
+    this.spineItemViewFactory.setVerticalLayout(v);
   }
 
   public isVerticalLayout(): boolean {
@@ -446,20 +438,12 @@ export class LayoutView extends View {
   }
 
   private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
-    const spineItemView = new SpineItemView(this.iframeLoader,
-                                            this.publication.Spine,
-                                            this.rsjPackage.spine,
-                                            this.rsjViewSettings,
-                                            this.isVertical,
-                                            this.isFixedLayout);
-    const spineItemViewContainer = document.createElement('div');
+    let spineItemView: SpineItemView;
+    let spineItemViewContainer: HTMLElement;
+    [spineItemView, spineItemViewContainer] =
+      this.spineItemViewFactory.createSpineItemView(this.pageWidth, this.pageHeight);
+
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
-    spineItemViewContainer.style.position = 'absolute';
-    spineItemViewContainer.style.width = `${this.pageWidth}px`;
-    if (!this.isVertical) {
-      spineItemViewContainer.style.height = `${this.pageHeight}px`;
-    }
-    spineItemView.attatchToHost(spineItemViewContainer);
 
     // RTL change
     this.layoutRoot.appendChild(spineItemViewContainer);
