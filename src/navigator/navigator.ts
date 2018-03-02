@@ -32,12 +32,8 @@ export class Navigator {
     return this.locationFromPagination(pos);
   }
 
-  public gotoLocation(loc: Location): Promise<void> {
-    // this.reader.openSpineItemElementCfi(loc.getHref(), loc.getLocation());
-
-    // return this.paginationChangedPromise();
-
-    return Promise.resolve();
+  public async gotoLocation(loc: Location): Promise<void> {
+    await this.rendition.viewport.renderAtLocation(loc);
   }
 
   public getScreenBegin(): Promise<Location | undefined | null> {

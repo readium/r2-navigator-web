@@ -1,6 +1,7 @@
 import { Publication } from '../../streamer/publication';
 import { PackageDocument } from '../../streamer/readium-share-js-impl/package-document';
 import { IFrameLoader } from '../iframe-loader';
+import { Location } from '../location';
 import { SpineItemView } from './spine-item-view';
 import { ZoomOptions } from './types';
 import { View } from './view';
@@ -73,6 +74,10 @@ export class LayoutView extends View {
     if (this.publication.Metadata.Rendition) {
       this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
     }
+  }
+
+  public findSpineItemIndexByHref(href: string): number {
+    return this.publication.findSpineItemIndexByHref(href);
   }
 
   public setPageSize(width: number, height: number): void {
@@ -187,6 +192,20 @@ export class LayoutView extends View {
     }
 
     return res;
+  }
+
+  public async getOffsetFromLocation(loc: Location): Promise<number | undefined> {
+    const siIndex = this.findSpineItemIndexByHref(loc.getHref());
+    for (const siv of this.spineItemViewStatus) {
+      if (siIndex === siv.spineItemIndex) {
+        await siv.view.ensureContentLoaded();
+        const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
+
+        return siv.offset + pageIndexOffset * this.pageWidth;
+      }
+    }
+
+    return undefined;
   }
 
   public async ensureLoaded(): Promise<void> {

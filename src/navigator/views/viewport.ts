@@ -1,3 +1,4 @@
+import { Location } from '../location';
 import { LayoutView, PaginationInfo } from './layout-view';
 import { View } from './view';
 
@@ -98,6 +99,23 @@ export class Viewport {
     await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
     this.viewOffset = 0;
 
+    this.render();
+  }
+
+  public async renderAtLocation(loc: Location): Promise<void> {
+    const spineItemIndex = this.bookView.findSpineItemIndexByHref(loc.getHref());
+    if (spineItemIndex < 0) {
+      return;
+    }
+
+    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
+
+    const offset = await this.bookView.getOffsetFromLocation(loc);
+    if (!offset) {
+      return;
+    }
+
+    this.viewOffset = offset;
     this.render();
   }
 

@@ -1,4 +1,4 @@
-import { Publication as PublicationBase } from 'r2-shared-js';
+import { Publication as PublicationBase, PublicationLink } from 'r2-shared-js';
 
 export class Publication extends PublicationBase {
   public baseUri: string;
@@ -12,5 +12,11 @@ export class Publication extends PublicationBase {
 
   public getManifestJSON(): string {
     return this.webpub;
+  }
+
+  public findSpineItemIndexByHref(href: string): number {
+    return this.Spine.findIndex((item: PublicationLink) => {
+      return item.Href === href;
+    });
   }
 }

@@ -67,6 +67,10 @@ export class SpineItemView extends View {
     this.isFixedLayout = isFixedLayout;
   }
 
+  public getPageIndexOffsetFromCfi(cfi: string): number {
+    return this.contentViewImpl.getPageIndexOffsetFromCfi(cfi);
+  }
+
   public loadSpineItem(spineItem: PublicationLink): Promise<void> {
     this.spineItemIndex = this.spine.indexOf(spineItem);
 
