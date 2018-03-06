@@ -41,6 +41,11 @@ export class Viewport {
     // tslint:disable-next-line:no-any
     (<any>this.root.style).webkitOverflowScrolling = 'auto';
 
+    // disable scrolling with rtl books for now
+    if (this.bookView.isRightToLeft() && !this.bookView.isVerticalLayout()) {
+      return;
+    }
+
     this.scrollEnabled = e;
     if (this.scrollEnabled) {
       if (this.bookView.isVerticalLayout()) {
@@ -198,11 +203,19 @@ export class Viewport {
       this.updateScrollFromViewOffset();
     } else {
       const containerElement = this.bookView.containerElement();
+      let transformString: string;
       if (this.bookView.isVerticalLayout()) {
-        containerElement.style.transform = `translateY(${-this.viewOffset}px)`;
+        transformString = `translateY(${-this.viewOffset}px)`;
       } else {
-        containerElement.style.transform = `translateX(${-this.viewOffset}px)`;
+        if (this.bookView.isRightToLeft()) {
+          const offset = this.viewOffset + this.viewportSize;
+          transformString = `translateX(${offset}px)`;
+        } else {
+          transformString = `translateX(${-this.viewOffset}px)`;
+        }
       }
+
+      containerElement.style.transform = transformString;
     }
 
     this.updatePositions();

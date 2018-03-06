@@ -54,6 +54,8 @@ export class LayoutView extends View {
 
   private spineItemViewFactory: SpineItemViewFactory;
 
+  private isRtl: boolean = false;
+
   public constructor(pub: Publication) {
     super();
     this.publication = pub;
@@ -61,6 +63,10 @@ export class LayoutView extends View {
 
     if (this.publication.Metadata.Rendition) {
       this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
+    }
+
+    if (this.publication.Metadata.Direction) {
+      this.isRtl = this.publication.Metadata.Direction === 'rtl';
     }
 
     this.spineItemViewFactory = new SpineItemViewFactory(pub,
@@ -73,6 +79,10 @@ export class LayoutView extends View {
 
   public findSpineItemIndexByHref(href: string): number {
     return this.publication.findSpineItemIndexByHref(href);
+  }
+
+  public isRightToLeft(): boolean {
+    return this.isRtl;
   }
 
   public setPageSize(width: number, height: number): void {
@@ -354,7 +364,7 @@ export class LayoutView extends View {
 
       vs.viewSize = vs.view.getTotalSize(this.pageWidth);
       vs.offset = offset;
-      vs.viewContainer.style.transform = this.cssTranslateValue(offset);
+      this.postionSpineItemView(vs);
 
       offset += vs.viewSize;
       this.spineItemViewSizes[vs.spineItemIndex] = vs.viewSize;
@@ -395,19 +405,17 @@ export class LayoutView extends View {
   private async loadNewSpineItemIndexAtEnd(index: number): Promise<void> {
     const newViewStatus = await this.loadNewSpineItem(index);
 
-    // RTL change
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
     this.spineItemViewStatus.forEach((vs: SpineItemViewStatus) => {
       newViewStatus.offset += vs.viewSize;
     });
-
-    newViewStatus.viewContainer.style.transform = this.cssTranslateValue(newViewStatus.offset);
-
     this.addNewViewStatus(newViewStatus);
 
     this.loadedContentRange[1] = newViewStatus.offset +
                                  newViewStatus.viewSize;
+
+    this.postionSpineItemView(newViewStatus);
   }
 
   private async loadNewSpineItemAtStart(): Promise<void> {
@@ -429,7 +437,6 @@ export class LayoutView extends View {
   private async loadNewSpineItemIndexAtStart(index: number): Promise<void> {
     const newViewStatus = await this.loadNewSpineItem(index);
 
-    // RTL change
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
     newViewStatus.offset -= newViewStatus.viewSize;
@@ -438,7 +445,7 @@ export class LayoutView extends View {
 
     this.loadedContentRange[0] = newViewStatus.offset;
 
-    newViewStatus.viewContainer.style.transform = this.cssTranslateValue(newViewStatus.offset);
+    this.postionSpineItemView(newViewStatus);
   }
 
   private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
@@ -449,7 +456,6 @@ export class LayoutView extends View {
 
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
 
-    // RTL change
     this.layoutRoot.appendChild(spineItemViewContainer);
 
     let viewLength: number;
@@ -486,8 +492,20 @@ export class LayoutView extends View {
     }
   }
 
-  private cssTranslateValue(offset: number): string {
-    return this.isVertical ? `translateY(${offset}px)` : `translateX(${offset}px)`;
+  private postionSpineItemView(viewStatus: SpineItemViewStatus): void {
+    let transformString: string;
+    if (this.isVertical) {
+      transformString = `translateY(${viewStatus.offset}px)`;
+    } else {
+      if (this.isRtl) {
+        const offset = -viewStatus.offset - viewStatus.viewSize;
+        transformString = `translateX(${offset}px)`;
+      } else {
+        transformString = `translateX(${viewStatus.offset}px)`;
+      }
+    }
+
+    viewStatus.viewContainer.style.transform = transformString;
   }
 
   private addNewViewStatus(vs: SpineItemViewStatus): void {
