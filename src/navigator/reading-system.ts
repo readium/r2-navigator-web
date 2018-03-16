@@ -1,4 +1,4 @@
-import { Publication } from '../streamer/publication';
+import { Publication } from '../streamer';
 import { Rendition } from './rendition';
 
 export class ReadingSystem {

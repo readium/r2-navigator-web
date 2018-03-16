@@ -1,15 +1,10 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { IFrameLoader } from '../../src/navigator/iframe-loader';
-import { Location } from '../../src/navigator/location';
-import { Navigator } from '../../src/navigator/navigator';
-import { ReadingSystem } from '../../src/navigator/reading-system';
-import { StreamerClient } from '../../src/navigator/streamer-client';
-import { LayoutView } from '../../src/navigator/views/layout-view';
+import { ReadingSystem } from '../../src/navigator';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
-import { Publication } from '../../src/streamer/publication';
-import { PackageDocument } from '../../src/streamer/readium-share-js-impl/package-document';
-import { openRendition } from '../helpers/reader-helper';
+import { Publication } from '../../src/streamer';
+import { PackageDocument } from '../../src/streamer/readium-shared-js-impl/package-document';
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
@@ -38,18 +33,17 @@ describe('SpineItemView', () => {
     document.body.appendChild(viewportDiv);
 
     const rs = new ReadingSystem();
-    const streamerClient = new StreamerClient();
 
     const viewport = document.getElementById('viewport');
     if (viewport) {
       rs.initRenderer(viewport);
     }
 
-    publication = await streamerClient.openPublicationFromUrl(
+    publication = await Publication.fromURL(
       '/fixtures/publications/metamorphosis/manifest.json',
     );
 
-    iframeLoader = new IFrameLoader(publication.baseUri);
+    iframeLoader = new IFrameLoader(publication.getBaseURI());
 
     const packageDoc = new PackageDocument(publication);
     rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });

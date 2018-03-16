@@ -1,5 +1,4 @@
-import { Publication } from '../streamer/publication';
-import { PackageDocument } from '../streamer/readium-share-js-impl/package-document';
+import { Publication } from '../streamer';
 import { LayoutView } from './views/layout-view';
 import { ZoomOptions } from './views/types';
 import { Viewport } from './views/viewport';
@@ -48,7 +47,7 @@ export class Rendition {
     }
   }
 
-  public setVeiwAsVertical(v: boolean): void {
+  public setViewAsVertical(v: boolean): void {
     this.viewAsVertical = v;
   }
 

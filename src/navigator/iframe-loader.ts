@@ -1,9 +1,9 @@
 export class IFrameLoader {
-  private publicationURI: string;
+  private publicationURI?: string;
 
   private isIE: boolean;
 
-  constructor(publicationURI: string) {
+  constructor(publicationURI?: string) {
     this.publicationURI = publicationURI;
     this.isIE =
       window.navigator.userAgent.indexOf('Trident') > 0 ||
@@ -20,10 +20,11 @@ export class IFrameLoader {
     // tslint:disable-next-line:no-any
     attachedData: any,
   ): void {
-    iframe.setAttribute('data-baseUri', iframe.baseURI ? iframe.baseURI : '');
+    const baseURI = this.publicationURI || iframe.baseURI || document.baseURI || location.href;
+    iframe.setAttribute('data-baseUri', baseURI);
     iframe.setAttribute('data-src', src);
 
-    const contentUri = this.publicationURI + src;
+    const contentUri = new URL(src, baseURI).toString();
 
     this.fetchContentDocument(contentUri).then((contentData: string) => {
       this.loadIframeWithDocument(iframe, contentUri, contentData, attachedData, callback);

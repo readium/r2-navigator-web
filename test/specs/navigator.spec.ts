@@ -2,9 +2,7 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { Location } from '../../src/navigator/location';
-import { Navigator } from '../../src/navigator/navigator';
-import { Publication } from '../../src/streamer/publication';
+import { Location, Navigator } from '../../src/navigator';
 
 import { openRendition } from '../helpers/reader-helper';
 

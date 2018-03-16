@@ -1,5 +1,5 @@
-import { Publication } from '../../streamer/publication';
-import { PackageDocument } from '../../streamer/readium-share-js-impl/package-document';
+import { Publication } from '../../streamer';
+import { PackageDocument } from '../../streamer/readium-shared-js-impl/package-document';
 import { IFrameLoader } from '../iframe-loader';
 import { SpineItemView } from './spine-item-view';
 
@@ -26,7 +26,7 @@ export class SpineItemViewFactory {
     this.publication = pub;
     this.rsjViewSettings = rsjViewSettings;
     this.isFixedLayout = isFixedLayout;
-    this.iframeLoader = new IFrameLoader(this.publication.baseUri);
+    this.iframeLoader = new IFrameLoader(this.publication.getBaseURI());
 
     const packageDoc = new PackageDocument(this.publication);
     this.rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });

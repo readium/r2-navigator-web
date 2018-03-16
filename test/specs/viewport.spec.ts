@@ -1,13 +1,7 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { Location } from '../../src/navigator/location';
-import { Navigator } from '../../src/navigator/navigator';
-import { ReadingSystem } from '../../src/navigator/reading-system';
-import { StreamerClient } from '../../src/navigator/streamer-client';
-import { LayoutView } from '../../src/navigator/views/layout-view';
-import { Viewport } from '../../src/navigator/views/viewport';
-import { Publication } from '../../src/streamer/publication';
-import { openRendition } from '../helpers/reader-helper';
+import { LayoutView, Viewport } from '../../src/navigator';
+import { Publication } from '../../src/streamer';
 
 describe('Viewport', () => {
   let viewportDiv: HTMLElement;
@@ -28,13 +22,10 @@ describe('Viewport', () => {
 
     document.body.appendChild(viewportDiv);
 
-    const rs = new ReadingSystem();
-    const streamerClient = new StreamerClient();
-
     viewport = new Viewport(viewportDiv);
 
     // tslint:disable-next-line:max-line-length
-    const publication = await streamerClient.openPublicationFromUrl(
+    const publication = await Publication.fromURL(
       '/fixtures/publications/metamorphosis/manifest.json',
     );
     layoutView = new LayoutView(publication);

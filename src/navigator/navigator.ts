@@ -1,8 +1,7 @@
-import { Publication } from '../streamer/publication';
+import { Publication } from '../streamer';
 import { Location } from './location';
 import { Rendition } from './rendition';
 import { PaginationInfo } from './views/layout-view';
-import { Viewport } from './views/viewport';
 
 export class Navigator {
   private rendition: Rendition;

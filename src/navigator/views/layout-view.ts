@@ -1,4 +1,4 @@
-import { Publication } from '../../streamer/publication';
+import { Publication } from '../../streamer';
 import { Location } from '../location';
 import { SpineItemView } from './spine-item-view';
 import { SpineItemViewFactory } from './spine-item-view-factory';

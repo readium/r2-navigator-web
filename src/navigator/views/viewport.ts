@@ -1,6 +1,5 @@
 import { Location } from '../location';
 import { LayoutView, PaginationInfo } from './layout-view';
-import { View } from './view';
 
 export class Viewport {
   private bookView: LayoutView;

@@ -1,4 +1,4 @@
-import { PublicationLink } from "r2-shared-js";
+import { PublicationLink } from 'r2-shared-js';
 import { Publication } from '../publication';
 
 export class PackageDocument {
