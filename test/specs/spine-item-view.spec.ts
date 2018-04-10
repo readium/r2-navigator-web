@@ -66,7 +66,7 @@ describe('SpineItemView', () => {
     spineItemViewContainer.style.width = `${pageWidth}px`;
     spineItemViewContainer.style.height = `${pageHeight}px`;
 
-    spineItemView.attatchToHost(spineItemViewContainer);
+    spineItemView.attachToHost(spineItemViewContainer);
 
     viewportDiv.appendChild(spineItemViewContainer);
 

@@ -50,7 +50,7 @@ export class SpineItemViewFactory {
     if (!this.isVertical) {
       spineItemViewContainer.style.height = `${pageHeight}px`;
     }
-    spineItemView.attatchToHost(spineItemViewContainer);
+    spineItemView.attachToHost(spineItemViewContainer);
 
     return [spineItemView, spineItemViewContainer];
   }

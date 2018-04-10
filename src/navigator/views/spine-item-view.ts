@@ -93,7 +93,7 @@ export class SpineItemView extends View {
 
     return this.isVertical || this.isFixedLayout
       ? this.loadSpineItemOnePageView(readiumViewParams, reader)
-      : this.laodSpineItemReflowableView(readiumViewParams, reader);
+      : this.loadSpineItemReflowableView(readiumViewParams, reader);
   }
 
   public unloadSpineItem(): void {
@@ -175,7 +175,7 @@ export class SpineItemView extends View {
     this.contentViewImpl.render();
   }
 
-  public attatchToHost(host: HTMLElement): void {
+  public attachToHost(host: HTMLElement): void {
     this.host = host;
   }
 
@@ -241,7 +241,7 @@ export class SpineItemView extends View {
   }
 
   // tslint:disable-next-line:no-any
-  private laodSpineItemReflowableView(params: any, reader: any): Promise<void> {
+  private loadSpineItemReflowableView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new ReflowableView(params, reader);
 
     this.contentViewImpl.render();

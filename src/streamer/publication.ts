@@ -10,7 +10,7 @@ export class Publication extends PublicationModel {
   }
 
   public static fromModel(publication: PublicationModel, sourceURI?: string): Publication {
-    return Object.assign(new Publication(sourceURI) , publication);
+    return Object.assign(new Publication(sourceURI), publication);
   }
 
   public static fromJSON(webPubManifestJSON: string): Publication {
@@ -24,6 +24,7 @@ export class Publication extends PublicationModel {
 
       return Publication.fromModel(webPublication, publicationURL);
     }
+
     const epubPublication = (await EpubParsePromise(publicationURL)) as Publication;
 
     return Publication.fromModel(epubPublication, publicationURL);

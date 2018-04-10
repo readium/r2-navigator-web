@@ -141,7 +141,7 @@ export class LayoutView extends View {
     return;
   }
 
-  public attatchToHost(host: HTMLElement): void {
+  public attachToHost(host: HTMLElement): void {
     this.host = host;
     this.host.appendChild(this.layoutRoot);
   }

@@ -31,7 +31,7 @@ export class Viewport {
 
   public setView(v: LayoutView): void {
     this.bookView = v;
-    this.bookView.attatchToHost(this.root);
+    this.bookView.attachToHost(this.root);
   }
 
   public enableScroll(e: boolean): void {

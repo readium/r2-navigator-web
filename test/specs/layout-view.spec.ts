@@ -34,7 +34,7 @@ describe('LayoutView', () => {
     layoutView = new LayoutView(publication);
 
     layoutView.setPageSize(200, 400);
-    layoutView.attatchToHost(viewportDiv);
+    layoutView.attachToHost(viewportDiv);
   });
 
   afterEach(() => {

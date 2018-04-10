@@ -3,5 +3,5 @@ export abstract class View {
 
   public abstract render(): void;
 
-  public abstract attatchToHost(host: HTMLElement): void;
+  public abstract attachToHost(host: HTMLElement): void;
 }
