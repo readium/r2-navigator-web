@@ -7,6 +7,8 @@ import { SpineItemView } from './spine-item-view';
 import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
 
 export class SpineItemViewFactory {
+  public iframeLoader: IFrameLoader;
+
   private publication: Publication;
 
   // tslint:disable-next-line:no-any
@@ -14,8 +16,6 @@ export class SpineItemViewFactory {
 
   // tslint:disable-next-line:no-any
   private rsjViewSettings: any;
-
-  private iframeLoader: IFrameLoader;
 
   private isFixedLayout: boolean = false;
 

@@ -276,6 +276,11 @@ export class LayoutView extends View {
     }
   }
 
+  // tslint:disable-next-line:no-any
+  public setIframeLoader(iframeLoader: any): void {
+    this.spineItemViewFactory.iframeLoader = iframeLoader;
+  }
+
   private clearLoadedContent(): void {
     this.spineItemViewStatus.forEach((v: SpineItemViewStatus) => {
       this.layoutRoot.removeChild(v.viewContainer);

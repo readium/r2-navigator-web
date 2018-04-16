@@ -68,4 +68,9 @@ export class Rendition {
 
     return Promise.resolve();
   }
+
+  // tslint:disable-next-line:no-any
+  public setIframeLoader(iframeLoader: any): void {
+    this.bookView.setIframeLoader(iframeLoader);
+  }
 }
