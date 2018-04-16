@@ -1,3 +1,5 @@
+import { URL } from 'isomorphic-url-shim';
+
 export class IFrameLoader {
   private publicationURI?: string;
 

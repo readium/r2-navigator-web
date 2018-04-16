@@ -1,5 +1,9 @@
-import { Publication as PublicationModel, PublicationLink } from 'r2-shared-js';
-import { EpubParsePromise } from 'r2-shared-js';
+import { URL } from 'isomorphic-url-shim';
+import {
+  EpubParsePromise,
+  Publication as PublicationModel,
+  PublicationLink,
+} from 'r2-shared-js';
 
 export class Publication extends PublicationModel {
   private sourceURI?: string;
