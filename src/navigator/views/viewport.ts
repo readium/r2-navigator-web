@@ -41,7 +41,7 @@ export class Viewport {
     (<any>this.root.style).webkitOverflowScrolling = 'auto';
 
     // disable scrolling with rtl books for now
-    if (this.bookView.isRightToLeft() && !this.bookView.isVerticalLayout()) {
+    if (this.bookView && this.bookView.isRightToLeft() && !this.bookView.isVerticalLayout()) {
       return;
     }
 
