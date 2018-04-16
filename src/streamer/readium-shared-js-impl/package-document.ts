@@ -11,7 +11,7 @@ export class PackageDocument {
   // tslint:disable-next-line:no-any
   public getSharedJsPackageData(): any {
     return {
-      rootUrl: '',
+      rootUrl: this.pub.getBaseURI(),
       rendition_viewport: '',
       rendition_layout: '',
       rendition_orientation: '',

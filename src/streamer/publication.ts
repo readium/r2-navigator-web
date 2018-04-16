@@ -36,11 +36,9 @@ export class Publication extends PublicationModel {
 
   public getBaseURI(): string | undefined {
     const selfLink = this.searchLinkByRel('self');
-    if (selfLink) {
-      return selfLink.Href;
-    }
+    const href = selfLink ? selfLink.Href : this.sourceURI;
 
-    return this.sourceURI;
+    return new URL('./', href).toString();
   }
 
   public findSpineItemIndexByHref(href: string): number {
