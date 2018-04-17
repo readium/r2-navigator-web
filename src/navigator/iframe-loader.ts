@@ -85,7 +85,7 @@ export class IFrameLoader {
       documentDataUri = window.URL.createObjectURL(
         new Blob([basedContentData], { type: contentType }),
       );
-    } else {
+    } else if (iframe.contentWindow) {
       // Internet Explorer doesn't handle loading documents from Blobs correctly.
       // Currently using the document.write() approach only for IE, as it breaks CSS selectors
       // with namespaces for some reason (e.g. the childrens-media-query sample EPUB)
@@ -101,7 +101,9 @@ export class IFrameLoader {
       if (MSApp && MSApp.execUnsafeLocalFunction) {
         // tslint:disable-next-line:no-disable-auto-sanitization
         MSApp.execUnsafeLocalFunction(() => {
-          iframe.contentWindow.document.write(contentDocumentData);
+          if (iframe.contentWindow) {
+            iframe.contentWindow.document.write(contentDocumentData);
+          }
         });
       } else {
         iframe.contentWindow.document.write(contentDocumentData);
@@ -117,7 +119,7 @@ export class IFrameLoader {
 
     if (!this.isIE) {
       iframe.setAttribute('src', documentDataUri);
-    } else {
+    } else if (iframe.contentWindow) {
       iframe.contentWindow.document.close();
     }
   }
