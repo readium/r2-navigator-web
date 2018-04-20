@@ -266,7 +266,7 @@ export class LayoutView extends View {
     }
 
     const existingStartIndex = this.startViewStatus().spineItemIndex;
-    for (let i = existingStartIndex; i < startIndex; i = i - 1) {
+    for (let i = existingStartIndex; i > startIndex; i = i - 1) {
       await this.loadNewSpineItemAtStart();
     }
 
