@@ -1,7 +1,7 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { IFrameLoader } from '../../src/navigator/iframe-loader';
 import { ReadingSystem } from '../../src/navigator';
+import { IFrameLoader } from '../../src/navigator/iframe-loader';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { Publication } from '../../src/streamer';
 import { PackageDocument } from '../../src/streamer/readium-shared-js-impl/package-document';

@@ -202,8 +202,8 @@ export class SpineItemView extends View {
   public getCfi(offsetMain: number, offset2nd: number): string {
     const navLogic = this.contentViewImpl.getNavigator();
 
-    const visOffset = this.isVertical ? { top: offsetMain, left: offset2nd } :
-                                        { top: offset2nd, left: offsetMain };
+    const visOffset = this.isVertical ? { top: -offsetMain, left: offset2nd } :
+                                        { top: offset2nd, left: -offsetMain };
 
     return navLogic.getFirstVisibleCfi(visOffset);
   }

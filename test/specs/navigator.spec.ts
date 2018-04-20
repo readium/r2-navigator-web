@@ -60,7 +60,7 @@ describe('Navigator', () => {
       const loc = await navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
+      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:32');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 
@@ -72,7 +72,7 @@ describe('Navigator', () => {
       const loc = await navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
+      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:32');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 
