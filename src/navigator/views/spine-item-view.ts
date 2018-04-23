@@ -238,6 +238,7 @@ export class SpineItemView extends View {
     this.spineItemPageCount = 1;
     this.contentViewImpl.resizeIFrameToContent();
     this.contentHeight = this.contentViewImpl.getCalculatedPageHeight();
+    this.contentStatus = ContentLoadingStatus.Loaded;
   }
 
   // tslint:disable-next-line:no-any

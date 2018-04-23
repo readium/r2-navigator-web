@@ -12,21 +12,13 @@ describe('Navigator', () => {
 
   let bookInitLocation: Location | undefined | null;
 
-  before(() => {
-    const head = document.querySelector('head');
-    if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
-    }
-  });
-
-  beforeEach(async () => {
+  const initBook = async (url: string): Promise<void> => {
     viewportDiv = document.createElement('div');
     viewportDiv.setAttribute('id', 'viewport');
 
     document.body.appendChild(viewportDiv);
 
-    const rendition = await openRendition('/fixtures/publications/metamorphosis/manifest.json');
+    const rendition = await openRendition(url);
     rendition.setPageSize(400, 800);
     rendition.viewport.setViewportSize(600);
     rendition.viewport.enableScroll(false);
@@ -37,6 +29,14 @@ describe('Navigator', () => {
 
     navigator = new Navigator(rendition);
     bookInitLocation = await navigator.getCurrentLocation()!;
+  };
+
+  before(() => {
+    const head = document.querySelector('head');
+    if (head) {
+      head.innerHTML +=
+        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+    }
   });
 
   afterEach(() => {
@@ -45,6 +45,8 @@ describe('Navigator', () => {
 
   describe('#rendition', () => {
     it('render()', async () => {
+      await initBook('/fixtures/publications/metamorphosis/manifest.json');
+
       const loc = await navigator.getCurrentLocation();
 
       assert(loc);
@@ -54,6 +56,10 @@ describe('Navigator', () => {
   });
 
   describe('#navigator', () => {
+    beforeEach(async () => {
+      await initBook('/fixtures/publications/metamorphosis/manifest.json');
+    });
+
     it('nextScreen()', async () => {
       await navigator.nextScreen();
 
@@ -76,7 +82,7 @@ describe('Navigator', () => {
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 
-    it('screen check functions', () => {
+    it('screen check functions', async () => {
       assert.equal(navigator.isFirstScreen(), true);
       assert.equal(navigator.isLastScreen(), false);
       assert.equal(navigator.isFirstScreenSpine(), true);
@@ -109,5 +115,32 @@ describe('Navigator', () => {
     //   assert.equal(navigator.isFirstScreenSpine(), false);
     //   assert.equal(navigator.getCurrentScreenIndexSpine(), 5);
     // });
+  });
+
+  describe('#navigator-fixed-layout', () => {
+    beforeEach(async () => {
+      await initBook('/fixtures/publications/igp-twss-fxl/manifest.json');
+    });
+
+    it('nextScreen()', async () => {
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+
+      const loc = await navigator.getCurrentLocation();
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2/2[Copyright1]/2[copyright1]/2[p2]/2/1:1');
+      assert.equal(loc!.getHref(), 'OPS/s004-Copyright-01.xhtml');
+    });
+
+    it('gotoLocation()', async () => {
+      const newLoc = new Location('/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0',
+                                  'OPS/s005-Epigraph-01.xhtml');
+      await navigator.gotoLocation(newLoc);
+
+      const loc = await navigator.getCurrentLocation();
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0');
+      assert.equal(loc!.getHref(), 'OPS/s005-Epigraph-01.xhtml');
+    });
   });
 });

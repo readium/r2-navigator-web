@@ -115,7 +115,7 @@ export class Viewport {
     await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
 
     const offset = await this.bookView.getOffsetFromLocation(loc);
-    if (!offset) {
+    if (offset === undefined) {
       return;
     }
 

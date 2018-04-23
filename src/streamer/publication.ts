@@ -29,7 +29,7 @@ export class Publication extends PublicationModel {
       return Publication.fromModel(webPublication, publicationURL);
     }
 
-    const epubPublication = (await EpubParsePromise(publicationURL)) as Publication;
+    const epubPublication = <Publication>(await EpubParsePromise(publicationURL));
 
     return Publication.fromModel(epubPublication, publicationURL);
   }
