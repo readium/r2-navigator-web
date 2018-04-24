@@ -32,7 +32,7 @@
   },
   "links": [
     {
-      "href": "http://localhost:3000/pub/L1VzZXJzL2xpbGlkL0RvY3VtZW50cy9kZXYvcmVkaXVtLW5nL2NvZGUvcmVhZGl1bS1uZy13b3Jrc3BhY2UvcmVhZGl1bS1uZy90ZXN0L2ZpeHR1cmVzL3B1YmxpY2F0aW9ucy9pZ3AtdHdzcy1meGwuZXB1Yg%3D%3D/manifest.json",
+      "href": "http://localhost:9876/fixtures/publications/igp-twss-fxl/manifest.json",
       "type": "application/webpub+json",
       "templated": false,
       "rel": "self"
