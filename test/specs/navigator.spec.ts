@@ -142,5 +142,12 @@ describe('Navigator', () => {
       assert.equal(loc!.getLocation(), '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0');
       assert.equal(loc!.getHref(), 'OPS/s005-Epigraph-01.xhtml');
     });
+
+    it('gotoAnchorLocation()', async () => {
+      await navigator.gotoAnchorLocation('OPS/s021-Poem-008.xhtml', 'pagebreak-rw_13');
+
+      const loc = await navigator.getCurrentLocation();
+      console.log(loc);
+    });
   });
 });

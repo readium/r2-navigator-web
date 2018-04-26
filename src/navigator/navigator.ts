@@ -35,6 +35,10 @@ export class Navigator {
     await this.rendition.viewport.renderAtLocation(loc);
   }
 
+  public async gotoAnchorLocation(href: string, eleId: string): Promise<void> {
+    await this.rendition.viewport.renderAtAnchorLocation(href, eleId);
+  }
+
   public getScreenBegin(): Promise<Location | undefined | null> {
     return this.getCurrentLocation();
   }

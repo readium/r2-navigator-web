@@ -123,6 +123,23 @@ export class Viewport {
     this.render();
   }
 
+  public async renderAtAnchorLocation(href: string, eleId: string): Promise<void> {
+    const spineItemIndex = this.bookView.findSpineItemIndexByHref(href);
+    if (spineItemIndex < 0) {
+      return;
+    }
+
+    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
+
+    const offset = await this.bookView.getOffsetFromAnchor(href, eleId);
+    if (offset === undefined) {
+      return;
+    }
+
+    this.viewOffset = offset;
+    this.render();
+  }
+
   public async nextScreen(): Promise<void> {
     let newPos = this.viewOffset + this.viewportSize;
     const loadedEndPos = this.bookView.getLoadedEndPosition();

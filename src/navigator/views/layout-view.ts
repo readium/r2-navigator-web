@@ -201,17 +201,27 @@ export class LayoutView extends View {
   }
 
   public async getOffsetFromLocation(loc: Location): Promise<number | undefined> {
-    const siIndex = this.findSpineItemIndexByHref(loc.getHref());
-    for (const siv of this.spineItemViewStatus) {
-      if (siIndex === siv.spineItemIndex) {
-        await siv.view.ensureContentLoaded();
-        const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
-
-        return siv.offset + pageIndexOffset * this.pageWidth;
-      }
+    const siv = await this.getSpineItemViewStatusFromHref(loc.getHref());
+    if (!siv) {
+      return undefined;
     }
 
-    return undefined;
+    const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
+
+    return siv.offset + pageIndexOffset * this.pageWidth;
+  }
+
+  public async getOffsetFromAnchor(href: string,
+                                   elementId: string):
+                                   Promise<number | undefined> {
+    const siv = await this.getSpineItemViewStatusFromHref(href);
+    if (!siv) {
+      return undefined;
+    }
+
+    const pageIndexOffset = siv.view.getPageIndexOffsetFromElementId(elementId);
+
+    return siv.offset + pageIndexOffset * this.pageWidth;
   }
 
   public async ensureLoaded(): Promise<void> {
@@ -551,6 +561,20 @@ export class LayoutView extends View {
         return vs.view.isSpineItemInUse();
       });
     }
+  }
+
+  private async getSpineItemViewStatusFromHref(href: string):
+                                               Promise<SpineItemViewStatus | undefined> {
+    let retSiv: SpineItemViewStatus | undefined;
+    const siIndex = this.findSpineItemIndexByHref(href);
+    for (const siv of this.spineItemViewStatus) {
+      if (siIndex === siv.spineItemIndex) {
+        await siv.view.ensureContentLoaded();
+        retSiv = siv;
+      }
+    }
+
+    return retSiv;
   }
 
 }
