@@ -8,6 +8,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
+    "build:bundle": "rollup -c rollup-bundle.config.js",
     "test": "npm run test:build && npm run test:start",
     "test:clean": "rimraf test/dist",
     "test:build": "npm run test:clean && cd test && webpack",
@@ -51,6 +52,7 @@
     "rollup-plugin-execute": "^1.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-typescript2": "^0.13.0",
+    "rollup-plugin-json": "^3.0.0",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^4.2.0",
     "tslint": "^5.9.1",
