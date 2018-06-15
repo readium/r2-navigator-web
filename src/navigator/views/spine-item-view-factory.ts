@@ -15,6 +15,9 @@ export class SpineItemViewFactory {
   private rsjPackage: any;
 
   // tslint:disable-next-line:no-any
+  private rsjPackageDoc: any;
+
+  // tslint:disable-next-line:no-any
   private rsjViewSettings: any;
 
   private isFixedLayout: boolean = false;
@@ -28,9 +31,19 @@ export class SpineItemViewFactory {
     this.isFixedLayout = isFixedLayout;
     this.iframeLoader = new IFrameLoader(this.publication.getBaseURI());
 
-    const packageDoc = new PackageDocument(this.publication);
-    this.rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });
+    this.rsjPackageDoc = new PackageDocument(this.publication);
+    this.rsjPackage = new ReadiumPackage({ ...this.rsjPackageDoc.getSharedJsPackageData() });
     this.rsjPackage.spine.handleLinear(true);
+  }
+
+  // tslint:disable-next-line:no-any
+  public getRsjPackageDocument(): any {
+    return this.rsjPackageDoc;
+  }
+
+  // tslint:disable-next-line:no-any
+  public getRsjPackage(): any {
+    return this.rsjPackage;
   }
 
   public setVerticalLayout(v: boolean): void {

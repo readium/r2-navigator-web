@@ -59,6 +59,16 @@ export class Rendition {
     return this.pub;
   }
 
+  // tslint:disable-next-line:no-any
+  public getReadiumPackageDocument(): any {
+    return this.bookView.getRsjPackageDocument();
+  }
+
+  // tslint:disable-next-line:no-any
+  public getReadiumPackage(): any {
+    return this.bookView.getRsjPackage();
+  }
+
   public render(): Promise<void> {
     this.bookView = new LayoutView(this.pub);
     this.bookView.setPageSize(this.pageWidth, this.pageHeight);

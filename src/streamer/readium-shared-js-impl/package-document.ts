@@ -26,6 +26,21 @@ export class PackageDocument {
   }
 
   // tslint:disable-next-line:no-any
+  public generateTocListDOM(callback: any): void {
+    callback(undefined);
+  }
+
+  // tslint:disable-next-line:no-any
+  public generateTocListJSON(callback: any): void {
+    callback(undefined);
+  }
+
+  // tslint:disable-next-line:no-any
+  public generatePageListJSON(callback: any): void {
+    callback(undefined);
+  }
+
+  // tslint:disable-next-line:no-any
   private getDefaultMediaOverlay(): any {
     return {
       duration: 0,

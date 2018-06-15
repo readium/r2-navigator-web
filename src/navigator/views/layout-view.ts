@@ -77,6 +77,16 @@ export class LayoutView extends View {
     this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
   }
 
+  // tslint:disable-next-line:no-any
+  public getRsjPackageDocument(): any {
+    return this.spineItemViewFactory.getRsjPackageDocument();
+  }
+
+  // tslint:disable-next-line:no-any
+  public getRsjPackage(): any {
+    return this.spineItemViewFactory.getRsjPackage();
+  }
+
   public findSpineItemIndexByHref(href: string): number {
     return this.publication.findSpineItemIndexByHref(href);
   }
