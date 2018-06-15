@@ -8,7 +8,6 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
-    "build:bundle": "rollup -c rollup-bundle.config.js",
     "test": "npm run test:build && npm run test:start",
     "test:clean": "rimraf test/dist",
     "test:build": "npm run test:clean && cd test && webpack",
