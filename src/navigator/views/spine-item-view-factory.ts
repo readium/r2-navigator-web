@@ -4,7 +4,7 @@ import { IFrameLoader } from '../iframe-loader';
 import { SpineItemView } from './spine-item-view';
 
 // tslint:disable-next-line:no-implicit-dependencies
-import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
+import { Package as ReadiumPackage, ViewerSettings } from '@evidentpoint/readium-shared-js';
 
 export class SpineItemViewFactory {
   public iframeLoader: IFrameLoader;

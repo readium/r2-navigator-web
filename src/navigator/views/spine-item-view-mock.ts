@@ -1,4 +1,4 @@
-import { PublicationLink } from 'r2-shared-js';
+import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { SpineItemView } from './spine-item-view';
 
 class ReflowableViewMock {

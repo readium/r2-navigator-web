@@ -6,7 +6,7 @@ import { ZoomOptions } from './types';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
-import { ViewerSettings } from 'readium-shared-js';
+import { ViewerSettings } from '@evidentpoint/readium-shared-js';
 
 export class PaginationInfo {
   public spineItemIndex: number;

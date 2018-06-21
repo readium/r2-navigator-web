@@ -1,7 +1,8 @@
-import { PublicationLink } from 'r2-shared-js';
+import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { IFrameLoader } from '../iframe-loader';
 import { ZoomOptions } from './types';
 import { View } from './view';
+import { Globals as Readium } from '@evidentpoint/readium-shared-js';
 
 import {
   OnePageView,
@@ -9,7 +10,7 @@ import {
   ReflowableView,
   StyleCollection,
   ViewerSettings,
-} from 'readium-shared-js';
+} from '@evidentpoint/readium-shared-js';
 
 export enum ContentLoadingStatus {
   NotLoaded,
@@ -263,11 +264,10 @@ export class SpineItemView extends View {
     handler: (paras: PaginationChangedEventArgs) => void,
     resolve: () => void,
   ): void {
-    const readium = this.getReadium();
     const pageInfo = paras.paginationInfo.openPages[0];
     if (pageInfo.spineItemIndex === this.spineItemIndex) {
       this.contentViewImpl.removeListener(
-        readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+        Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
         handler,
       );
       this.spineItemPageCount = pageInfo.spineItemPageCount;
@@ -283,7 +283,7 @@ export class SpineItemView extends View {
         this.paginationChangedHanlder(paras, handler, resolve);
       };
       this.contentViewImpl.on(
-        this.getReadium().InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+        Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
         handler,
       );
     });
@@ -317,12 +317,6 @@ export class SpineItemView extends View {
         handler,
       );
     });
-  }
-
-  // tslint:disable-next-line:no-any
-  private getReadium(): any {
-    // tslint:disable-next-line:no-any
-    return (<any>window).ReadiumSDK;
   }
 
   private updateScale(): void {

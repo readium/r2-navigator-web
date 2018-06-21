@@ -3,7 +3,7 @@ import {
   EpubParsePromise,
   Publication as PublicationModel,
   PublicationLink,
-} from 'r2-shared-js';
+} from '@evidentpoint/r2-shared-js';
 
 export class Publication extends PublicationModel {
   private sourceURI?: string;
