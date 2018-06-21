@@ -19,14 +19,14 @@ export default {
       name: 'readiumNg',
       sourcemap: true,
       globals: {
-        'readium-shared-js': 'readiumSharedJs',
-        'r2-shared-js': 'r2SharedJs'
+        '@evidentpoint/readium-shared-js': 'readiumSharedJs',
+        '@evidentpoint/r2-shared-js': 'r2SharedJs'
       }
     }
   ],
   external: [
-    'readium-shared-js',
-    'r2-shared-js'
+    '@evidentpoint/readium-shared-js',
+    '@evidentpoint/r2-shared-js'
   ],
   plugins: [
     resolve(),
