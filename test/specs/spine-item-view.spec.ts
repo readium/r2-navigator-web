@@ -7,7 +7,7 @@ import { Publication } from '../../src/streamer';
 import { PackageDocument } from '../../src/streamer/readium-shared-js-impl/package-document';
 
 // tslint:disable-next-line:no-implicit-dependencies
-import { Package as ReadiumPackage, ViewerSettings } from 'readium-shared-js';
+import { Package as ReadiumPackage, ViewerSettings } from '@evidentpoint/readium-shared-js';
 
 describe('SpineItemView', () => {
   let viewportDiv: HTMLElement;
