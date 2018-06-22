@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.2",
     "@types/mocha": "^5.0.0",
-    "@types/node": "^9.6.5",
+    "@types/node": "^10.3.4",
     "chai": "^4.1.2",
     "dts-bundle": "^0.7.3",
     "glob": "^7.1.2",
@@ -49,12 +49,12 @@
     "mocha": "^5.1.0",
     "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.2",
-    "rollup": "^0.58.0",
+    "rollup": "^0.61.1",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-execute": "^1.0.0",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-typescript2": "^0.13.0",
+    "rollup-plugin-typescript2": "^0.15.0",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^4.2.0",
     "tslint": "^5.9.1",
@@ -63,10 +63,10 @@
     "tslint-microsoft-contrib": "^5.0.3",
     "typescript": "^2.8.1",
     "webpack": "^4.6.0",
-    "webpack-cli": "^2.0.14"
+    "webpack-cli": "^3.0.8"
   },
   "dependencies": {
-    "@evidentpoint/r2-shared-js": "^0.0.1-alpha34",
+    "@evidentpoint/r2-shared-js": "^1.0.0-alpha.2",
     "@evidentpoint/readium-shared-js": "^1.0.0-alpha",
     "isomorphic-url-shim": "^1.0.2"
   }
