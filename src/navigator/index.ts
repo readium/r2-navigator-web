@@ -5,4 +5,4 @@ export { Rendition } from './rendition';
 export { Viewport } from './views/viewport';
 export { LayoutView } from './views/layout-view';
 export { ZoomOptions } from './views/types';
-export { getReaidumEventsRelayInstance } from './views/readium-events-relay';
+export { getReadiumEventsRelayInstance } from './views/readium-events-relay';

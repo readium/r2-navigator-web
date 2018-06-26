@@ -1,7 +1,7 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { Globals as Readium } from '@evidentpoint/readium-shared-js';
 import { IFrameLoader } from '../iframe-loader';
-import { getReaidumEventsRelayInstance } from './readium-events-relay';
+import { getReadiumEventsRelayInstance } from './readium-events-relay';
 import { ZoomOptions } from './types';
 import { View } from './view';
 
@@ -106,7 +106,7 @@ export class SpineItemView extends View {
     while (this.host.firstChild) {
       this.host.removeChild(this.host.firstChild);
     }
-    getReaidumEventsRelayInstance().unregisterEvents(this.contentViewImpl);
+    getReadiumEventsRelayInstance().unregisterEvents(this.contentViewImpl);
     this.isInUse = false;
   }
 
@@ -222,7 +222,7 @@ export class SpineItemView extends View {
                                            !this.isFixedLayout,
                                            reader);
 
-    getReaidumEventsRelayInstance().registerEvents(this.contentViewImpl);
+    getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
 
     this.contentViewImpl.render();
 
@@ -254,7 +254,7 @@ export class SpineItemView extends View {
   private loadSpineItemReflowableView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new ReflowableView(params, reader);
 
-    getReaidumEventsRelayInstance().registerEvents(this.contentViewImpl);
+    getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
 
     this.contentViewImpl.render();
 

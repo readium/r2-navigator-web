@@ -36,6 +36,6 @@ function onCurrentViewPaginationChanged(pageChangeData: any): void {
   relayInstance.emit(Readium.Events.PAGINATION_CHANGED, pageChangeData);
 }
 
-export function getReaidumEventsRelayInstance(): ReaidumEventsRelay {
+export function getReadiumEventsRelayInstance(): ReaidumEventsRelay {
   return relayInstance;
 }
