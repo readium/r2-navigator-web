@@ -27,7 +27,8 @@ export default {
   external: [
     '@evidentpoint/readium-shared-js',
     '@evidentpoint/r2-shared-js',
-    'eventemitter3'
+    'eventemitter3',
+    'jquery'
   ],
   plugins: [
     resolve(),
