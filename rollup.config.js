@@ -27,6 +27,7 @@ export default {
   external: [
     '@evidentpoint/readium-shared-js',
     '@evidentpoint/r2-shared-js',
+    'readium-cfi-js',
     'eventemitter3',
     'jquery'
   ],

@@ -1,8 +1,10 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
+import * as EpubCfi from 'readium-cfi-js';
 import { Publication } from '../publication';
 
 export class PackageDocument {
   private pub: Publication;
+  private packageDom: HTMLDocument | null = null;
 
   constructor(pub: Publication) {
     this.pub = pub;
@@ -36,8 +38,34 @@ export class PackageDocument {
   }
 
   // tslint:disable-next-line:no-any
-  public generatePageListJSON(callback: any): void {
-    callback(undefined);
+  public async generatePageListJSON(callback: any): Promise<void> {
+    if (!this.packageDom) {
+      this.packageDom = await this.getPackageDom();
+    }
+
+    if (!this.packageDom) {
+      callback(undefined);
+
+      return;
+    }
+
+    const pageList = this.pub.PageList.map((link: PublicationLink) => {
+      if (this.isIntraPubCfiLink(link.Href)) {
+        const parsedHref = this.parseIntraPubCfiLink(link.Href);
+
+        return {
+          label: link.Title,
+          cfi: parsedHref,
+        };
+      }
+
+      return {
+        label: link.Title,
+        href: link.Href,
+      };
+    });
+
+    callback(pageList);
   }
 
   // tslint:disable-next-line:no-any
@@ -144,5 +172,96 @@ export class PackageDocument {
         properties: '',
       };
     });
+  }
+
+  private async getPackageDom(): Promise<HTMLDocument | null> {
+    const containerUrl = `${this.pub.getBaseURI()}META-INF/container.xml`;
+    const containerDom = await this.fetchXmlDom(containerUrl);
+    if (!containerDom) {
+      return null;
+    }
+
+    const rootElements = containerDom.getElementsByTagName('rootfile');
+    if (rootElements.length === 0) {
+      return null;
+    }
+
+    const rootPath = rootElements[0].getAttribute('full-path');
+    const packageUrl = `${this.pub.getBaseURI()}${rootPath}`;
+
+    return this.fetchXmlDom(packageUrl);
+  }
+
+  private async fetchXmlDom(xmlUrl: string): Promise<HTMLDocument | null> {
+    const resp = await fetch(xmlUrl);
+    const xmlString = await resp.text();
+
+    return this.tryParseXml(xmlString);
+  }
+
+  private tryParseXml(xmlString: string): HTMLDocument | null {
+    const parser = new DOMParser();
+
+    let dom = null;
+    try {
+      dom = parser.parseFromString(xmlString, 'text/xml');
+    } catch (ex) {
+      console.warn(ex);
+
+      return null;
+    }
+    // check for an empty result (native browser xml parsing problems)
+    if (!dom || !dom.childNodes || !dom.childNodes.length ||
+        dom.getElementsByTagNameNS('*', 'parsererror').length) {
+      return null;
+    }
+
+    return dom;
+  }
+
+  private isIntraPubCfiLink(href: string): boolean {
+    return href.indexOf('#epubcfi(') !== -1;
+  }
+
+  private parseIntraPubCfiLink(href: string): object | null {
+    if (!this.packageDom) {
+      return null;
+    }
+    const regEx = /#epubcfi\((.*?)\)/g;
+    const regExMatch = regEx.exec(href);
+    if (!regExMatch) {
+      return null;
+    }
+
+    const rawCfi = regExMatch[1];
+    const splitCfi = rawCfi.split('!');
+
+    // tslint:disable-next-line:max-line-length
+    const $spineItemElement =  EpubCfi.Interpreter.getTargetElementWithPartialCFI(`epubcfi(${splitCfi[0]})`, this.packageDom);
+    const contentCFI = splitCfi[1];
+    let idref = $spineItemElement.attr('idref');
+    idref = this.itemHrefFromId(idref);
+    if (!idref) {
+      return null;
+    }
+
+    return { idref, contentCFI };
+  }
+
+  private itemHrefFromId(idref: string): string | null {
+    if (!this.packageDom) {
+      return null;
+    }
+
+    const itemElements = this.packageDom.getElementsByTagName('item');
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < itemElements.length; i = i + 1) {
+      const itemEle = itemElements[i];
+      if (itemEle.getAttribute('id') === idref) {
+        return itemEle.getAttribute('href');
+      }
+    }
+
+    return null;
   }
 }

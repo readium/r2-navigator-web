@@ -1,5 +1,6 @@
 // tslint:disable-next-line:import-name
 import $ from 'jquery';
+import { Location } from '../location';
 import { Navigator } from '../navigator';
 import { Rendition } from '../rendition';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
@@ -66,7 +67,8 @@ export class ReadiumReaderViewAdapter {
   public getLoadedContentFrames(): object[] {
     const ret = [];
     const iframes = this.viewRoot.querySelectorAll('iframe');
-    for (let i = 0; i < iframes.length; i++) {
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < iframes.length; i = i + 1) {
       const iframe = iframes[i];
       const viewDiv = this.getParentElement(iframe, 3);
       const sIndex = this.getSpineItemIndexFromId(viewDiv);
@@ -147,6 +149,11 @@ export class ReadiumReaderViewAdapter {
     this.navigator.previousScreen();
   }
 
+  // tslint:disable-next-line:no-empty
+  public openSpineItemElementCfi(idref: string, elementCfi: string, initiator: any): void {
+    this.navigator.gotoLocation(new Location(elementCfi, idref));
+  }
+
   private getParentElement(node: HTMLElement, level: number): HTMLElement {
     let n = node;
     let count = 1;
@@ -176,7 +183,7 @@ class IframeEventManager {
 
     const handlers = this.iframeEvents.get(eventName);
     if (handlers) {
-      handlers.push({ callback: callback, context: context });
+      handlers.push({ callback, context });
     }
   }
 
