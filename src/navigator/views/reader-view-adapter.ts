@@ -47,9 +47,13 @@ export class ReadiumReaderViewAdapter {
     return this.rsjPackage.spine;
   }
 
-  public on(eventName: string, fn: ListenerFn, context?: any): void {
+  public on(event: string, fn: ListenerFn, context?: any): void {
     // console.log('reader-view-adapter:', eventName);
-    getReadiumEventsRelayInstance().on(eventName, fn, context);
+    getReadiumEventsRelayInstance().on(event, fn, context);
+  }
+
+  public off(event: string, fn?: ListenerFn, context?: any, once?: boolean): void {
+    getReadiumEventsRelayInstance().off(event, fn, context, once);
   }
 
   public getLoadedSpineItems(): any {
@@ -114,12 +118,22 @@ export class ReadiumReaderViewAdapter {
     return '';
   }
 
-  public getFirstVisibleCfi(): string {
-    return '';
+  public getFirstVisibleCfi(): object | undefined {
+    const loc = this.navigator.getScreenBegin();
+    if (!loc) {
+      return undefined;
+    }
+
+    return { idref: loc.getHref(), contentCFI: loc.getLocation() };
   }
 
-  public getLastVisibleCfi(): string {
-    return '';
+  public getLastVisibleCfi(): object | undefined {
+    const loc = this.navigator.getScreenEnd();
+    if (!loc) {
+      return undefined;
+    }
+
+    return { idref: loc.getHref(), contentCFI: loc.getLocation() };
   }
 
   public getElements(): any {

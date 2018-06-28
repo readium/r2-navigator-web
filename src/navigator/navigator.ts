@@ -25,7 +25,13 @@ export class Navigator {
     await this.rendition.viewport.ensureLoaded();
   }
 
-  public async getCurrentLocation(): Promise<Location | undefined | null> {
+  public async getCurrentLocationAsync(): Promise<Location | undefined | null> {
+    const pos = this.rendition.viewport.getStartPosition();
+
+    return this.locationFromPaginationAsync(pos);
+  }
+
+  public getCurrentLocation(): Location | undefined | null {
     const pos = this.rendition.viewport.getStartPosition();
 
     return this.locationFromPagination(pos);
@@ -39,11 +45,21 @@ export class Navigator {
     await this.rendition.viewport.renderAtAnchorLocation(href, eleId);
   }
 
-  public getScreenBegin(): Promise<Location | undefined | null> {
+  public async getScreenBeginAsync(): Promise<Location | undefined | null> {
+    return this.getCurrentLocationAsync();
+  }
+
+  public getScreenBegin(): Location | undefined | null {
     return this.getCurrentLocation();
   }
 
-  public async getScreenEnd(): Promise<Location | undefined | null> {
+  public async getScreenEndAsync(): Promise<Location | undefined | null> {
+    const pos = this.rendition.viewport.getEndPosition();
+
+    return this.locationFromPaginationAsync(pos);
+  }
+
+  public getScreenEnd(): Location | undefined | null {
     const pos = this.rendition.viewport.getEndPosition();
 
     return this.locationFromPagination(pos);
@@ -104,12 +120,22 @@ export class Navigator {
   //   return -1;
   // }
 
-  private async locationFromPagination(pos?: PaginationInfo): Promise<Location | undefined | null> {
+  // tslint:disable-next-line:max-line-length
+  private async locationFromPaginationAsync(pos?: PaginationInfo): Promise<Location | undefined | null> {
     if (!pos) {
       return pos;
     }
 
     await pos.view.ensureContentLoaded();
+
+    return new Location(pos.view.getCfi(pos.offsetInView, 0),
+                        this.pub.Spine[pos.spineItemIndex].Href);
+  }
+
+  private locationFromPagination(pos?: PaginationInfo): Location | undefined | null {
+    if (!pos) {
+      return pos;
+    }
 
     return new Location(pos.view.getCfi(pos.offsetInView, 0),
                         this.pub.Spine[pos.spineItemIndex].Href);
