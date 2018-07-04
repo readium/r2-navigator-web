@@ -215,6 +215,15 @@ export class SpineItemView extends View {
     return navLogic.getFirstVisibleCfi(visOffset);
   }
 
+  public getPaginationInfo(): object {
+    return {
+      paginationInfo: this.contentViewImpl.getPaginationInfo(),
+      initiator: this,
+      spineItem: this.contentViewImpl.getLoadedSpineItems()[0],
+      elementId: undefined,
+    };
+  }
+
   // tslint:disable-next-line:no-any
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new OnePageView(params,

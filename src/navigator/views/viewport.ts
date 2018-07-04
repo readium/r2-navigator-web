@@ -1,5 +1,6 @@
 import { Location } from '../location';
 import { LayoutView, PaginationInfo } from './layout-view';
+import { getReadiumEventsRelayInstance } from './readium-events-relay';
 
 export class Viewport {
   private bookView: LayoutView;
@@ -97,6 +98,8 @@ export class Viewport {
     // scroller position may out of sync if additonal
     // spine item is loaded
     this.render();
+
+    this.onPagesReady();
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
@@ -104,6 +107,8 @@ export class Viewport {
     this.viewOffset = 0;
 
     this.render();
+
+    this.onPagesReady();
   }
 
   public async renderAtLocation(loc: Location): Promise<void> {
@@ -121,6 +126,8 @@ export class Viewport {
 
     this.viewOffset = offset;
     this.render();
+
+    this.onPagesReady();
   }
 
   public async renderAtAnchorLocation(href: string, eleId: string): Promise<void> {
@@ -247,5 +254,15 @@ export class Viewport {
     } else {
       this.root.scrollLeft = this.viewOffset;
     }
+  }
+
+  private onPagesReady(): void {
+    const pageInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
+    if (pageInfo.length === 0) {
+      return;
+    }
+
+    const rjsPageInfo = pageInfo[0].view.getPaginationInfo();
+    getReadiumEventsRelayInstance().triggerPaginationChanged(rjsPageInfo);
   }
 }
