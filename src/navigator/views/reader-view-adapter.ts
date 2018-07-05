@@ -48,7 +48,6 @@ export class ReadiumReaderViewAdapter {
   }
 
   public on(event: string, fn: ListenerFn, context?: any): void {
-    // console.log('reader-view-adapter:', eventName);
     getReadiumEventsRelayInstance().on(event, fn, context);
   }
 
@@ -75,6 +74,10 @@ export class ReadiumReaderViewAdapter {
   }
 
   public isCurrentViewFixedLayout(): boolean {
+    if (this.rendition.getPublication().Metadata.Rendition) {
+      return this.rendition.getPublication().Metadata.Rendition.Layout === 'fixed';
+    }
+
     return false;
   }
 
@@ -109,12 +112,14 @@ export class ReadiumReaderViewAdapter {
     return 1;
   }
 
-  public addIFrameEventListener(eventName: string, callback: any, context: any): void {
-    this.iframeEventManager.addIFrameEventListener(eventName, callback, context);
+  public addIFrameEventListener(eventName: string, callback: any,
+                                context: any, opts: object): void {
+    this.iframeEventManager.addIFrameEventListener(eventName, callback, context, opts);
   }
 
-  // tslint:disable-next-line:no-empty
   public updateIFrameEvents(): void {
+    const iframes = this.viewRoot.querySelectorAll('iframe');
+    this.iframeEventManager.updateIFrameEvents(Array.prototype.slice.call(iframes));
   }
 
   public getRenderedSythenticSpread(): string {
@@ -209,39 +214,73 @@ export class ReadiumReaderViewAdapter {
   }
 }
 
+interface IframeEventHandler {
+  callback: any;
+  context: any;
+  opts: any;
+}
+
 class IframeEventManager {
 
-  private iframeEvents: Map<string, object[]> = new Map();
+  private iframeEvents: Map<string, IframeEventHandler[]> = new Map();
 
-  public addIFrameEventListener(eventName: string, callback: any, context: any): void {
+  public addIFrameEventListener(eventName: string, callback: any,
+                                context: any, opts: object): void {
     if (!this.iframeEvents.has(eventName)) {
       this.iframeEvents.set(eventName, []);
     }
 
     const handlers = this.iframeEvents.get(eventName);
     if (handlers) {
-      handlers.push({ callback, context });
+      handlers.push({ callback, context, opts });
     }
   }
 
-  // tslint:disable-next-line:no-empty
-  public updateIFrameEvents(): void {
+  public updateIFrameEvents(iframes: HTMLIFrameElement[]): void {
+    iframes.forEach(iframe => this.updateIframeEventsInternal(iframe));
   }
 
-  // private updateIframeEventsInternal(iframe: HTMLIFrameElement): void {
-  //   this.iframeEvents.forEach(((eventHandlers, eventName) => {
-  //     eventHandlers.forEach(handler => {
-  //     });
-  //   }));
-  // }
+  private updateIframeEventsInternal(iframe: HTMLIFrameElement): void {
+    this.iframeEvents.forEach(((eventHandlers, eventName) => {
+      eventHandlers.forEach((handler: IframeEventHandler) => {
+        this.bindIframeEvent(iframe, eventName, handler);
+      });
+    }));
+  }
 
-  // private bindIframeEvent(iframe: HTMLIFrameElement, eventName: string, handler: object) {
-  //   if (!iframe.contentWindow) {
-  //     return;
-  //   }
-  // }
+  private bindIframeEvent(iframe: HTMLIFrameElement,
+                          eventName: string,
+                          handler: IframeEventHandler): void {
+    if (!iframe.contentWindow) {
+      return;
+    }
 
-  // private addNativeEvent(win: Window, eventName: string, handler: object) {
-  //   // win.addEventListener(eventName, handler.callback, handler.context);
-  // }
+    if (handler.opts) {
+      if (handler.opts.onWindow) {
+        if (handler.opts.jqueryEvent) {
+          this.addJqueryEvent($(iframe.contentWindow), eventName, handler);
+        } else {
+          this.addNativeEvent(iframe.contentWindow, eventName, handler);
+        }
+      } else if (handler.opts.onDocument) {
+        if (handler.opts.jqueryEvent) {
+          this.addJqueryEvent($(iframe.contentWindow.document), eventName, handler);
+        } else {
+          this.addNativeEvent(iframe.contentWindow.document, eventName, handler);
+        }
+      }
+    } else {
+      this.addNativeEvent(iframe.contentWindow, eventName, handler);
+    }
+  }
+
+  private addNativeEvent(target: Window | Document,
+                         eventName: string,
+                         handler: IframeEventHandler): void {
+    target.addEventListener(eventName, handler.callback, handler.context);
+  }
+
+  private addJqueryEvent(target: any, eventName: string, handler: IframeEventHandler): void {
+    target.on(eventName, handler.callback, handler.context);
+  }
 }
