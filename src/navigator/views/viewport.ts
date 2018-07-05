@@ -179,6 +179,25 @@ export class Viewport {
     this.updatePositions();
   }
 
+  public visibleSpineItemIndexRange(): number[] {
+    const indices: number[] = [];
+    const startPageInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
+    if (startPageInfo.length === 0) {
+      return indices;
+    }
+
+    const pos = this.viewOffset + this.viewportSize;
+    const endPageInfo = this.bookView.getPaginationInfoAtOffset(pos);
+    if (endPageInfo.length === 0) {
+      return indices;
+    }
+
+    indices.push(startPageInfo[startPageInfo.length - 1].spineItemIndex);
+    indices.push(endPageInfo[0].spineItemIndex);
+
+    return indices;
+  }
+
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {

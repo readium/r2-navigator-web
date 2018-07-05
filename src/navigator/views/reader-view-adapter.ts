@@ -56,8 +56,18 @@ export class ReadiumReaderViewAdapter {
     getReadiumEventsRelayInstance().off(event, fn, context, once);
   }
 
-  public getLoadedSpineItems(): any {
-    return this.rsjPackage.spine.items;
+  public getLoadedSpineItems(): any[] {
+    const itemRange = this.rendition.viewport.visibleSpineItemIndexRange();
+    const ret: any[] = [];
+    if (itemRange.length === 0) {
+      return ret;
+    }
+
+    for (let i = itemRange[0]; i <= itemRange[1]; i = i + 1) {
+      ret.push(this.rsjPackage.spine.items[i]);
+    }
+
+    return ret;
   }
 
   // tslint:disable-next-line:no-empty
@@ -69,14 +79,27 @@ export class ReadiumReaderViewAdapter {
   }
 
   public getLoadedContentFrames(): object[] {
-    const ret = [];
+    const itemRange = this.rendition.viewport.visibleSpineItemIndexRange();
+    const ret: object[] = [];
+    if (itemRange.length === 0) {
+      return ret;
+    }
+
     const iframes = this.viewRoot.querySelectorAll('iframe');
+    const iframeMap = new Map<number, HTMLElement>();
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < iframes.length; i = i + 1) {
       const iframe = iframes[i];
       const viewDiv = this.getParentElement(iframe, 3);
       const sIndex = this.getSpineItemIndexFromId(viewDiv);
-      ret.push({ spineItem: this.rsjPackage.spine.items[sIndex],  $iframe: $(iframes[i]) });
+      iframeMap.set(sIndex, iframes[i]);
+    }
+
+    for (let i = itemRange[0]; i <= itemRange[1]; i = i + 1) {
+      const iframe = iframeMap.get(i);
+      if (iframe) {
+        ret.push({ spineItem: this.rsjPackage.spine.items[i],  $iframe: $(iframe) });
+      }
     }
 
     return ret;
