@@ -172,8 +172,10 @@ export class ReadiumReaderViewAdapter {
     return false;
   }
 
-  // tslint:disable-next-line:no-empty
-  public bookmarkCurrentPage(): void {
+  public bookmarkCurrentPage(): string | null {
+    const bookmark = this.getFirstVisibleCfi();
+
+    return bookmark ? JSON.stringify(bookmark) : null;
   }
 
   public getPaginationInfo(): any {
