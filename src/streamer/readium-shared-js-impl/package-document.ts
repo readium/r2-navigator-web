@@ -39,6 +39,12 @@ export class PackageDocument {
 
   // tslint:disable-next-line:no-any
   public async generatePageListJSON(callback: any): Promise<void> {
+    if (!this.pub.PageList) {
+      callback(undefined);
+
+      return;
+    }
+
     if (!this.packageDom) {
       this.packageDom = await this.getPackageDom();
     }
