@@ -134,6 +134,10 @@ export class ReadiumReaderViewAdapter {
     return 1;
   }
 
+  public getViewScale(): number {
+    return 1;
+  }
+
   // tslint:disable-next-line:no-empty
   public setZoom(): void {
   }
@@ -170,6 +174,10 @@ export class ReadiumReaderViewAdapter {
 
   public isVisibleSpineItemElementCfi(): boolean {
     return false;
+  }
+
+  public getRangeCfiFromDomRange(range: object): any {
+    return undefined;
   }
 
   public bookmarkCurrentPage(): string | null {
