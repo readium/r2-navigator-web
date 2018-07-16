@@ -225,6 +225,11 @@ export class SpineItemView extends View {
   }
 
   // tslint:disable-next-line:no-any
+  public getRangeCfiFromDomRange(range: Range): any {
+    return this.contentViewImpl.getRangeCfiFromDomRange(range);
+  }
+
+  // tslint:disable-next-line:no-any
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new OnePageView(params,
                                            ['content-doc-frame'],

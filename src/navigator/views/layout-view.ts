@@ -87,6 +87,16 @@ export class LayoutView extends View {
     return this.spineItemViewFactory.getRsjPackage();
   }
 
+  public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
+    for (const siv of this.spineItemViewStatus) {
+      if (siv.spineItemIndex === spineItemIndex) {
+        return siv.view;
+      }
+    }
+
+    return undefined;
+  }
+
   public findSpineItemIndexByHref(href: string): number {
     return this.publication.findSpineItemIndexByHref(href);
   }

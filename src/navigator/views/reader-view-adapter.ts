@@ -176,8 +176,23 @@ export class ReadiumReaderViewAdapter {
     return false;
   }
 
-  public getRangeCfiFromDomRange(range: object): any {
-    return undefined;
+  public getRangeCfiFromDomRange(range: Range): any {
+    let spineItemIndex = -1;
+    const iframes = this.viewRoot.querySelectorAll('iframe');
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < iframes.length; i = i + 1) {
+      const iframe = iframes[i];
+      if (range.startContainer.ownerDocument === iframe.contentDocument) {
+        const viewDiv = this.getParentElement(iframe, 3);
+        spineItemIndex = this.getSpineItemIndexFromId(viewDiv);
+      }
+    }
+
+    if (spineItemIndex < 0) {
+      return undefined;
+    }
+
+    return this.rendition.viewport.getRangeCfiFromDomRange(range, spineItemIndex);
   }
 
   public bookmarkCurrentPage(): string | null {

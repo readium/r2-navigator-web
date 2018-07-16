@@ -198,6 +198,16 @@ export class Viewport {
     return indices;
   }
 
+  // tslint:disable-next-line:no-any
+  public getRangeCfiFromDomRange(range: Range, spineItemIndex: number): any {
+    const view = this.bookView.getSpineItemView(spineItemIndex);
+    if (!view) {
+      return undefined;
+    }
+
+    return view.getRangeCfiFromDomRange(range);
+  }
+
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {
