@@ -291,6 +291,12 @@ export class Viewport {
       return;
     }
 
+    for (const p of pageInfo) {
+      const $iframe = p.view.getIframe();
+      const spineItem = p.view.getRjsSpineItem();
+      getReadiumEventsRelayInstance().triggerContentDocumentLoaded($iframe, spineItem);
+    }
+
     const rjsPageInfo = pageInfo[0].view.getPaginationInfo();
     getReadiumEventsRelayInstance().triggerPaginationChanged(rjsPageInfo);
   }

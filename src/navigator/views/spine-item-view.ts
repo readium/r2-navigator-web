@@ -19,6 +19,8 @@ export enum ContentLoadingStatus {
   Loaded,
 }
 
+/* tslint:disable:no-any */
+
 export class SpineItemView extends View {
   protected host: HTMLElement;
 
@@ -47,8 +49,9 @@ export class SpineItemView extends View {
 
   protected contentHeight: number = 0;
 
-  // tslint:disable-next-line:no-any
   protected contentViewImpl: any;
+  protected $iframe: any;
+  protected rjsSpineItem: any;
 
   public constructor(
     iframeLoader: IFrameLoader,
@@ -224,17 +227,25 @@ export class SpineItemView extends View {
     };
   }
 
-  // tslint:disable-next-line:no-any
   public getRangeCfiFromDomRange(range: Range): any {
     return this.contentViewImpl.getRangeCfiFromDomRange(range);
   }
 
-  // tslint:disable-next-line:no-any
+  public getIframe(): any {
+    return this.$iframe;
+  }
+
+  public getRjsSpineItem(): any {
+    return this.rjsSpineItem;
+  }
+
   private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new OnePageView(params,
                                            ['content-doc-frame'],
                                            !this.isFixedLayout,
                                            reader);
+
+    this.handleDocumentContentLoaded();
 
     getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
 
@@ -267,6 +278,8 @@ export class SpineItemView extends View {
   // tslint:disable-next-line:no-any
   private loadSpineItemReflowableView(params: any, reader: any): Promise<void> {
     this.contentViewImpl = new ReflowableView(params, reader);
+
+    this.handleDocumentContentLoaded();
 
     getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
 
@@ -309,7 +322,14 @@ export class SpineItemView extends View {
     });
   }
 
-  // tslint:disable-next-line:no-any
+  private handleDocumentContentLoaded(): void {
+    this.contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOADED,
+                            ($iframe: any, spineItem: any) => {
+                              this.$iframe = $iframe;
+                              this.rjsSpineItem = spineItem;
+                            });
+  }
+
   private contentSizeChangedHandler(iframe: any, spineItem: any, handler: any,
                                     resolve: () => void): void {
     if (this.rsjSpine.items[this.spineItemIndex] !== spineItem) {
