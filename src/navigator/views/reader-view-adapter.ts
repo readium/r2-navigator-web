@@ -135,7 +135,7 @@ export class ReadiumReaderViewAdapter {
   }
 
   public getViewScale(): number {
-    return 1;
+    return 100;
   }
 
   // tslint:disable-next-line:no-empty
