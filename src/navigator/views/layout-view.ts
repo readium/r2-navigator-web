@@ -127,6 +127,11 @@ export class LayoutView extends View {
     this.isViewSettingChanged = false;
   }
 
+  // tslint:disable-next-line:no-any
+  public viewSettings() : any {
+    return this.rsjViewSettings;
+  }
+
   public zoom(scale: number): void {
     if (!this.isFixedLayout) {
       return;

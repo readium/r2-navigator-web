@@ -231,6 +231,10 @@ export class SpineItemView extends View {
     return this.contentViewImpl.getRangeCfiFromDomRange(range);
   }
 
+  public getVisibleElements(selector: string, includeSpineItems: boolean): any {
+    return this.contentViewImpl.getVisibleElements(selector, includeSpineItems);
+  }
+
   public getIframe(): any {
     return this.$iframe;
   }

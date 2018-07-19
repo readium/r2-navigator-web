@@ -35,6 +35,15 @@ export class Rendition {
     }
   }
 
+  // tslint:disable-next-line:no-any
+  public viewSettings(): any {
+    if (this.bookView) {
+      return this.bookView.viewSettings();
+    }
+
+    return undefined;
+  }
+
   public zoom(scale: number): void {
     if (this.bookView) {
       this.bookView.zoom(scale);

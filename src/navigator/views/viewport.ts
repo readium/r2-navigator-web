@@ -199,13 +199,23 @@ export class Viewport {
   }
 
   // tslint:disable-next-line:no-any
-  public getRangeCfiFromDomRange(range: Range, spineItemIndex: number): any {
+  public getRangeCfiFromDomRange(spineItemIndex: number, range: Range): any {
     const view = this.bookView.getSpineItemView(spineItemIndex);
     if (!view) {
       return undefined;
     }
 
     return view.getRangeCfiFromDomRange(range);
+  }
+
+  // tslint:disable-next-line:no-any
+  public getVisibleElements(siIndex: number, selector: string): any {
+    const view = this.bookView.getSpineItemView(siIndex);
+    if (!view) {
+      return undefined;
+    }
+
+    return view.getVisibleElements(selector, true);
   }
 
   private bindEvents(): void {

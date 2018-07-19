@@ -130,6 +130,10 @@ export class ReadiumReaderViewAdapter {
     this.rendition.updateViewSettings(settings);
   }
 
+  public viewerSettings(): any {
+    return this.rendition.viewSettings();
+  }
+
   public getDefaultViewScale(): number {
     return 1;
   }
@@ -192,7 +196,22 @@ export class ReadiumReaderViewAdapter {
       return undefined;
     }
 
-    return this.rendition.viewport.getRangeCfiFromDomRange(range, spineItemIndex);
+    return this.rendition.viewport.getRangeCfiFromDomRange(spineItemIndex, range);
+  }
+
+  public getVisibleElements(selector: string): any[] {
+    const itemRange = this.rendition.viewport.visibleSpineItemIndexRange();
+    const ret: any[] = [];
+    if (itemRange.length === 0) {
+      return ret;
+    }
+
+    for (let i = itemRange[0]; i <= itemRange[1]; i = i + 1) {
+      const eles = this.rendition.viewport.getVisibleElements(i, selector);
+      ret.push(...eles);
+    }
+
+    return ret;
   }
 
   public bookmarkCurrentPage(): string | null {
