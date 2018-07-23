@@ -145,6 +145,8 @@ export class Viewport {
 
     this.viewOffset = offset;
     this.render();
+
+    this.onPagesReady();
   }
 
   public async nextScreen(): Promise<void> {
