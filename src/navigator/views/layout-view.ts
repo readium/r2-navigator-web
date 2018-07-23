@@ -97,6 +97,25 @@ export class LayoutView extends View {
     return undefined;
   }
 
+  // tslint:disable-next-line:no-any
+  public isElementVisible(siIndex: number, $ele: any,
+                          viewOffset: number, viewportSize: number): boolean {
+    const viewStatus = this.spineItemViewStatus.find((status: SpineItemViewStatus) => {
+      return status.spineItemIndex === siIndex;
+    });
+
+    if (!viewStatus) {
+      return false;
+    }
+
+    if (viewStatus.offset + viewStatus.viewSize < viewOffset ||
+        viewStatus.offset > viewOffset + viewportSize) {
+      return false;
+    }
+
+    return viewStatus.view.isElementVisible($ele, viewOffset - viewStatus.offset, 0);
+  }
+
   public findSpineItemIndexByHref(href: string): number {
     return this.publication.findSpineItemIndexByHref(href);
   }

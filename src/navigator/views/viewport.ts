@@ -218,6 +218,21 @@ export class Viewport {
     return view.getVisibleElements(selector, true);
   }
 
+  // tslint:disable-next-line:no-any
+  public getElements(siIndex: number, selector: string): any {
+    const view = this.bookView.getSpineItemView(siIndex);
+    if (!view) {
+      return undefined;
+    }
+
+    return view.getElements(selector);
+  }
+
+  // tslint:disable-next-line:no-any
+  public isElementVisible(siIndex: number, $ele: any): boolean {
+    return this.bookView.isElementVisible(siIndex, $ele, this.viewOffset, this.viewportSize);
+  }
+
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {

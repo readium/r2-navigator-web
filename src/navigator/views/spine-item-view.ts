@@ -81,6 +81,7 @@ export class SpineItemView extends View {
   }
 
   public loadSpineItem(spineItem: PublicationLink): Promise<void> {
+    this.spineItem = spineItem;
     this.spineItemIndex = this.spine.indexOf(spineItem);
 
     const readiumViewParams = {
@@ -233,6 +234,19 @@ export class SpineItemView extends View {
 
   public getVisibleElements(selector: string, includeSpineItems: boolean): any {
     return this.contentViewImpl.getVisibleElements(selector, includeSpineItems);
+  }
+
+  public getElements(selector: string): any {
+    return this.contentViewImpl.getElements(this.spineItem.Href, selector);
+  }
+
+  public isElementVisible($ele: any, offsetMain: number, offset2nd: number): boolean {
+    const navLogic = this.contentViewImpl.getNavigator();
+
+    const visOffset = this.isVertical ? { top: -offsetMain, left: offset2nd } :
+                                        { top: offset2nd, left: -offsetMain };
+
+    return navLogic.isElementVisible($ele, visOffset);
   }
 
   public getIframe(): any {

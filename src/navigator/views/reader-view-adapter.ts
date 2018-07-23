@@ -55,6 +55,10 @@ export class ReadiumReaderViewAdapter {
     getReadiumEventsRelayInstance().off(event, fn, context, once);
   }
 
+  public once(event: string, fn: ListenerFn, context?: any): void {
+    getReadiumEventsRelayInstance().once(event, fn, context);
+  }
+
   public getLoadedSpineItems(): any[] {
     const itemRange = this.rendition.viewport.visibleSpineItemIndexRange();
     const ret: any[] = [];
@@ -172,8 +176,22 @@ export class ReadiumReaderViewAdapter {
     return { idref: loc.getHref(), contentCFI: loc.getLocation() };
   }
 
-  public getElements(): any {
-    return [];
+  public getElements(idref: string, selector: string): any {
+    const siIndex = this.rendition.getPublication().findSpineItemIndexByHref(idref);
+    if (siIndex < 0) {
+      return undefined;
+    }
+
+    return this.rendition.viewport.getElements(siIndex, selector);
+  }
+
+  public isElementVisible(ele: HTMLElement): boolean {
+    const spineItemIndex = this.findSpineItemIndexFromDocument(ele.ownerDocument);
+    if (spineItemIndex < 0) {
+      return false;
+    }
+
+    return this.rendition.viewport.isElementVisible(spineItemIndex, $(ele));
   }
 
   public isVisibleSpineItemElementCfi(): boolean {
@@ -181,17 +199,7 @@ export class ReadiumReaderViewAdapter {
   }
 
   public getRangeCfiFromDomRange(range: Range): any {
-    let spineItemIndex = -1;
-    const iframes = this.viewRoot.querySelectorAll('iframe');
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < iframes.length; i = i + 1) {
-      const iframe = iframes[i];
-      if (range.startContainer.ownerDocument === iframe.contentDocument) {
-        const viewDiv = this.getParentElement(iframe, 3);
-        spineItemIndex = this.getSpineItemIndexFromId(viewDiv);
-      }
-    }
-
+    const spineItemIndex = this.findSpineItemIndexFromDocument(range.startContainer.ownerDocument);
     if (spineItemIndex < 0) {
       return undefined;
     }
@@ -235,9 +243,30 @@ export class ReadiumReaderViewAdapter {
     this.navigator.previousScreen();
   }
 
-  // tslint:disable-next-line:no-empty
   public openSpineItemElementCfi(idref: string, elementCfi: string, initiator: any): void {
     this.navigator.gotoLocation(new Location(elementCfi, idref));
+  }
+
+  public openSpineItemPage(idref: string, pageIndex?: number, initiator?: any): void {
+    if (pageIndex !== undefined) {
+      console.warn('openSpineItemPage: page index is ignored');
+    }
+    this.navigator.gotoLocation(new Location('', idref));
+  }
+
+  private findSpineItemIndexFromDocument(doc: Document): number {
+    let spineItemIndex = -1;
+    const iframes = this.viewRoot.querySelectorAll('iframe');
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < iframes.length; i = i + 1) {
+      const iframe = iframes[i];
+      if (doc === iframe.contentDocument) {
+        const viewDiv = this.getParentElement(iframe, 3);
+        spineItemIndex = this.getSpineItemIndexFromId(viewDiv);
+      }
+    }
+
+    return spineItemIndex;
   }
 
   private getParentElement(node: HTMLElement, level: number): HTMLElement {
