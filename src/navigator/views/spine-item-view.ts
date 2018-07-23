@@ -73,10 +73,18 @@ export class SpineItemView extends View {
   }
 
   public getPageIndexOffsetFromCfi(cfi: string): number {
+    if (cfi === '') {
+      return 0;
+    }
+
     return this.contentViewImpl.getPageIndexOffsetFromCfi(cfi);
   }
 
   public getPageIndexOffsetFromElementId(elementId: string): number {
+    if (elementId === '') {
+      return 0;
+    }
+
     return this.contentViewImpl.getNavigator().getPageIndexDeltaForElementId(elementId);
   }
 

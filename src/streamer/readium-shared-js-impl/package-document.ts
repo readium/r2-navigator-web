@@ -74,6 +74,10 @@ export class PackageDocument {
     callback(pageList);
   }
 
+  public getNavDocHref(): string | undefined {
+    return undefined;
+  }
+
   // tslint:disable-next-line:no-any
   private getDefaultMediaOverlay(): any {
     return {

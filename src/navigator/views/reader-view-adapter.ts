@@ -254,6 +254,29 @@ export class ReadiumReaderViewAdapter {
     this.navigator.gotoLocation(new Location('', idref));
   }
 
+  public openContentUrl(contentUrl: string): void {
+    const hashIndex = contentUrl.indexOf('#');
+    let hrefPart;
+    let elementId;
+    if (hashIndex >= 0) {
+      hrefPart = contentUrl.substr(0, hashIndex);
+      elementId = contentUrl.substr(hashIndex + 1);
+    } else {
+      hrefPart = contentUrl;
+      elementId = '';
+    }
+
+    this.navigator.gotoAnchorLocation(hrefPart, elementId);
+  }
+
+  public pauseMediaOverlay():void {
+    return;
+  }
+
+  public resetMediaOverlay():void {
+    return;
+  }
+
   private findSpineItemIndexFromDocument(doc: Document): number {
     let spineItemIndex = -1;
     const iframes = this.viewRoot.querySelectorAll('iframe');
