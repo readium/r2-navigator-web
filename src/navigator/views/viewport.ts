@@ -313,6 +313,10 @@ export class Viewport {
   }
 
   private onPagesReady(): void {
+    if (!this.bookView.hasNewContentLoaded()) {
+      return;
+    }
+
     const pageInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
     if (pageInfo.length === 0) {
       return;
