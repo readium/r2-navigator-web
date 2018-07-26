@@ -325,6 +325,9 @@ export class Viewport {
     for (const p of pageInfo) {
       const $iframe = p.view.getIframe();
       const spineItem = p.view.getRjsSpineItem();
+      if (!$iframe) {
+        continue;
+      }
       getReadiumEventsRelayInstance().triggerContentDocumentLoaded($iframe, spineItem);
     }
 
