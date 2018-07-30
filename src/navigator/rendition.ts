@@ -3,6 +3,20 @@ import { LayoutView } from './views/layout-view';
 import { ZoomOptions } from './views/types';
 import { Viewport } from './views/viewport';
 
+export enum SpreadMode {
+  Freeform,
+  FitViewportAuto,
+  FitViewportSingleSpread,
+  FitViewportDoubleSpread,
+}
+
+// tslint:disable-next-line:interface-name
+export interface PageLayoutSettings {
+  spreadMode: SpreadMode;
+  pageWidth?: number;
+  pageHeight?: number;
+}
+
 export class Rendition {
   public viewport: Viewport;
 
@@ -12,6 +26,7 @@ export class Rendition {
 
   private pageWidth: number;
   private pageHeight: number;
+  private spreadMode: SpreadMode = SpreadMode.FitViewportAuto;
 
   private viewAsVertical: boolean = false;
 
@@ -20,13 +35,35 @@ export class Rendition {
     this.viewport = new Viewport(viewport);
   }
 
-  public setPageSize(pageWidth: number, pageHeight: number): void {
-    this.pageWidth = pageWidth;
-    this.pageHeight = pageHeight;
+  public setPageLayout(layoutSetting: PageLayoutSettings): void {
+    const viewportSize = this.viewport.getViewportSize();
+    let pageWidth = this.viewAsVertical ? this.viewport.getViewportSize2nd() : viewportSize;
+    let pageHeight = this.viewAsVertical ? viewportSize : this.viewport.getViewportSize2nd();
 
-    if (this.bookView) {
-      this.bookView.setPageSize(this.pageWidth, this.pageHeight);
+    if (layoutSetting.spreadMode === SpreadMode.Freeform) {
+      if (layoutSetting.pageWidth && layoutSetting.pageHeight) {
+        pageWidth = layoutSetting.pageWidth;
+        pageHeight = layoutSetting.pageHeight;
+      } else {
+        console.warn('Missing page width or height for freeform layout');
+      }
+    } else if (layoutSetting.spreadMode === SpreadMode.FitViewportAuto) {
+      if (viewportSize > 1200) {
+        if (this.viewAsVertical) {
+          pageHeight = viewportSize / 2;
+        } else {
+          pageWidth = viewportSize / 2;
+        }
+      }
+    } else if (layoutSetting.spreadMode === SpreadMode.FitViewportDoubleSpread) {
+      if (this.viewAsVertical) {
+        pageHeight = viewportSize / 2;
+      } else {
+        pageWidth = viewportSize / 2;
+      }
     }
+
+    this.setPageSize(pageWidth, pageHeight);
   }
 
   public async updateViewSettings(viewSettings: object): Promise<void> {
@@ -91,5 +128,14 @@ export class Rendition {
   // tslint:disable-next-line:no-any
   public setIframeLoader(iframeLoader: any): void {
     this.bookView.setIframeLoader(iframeLoader);
+  }
+
+  private setPageSize(pageWidth: number, pageHeight: number): void {
+    this.pageWidth = pageWidth;
+    this.pageHeight = pageHeight;
+
+    if (this.bookView) {
+      this.bookView.setPageSize(this.pageWidth, this.pageHeight);
+    }
   }
 }

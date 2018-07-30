@@ -144,7 +144,12 @@ export class LayoutView extends View {
     this.isPageSizeChanged = false;
   }
 
-  public async updateViewSettings(viewSetting: object): Promise<void> {
+  // tslint:disable-next-line:no-any
+  public async updateViewSettings(viewSetting: any): Promise<void> {
+    if (viewSetting.hasOwnProperty('syntheticSpread')) {
+      delete viewSetting.syntheticSpread;
+    }
+
     this.rsjViewSettings.update(viewSetting);
     this.isViewSettingChanged = true;
 

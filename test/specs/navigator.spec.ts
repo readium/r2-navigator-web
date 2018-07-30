@@ -2,7 +2,7 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { Location, Navigator } from '../../src/navigator';
+import { Location, Navigator, SpreadMode } from '../../src/navigator';
 
 import { openRendition } from '../helpers/reader-helper';
 
@@ -19,8 +19,12 @@ describe('Navigator', () => {
     document.body.appendChild(viewportDiv);
 
     const rendition = await openRendition(url);
-    rendition.setPageSize(400, 800);
-    rendition.viewport.setViewportSize(600);
+    rendition.viewport.setViewportSize(600, 800);
+    rendition.setPageLayout({
+      spreadMode: SpreadMode.Freeform,
+      pageWidth: 400,
+      pageHeight: 800,
+    });
     rendition.viewport.enableScroll(false);
 
     await rendition.render();

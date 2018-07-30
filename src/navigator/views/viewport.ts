@@ -6,6 +6,7 @@ export class Viewport {
   private bookView: LayoutView;
 
   private viewportSize: number;
+  private viewportSize2nd: number;
   private prefetchSize: number = 0;
 
   private viewOffset: number;
@@ -59,12 +60,17 @@ export class Viewport {
     }
   }
 
+  public setViewportSize(size: number, size2nd: number): void {
+    this.viewportSize = size;
+    this.viewportSize2nd = size2nd;
+  }
+
   public getViewportSize(): number {
     return this.viewportSize;
   }
 
-  public setViewportSize(size: number): void {
-    this.viewportSize = size;
+  public getViewportSize2nd(): number {
+    return this.viewportSize2nd;
   }
 
   public setPrefetchSize(size: number): void {
@@ -124,6 +130,10 @@ export class Viewport {
       return;
     }
 
+    const start = offset - this.prefetchSize;
+    const end = offset + this.viewportSize + this.prefetchSize;
+    await this.bookView.ensureConentLoadedAtRange(start, end);
+
     this.viewOffset = offset;
     this.render();
 
@@ -142,6 +152,10 @@ export class Viewport {
     if (offset === undefined) {
       return;
     }
+
+    const start = offset - this.prefetchSize;
+    const end = offset + this.viewportSize + this.prefetchSize;
+    await this.bookView.ensureConentLoadedAtRange(start, end);
 
     this.viewOffset = offset;
     this.render();

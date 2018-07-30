@@ -32,7 +32,7 @@ describe('Viewport', () => {
     layoutView.setPageSize(400, 400);
 
     viewport.setView(layoutView);
-    viewport.setViewportSize(800);
+    viewport.setViewportSize(800, 800);
   });
 
   afterEach(() => {
