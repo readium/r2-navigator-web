@@ -249,6 +249,14 @@ export class Viewport {
     return this.bookView.isElementVisible(siIndex, $ele, this.viewOffset, this.viewportSize);
   }
 
+  public beginViewUpdate(): void {
+    this.bookView.beginViewUpdate();
+  }
+
+  public async endViewUpdate(): Promise<void> {
+    await this.bookView.endViewUpdate();
+  }
+
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {

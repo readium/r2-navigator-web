@@ -44,6 +44,8 @@ export class LayoutView extends View {
   private pageHeight: number = 800;
   private isPageSizeChanged: boolean = false;
 
+  private inViewUpdate: boolean = false;
+
   private isVertical: boolean = false;
 
   private hasUnknownSizeSpineItemLoading: boolean = false;
@@ -130,7 +132,7 @@ export class LayoutView extends View {
     return this.newContentLoaded;
   }
 
-  public setPageSize(width: number, height: number): void {
+  public async setPageSize(width: number, height: number): Promise<void> {
     this.pageWidth = width;
     this.pageHeight = height;
     if (!this.isVertical) {
@@ -140,7 +142,26 @@ export class LayoutView extends View {
     }
 
     this.isPageSizeChanged = true;
-    this.rePaginate();
+
+    if (!this.inViewUpdate) {
+      await this.rePaginate();
+      this.isPageSizeChanged = false;
+    }
+  }
+
+  public beginViewUpdate(): void {
+    this.inViewUpdate = true;
+  }
+
+  public async endViewUpdate(): Promise<void> {
+    if (!this.inViewUpdate) {
+      return;
+    }
+
+    await this.rePaginate();
+
+    this.inViewUpdate = false;
+    this.isViewSettingChanged = false;
     this.isPageSizeChanged = false;
   }
 
@@ -153,8 +174,10 @@ export class LayoutView extends View {
     this.rsjViewSettings.update(viewSetting);
     this.isViewSettingChanged = true;
 
-    await this.rePaginate();
-    this.isViewSettingChanged = false;
+    if (!this.inViewUpdate) {
+      await this.rePaginate();
+      this.isViewSettingChanged = false;
+    }
   }
 
   // tslint:disable-next-line:no-any

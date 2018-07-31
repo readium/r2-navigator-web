@@ -2,7 +2,7 @@
 import $ from 'jquery';
 import { Location } from '../location';
 import { Navigator } from '../navigator';
-import { Rendition } from '../rendition';
+import { Rendition, SpreadMode } from '../rendition';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
 
 /* tslint:disable:no-any */
@@ -130,8 +130,34 @@ export class ReadiumReaderViewAdapter {
     return '';
   }
 
-  public updateSettings(settings: object): void {
-    this.rendition.updateViewSettings(settings);
+  public async updateSettings(settings: any): Promise<void> {
+    const loc = await this.navigator.getCurrentLocationAsync();
+
+    this.rendition.viewport.beginViewUpdate();
+
+    if (settings.hasOwnProperty('syntheticSpread')) {
+      const spreadSetting = settings.syntheticSpread;
+      let spreadMode = SpreadMode.FitViewportAuto;
+      if (spreadSetting === 'auto') {
+        spreadMode = SpreadMode.FitViewportAuto;
+      } else if (spreadSetting === 'single') {
+        spreadMode = SpreadMode.FitViewportSingleSpread;
+      } else if (spreadSetting === 'double') {
+        spreadMode = SpreadMode.FitViewportDoubleSpread;
+      }
+
+      this.rendition.setPageLayout({ spreadMode });
+
+      delete settings.syntheticSpread;
+    }
+
+    await this.rendition.updateViewSettings(settings);
+
+    await this.rendition.viewport.endViewUpdate();
+
+    if (loc) {
+      await this.rendition.viewport.renderAtLocation(loc);
+    }
   }
 
   public viewerSettings(): any {
