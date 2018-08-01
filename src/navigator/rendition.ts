@@ -36,18 +36,19 @@ export class Rendition {
   }
 
   public async setPageLayout(layoutSetting: PageLayoutSettings): Promise<void> {
+    const spreadMode = layoutSetting.spreadMode;
     const viewportSize = this.viewport.getViewportSize();
     let pageWidth = this.viewAsVertical ? this.viewport.getViewportSize2nd() : viewportSize;
     let pageHeight = this.viewAsVertical ? viewportSize : this.viewport.getViewportSize2nd();
 
-    if (layoutSetting.spreadMode === SpreadMode.Freeform) {
+    if (spreadMode === SpreadMode.Freeform) {
       if (layoutSetting.pageWidth && layoutSetting.pageHeight) {
         pageWidth = layoutSetting.pageWidth;
         pageHeight = layoutSetting.pageHeight;
       } else {
         console.warn('Missing page width or height for freeform layout');
       }
-    } else if (layoutSetting.spreadMode === SpreadMode.FitViewportAuto) {
+    } else if (spreadMode === SpreadMode.FitViewportAuto) {
       if (viewportSize > 1200) {
         if (this.viewAsVertical) {
           pageHeight = viewportSize / 2;
@@ -55,7 +56,7 @@ export class Rendition {
           pageWidth = viewportSize / 2;
         }
       }
-    } else if (layoutSetting.spreadMode === SpreadMode.FitViewportDoubleSpread) {
+    } else if (spreadMode === SpreadMode.FitViewportDoubleSpread) {
       if (this.viewAsVertical) {
         pageHeight = viewportSize / 2;
       } else {
@@ -63,7 +64,17 @@ export class Rendition {
       }
     }
 
+    this.spreadMode = spreadMode;
+
     await this.setPageSize(pageWidth, pageHeight);
+  }
+
+  public async refreshPageLayout(): Promise<void> {
+    if (this.spreadMode === SpreadMode.Freeform) {
+      return;
+    }
+
+    await this.setPageLayout({ spreadMode: this.spreadMode });
   }
 
   public async updateViewSettings(viewSettings: object): Promise<void> {

@@ -1,3 +1,4 @@
+import { Helpers } from '@evidentpoint/readium-shared-js';
 // tslint:disable-next-line:import-name
 import $ from 'jquery';
 import { Location } from '../location';
@@ -13,11 +14,12 @@ export class ReadiumReaderViewAdapter {
   private rsjPackageDoc: any;
   private rsjPackage: any;
 
-  private navigator: any;
-
+  private navigator: Navigator;
   private rendition: Rendition;
 
   private viewRoot: HTMLElement;
+
+  private resizer: ViewportResizer;
 
   private iframeEventManager: IframeEventManager = new IframeEventManager();
 
@@ -28,6 +30,8 @@ export class ReadiumReaderViewAdapter {
     this.navigator = navigator;
     this.viewRoot = viewRoot;
     this.rendition = rendition;
+
+    this.resizer = new ViewportResizer(this.viewRoot, this.rendition, this.navigator);
   }
 
   public getReadiumPackageDocument(): any {
@@ -333,6 +337,55 @@ export class ReadiumReaderViewAdapter {
     const components = node.id.split('-');
 
     return parseInt(components[components.length - 1], 10);
+  }
+}
+
+class ViewportResizer {
+  private viewRoot: HTMLElement;
+  private rendition: Rendition;
+  private navigator: Navigator;
+
+  private location: Location | null | undefined;
+
+  public constructor(viewRoot: HTMLElement, rendi: Rendition, nav: Navigator) {
+    this.viewRoot = viewRoot;
+    this.rendition = rendi;
+    this.navigator = nav;
+
+    this.registerResizeHandler();
+  }
+
+  private registerResizeHandler(): void {
+    const lazyResize = Helpers.extendedThrottle(
+      this.handleViewportResizeStart.bind(this),
+      this.handleViewportResizeTick.bind(this),
+      this.handleViewportResizeEnd.bind(this), 250, 1000, self);
+
+    $(window).on('resize.ReadiumSDK.readerView', lazyResize);
+  }
+
+  private handleViewportResizeStart(): void {
+    this.location = this.navigator.getCurrentLocation();
+  }
+
+  private async handleViewportResizeTick(): Promise<void> {
+    await this.resize();
+  }
+
+  private async handleViewportResizeEnd(): Promise<void> {
+    await this.resize();
+
+    if (this.location) {
+      await this.rendition.viewport.renderAtLocation(this.location);
+    }
+  }
+
+  private async resize(): Promise<void> {
+    const newWidth = this.viewRoot.clientWidth;
+    const newHeight = this.viewRoot.clientHeight;
+
+    this.rendition.viewport.setViewportSize(newWidth, newHeight);
+    await this.rendition.refreshPageLayout();
   }
 }
 
