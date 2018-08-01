@@ -93,6 +93,7 @@ export class Viewport {
     this.render();
 
     await this.ensureViewportFilledAtPosition(pos);
+    this.adjustScrollPosition();
     this.updatePositions();
 
     this.hasPendingAction = false;
@@ -117,6 +118,7 @@ export class Viewport {
     this.updatePositions();
 
     this.viewOffset = pos;
+    this.adjustScrollPosition();
     this.render();
 
     this.onPagesReady();
@@ -139,6 +141,7 @@ export class Viewport {
     this.updatePositions();
 
     this.viewOffset = offset;
+    this.adjustScrollPosition();
     this.render();
 
     this.onPagesReady();
@@ -300,6 +303,19 @@ export class Viewport {
     } else {
       this.endPos = undefined;
     }
+  }
+
+  private adjustScrollPosition(): void {
+    if (!this.enableScroll) {
+      return;
+    }
+
+    const adjustment = this.bookView.adjustLoadedConentRangeToPositive();
+    if (adjustment === 0) {
+      return;
+    }
+
+    this.viewOffset -= adjustment;
   }
 
   private render(): void {

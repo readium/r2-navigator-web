@@ -382,6 +382,29 @@ export class LayoutView extends View {
     this.spineItemViewFactory.iframeLoader = iframeLoader;
   }
 
+  public adjustLoadedConentRangeToPositive(): number {
+    if (this.spineItemViewStatus.length === 0) {
+      return 0;
+    }
+
+    const adj = this.startViewStatus().offset;
+    if (adj > 0) {
+      return 0;
+    }
+
+    for (const vs of this.spineItemViewStatus) {
+      vs.offset -= adj;
+      this.postionSpineItemView(vs);
+    }
+
+    this.loadedContentRange[0] -= adj;
+    this.loadedContentRange[1] -= adj;
+    this.paginatedRange[0] -= adj;
+    this.paginatedRange[1] -= adj;
+
+    return adj;
+  }
+
   private clearLoadedContent(): void {
     this.spineItemViewStatus.forEach((v: SpineItemViewStatus) => {
       this.layoutRoot.removeChild(v.viewContainer);
