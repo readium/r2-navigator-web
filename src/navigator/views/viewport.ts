@@ -92,9 +92,7 @@ export class Viewport {
     this.viewOffset = pos;
     this.render();
 
-    const start = pos - this.prefetchSize;
-    const end = pos + this.viewportSize + this.prefetchSize;
-    await this.ensureConentLoadedAtRange(start, end);
+    await this.ensureViewportFilledAtPosition(pos);
     this.updatePositions();
 
     this.hasPendingAction = false;
@@ -110,8 +108,15 @@ export class Viewport {
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
     await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
-    this.viewOffset = 0;
+    const pos = this.bookView.getSpineItemViewOffset(spineItemIndex);
+    if (pos === undefined) {
+      return;
+    }
 
+    await this.ensureViewportFilledAtPosition(pos);
+    this.updatePositions();
+
+    this.viewOffset = pos;
     this.render();
 
     this.onPagesReady();
@@ -130,9 +135,8 @@ export class Viewport {
       return;
     }
 
-    const start = offset - this.prefetchSize;
-    const end = offset + this.viewportSize + this.prefetchSize;
-    await this.bookView.ensureConentLoadedAtRange(start, end);
+    await this.ensureViewportFilledAtPosition(offset);
+    this.updatePositions();
 
     this.viewOffset = offset;
     this.render();
@@ -153,9 +157,8 @@ export class Viewport {
       return;
     }
 
-    const start = offset - this.prefetchSize;
-    const end = offset + this.viewportSize + this.prefetchSize;
-    await this.bookView.ensureConentLoadedAtRange(start, end);
+    await this.ensureViewportFilledAtPosition(offset);
+    this.updatePositions();
 
     this.viewOffset = offset;
     this.render();
@@ -332,6 +335,12 @@ export class Viewport {
     } else {
       this.root.scrollLeft = this.viewOffset;
     }
+  }
+
+  private async ensureViewportFilledAtPosition(pos: number): Promise<void> {
+    const start = pos - this.prefetchSize;
+    const end = pos + this.viewportSize + this.prefetchSize;
+    await this.bookView.ensureConentLoadedAtRange(start, end);
   }
 
   private onPagesReady(): void {

@@ -101,6 +101,16 @@ export class LayoutView extends View {
     return undefined;
   }
 
+  public getSpineItemViewOffset(spineItemIndex: number): number | undefined {
+    for (const siv of this.spineItemViewStatus) {
+      if (siv.spineItemIndex === spineItemIndex) {
+        return siv.offset;
+      }
+    }
+
+    return undefined;
+  }
+
   // tslint:disable-next-line:no-any
   public isElementVisible(siIndex: number, $ele: any,
                           viewOffset: number, viewportSize: number): boolean {
