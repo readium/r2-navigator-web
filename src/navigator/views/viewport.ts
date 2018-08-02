@@ -251,6 +251,16 @@ export class Viewport {
   }
 
   // tslint:disable-next-line:no-any
+  public getElementById(siIndex: number, id: string): any {
+    const view = this.bookView.getSpineItemView(siIndex);
+    if (!view) {
+      return undefined;
+    }
+
+    return view.getElementById(id);
+  }
+
+  // tslint:disable-next-line:no-any
   public isElementVisible(siIndex: number, $ele: any): boolean {
     return this.bookView.isElementVisible(siIndex, $ele, this.viewOffset, this.viewportSize);
   }

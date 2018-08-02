@@ -215,6 +215,15 @@ export class ReadiumReaderViewAdapter {
     return this.rendition.viewport.getElements(siIndex, selector);
   }
 
+  public getElementById(idref: string, id: string): any {
+    const siIndex = this.rendition.getPublication().findSpineItemIndexByHref(idref);
+    if (siIndex < 0) {
+      return undefined;
+    }
+
+    return this.rendition.viewport.getElementById(siIndex, id);
+  }
+
   public isElementVisible(ele: HTMLElement): boolean {
     const spineItemIndex = this.findSpineItemIndexFromDocument(ele.ownerDocument);
     if (spineItemIndex < 0) {
@@ -297,6 +306,38 @@ export class ReadiumReaderViewAdapter {
     }
 
     this.navigator.gotoAnchorLocation(hrefPart, elementId);
+  }
+
+  public resolveContentUrl(contentRefUrl: string, sourceFileHref: string): object | boolean {
+    const combinedPath = Helpers.ResolveContentRef(contentRefUrl, sourceFileHref);
+
+    const hashIndex = combinedPath.indexOf('#');
+    let hrefPart;
+    let elementId;
+    if (hashIndex >= 0) {
+      hrefPart = combinedPath.substr(0, hashIndex);
+      elementId = combinedPath.substr(hashIndex + 1);
+    } else {
+      hrefPart = combinedPath;
+      elementId = undefined;
+    }
+
+    let spineItem = this.rsjPackage.spine.getItemByHref(hrefPart);
+    if (!spineItem) {
+      console.warn(`spineItem ${hrefPart} not found`);
+      // sometimes that happens because spine item's URI gets encoded,
+      // yet it's compared with raw strings by `getItemByHref()` -
+      // so we try to search with decoded link as well
+      const decodedHrefPart = decodeURIComponent(hrefPart);
+      spineItem = this.rsjPackage.spine.getItemByHref(decodedHrefPart);
+      if (!spineItem) {
+        console.warn(`decoded spineItem ${decodedHrefPart} missing as well`);
+
+        return false;
+      }
+    }
+
+    return { elementId, href: hrefPart, idref: spineItem.idref };
   }
 
   public pauseMediaOverlay():void {

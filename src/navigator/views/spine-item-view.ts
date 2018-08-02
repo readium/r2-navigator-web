@@ -248,6 +248,10 @@ export class SpineItemView extends View {
     return this.contentViewImpl.getElements(this.spineItem.Href, selector);
   }
 
+  public getElementById(id: string): any {
+    return this.contentViewImpl.getElementById(this.spineItem.Href, id);
+  }
+
   public isElementVisible($ele: any, offsetMain: number, offset2nd: number): boolean {
     const navLogic = this.contentViewImpl.getNavigator();
 
