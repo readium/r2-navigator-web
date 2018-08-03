@@ -211,10 +211,6 @@ export class SpineItemView extends View {
       return this.contentHeight;
     }
 
-    if (this.isFixedLayout) {
-      return this.contentViewImpl.meta_width() * this.scale;
-    }
-
     return this.spineItemPageCount * pageWidth;
   }
 
