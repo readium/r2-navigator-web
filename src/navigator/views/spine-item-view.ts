@@ -261,6 +261,12 @@ export class SpineItemView extends View {
     return navLogic.isElementVisible($ele, visOffset);
   }
 
+  public getNearestCfiFromElement(element: any): any {
+    const navLogic = this.contentViewImpl.getNavigator();
+
+    return navLogic.getNearestCfiFromElement(element);
+  }
+
   public getIframe(): any {
     return this.$iframe;
   }

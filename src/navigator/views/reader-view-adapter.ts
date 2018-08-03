@@ -233,6 +233,15 @@ export class ReadiumReaderViewAdapter {
     return this.rendition.viewport.isElementVisible(spineItemIndex, $(ele));
   }
 
+  public getNearestCfiFromElement(ele: HTMLElement): any {
+    const spineItemIndex = this.findSpineItemIndexFromDocument(ele.ownerDocument);
+    if (spineItemIndex < 0) {
+      return false;
+    }
+
+    return this.rendition.viewport.getNearestCfiFromElement(spineItemIndex, ele);
+  }
+
   public isVisibleSpineItemElementCfi(): boolean {
     return false;
   }

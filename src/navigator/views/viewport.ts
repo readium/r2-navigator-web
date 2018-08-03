@@ -265,6 +265,16 @@ export class Viewport {
     return this.bookView.isElementVisible(siIndex, $ele, this.viewOffset, this.viewportSize);
   }
 
+  // tslint:disable-next-line:no-any
+  public getNearestCfiFromElement(siIndex: number, element: any): any {
+    const view = this.bookView.getSpineItemView(siIndex);
+    if (!view) {
+      return undefined;
+    }
+
+    return view.getNearestCfiFromElement(element);
+  }
+
   public beginViewUpdate(): void {
     this.bookView.beginViewUpdate();
   }
