@@ -92,8 +92,8 @@ export class Viewport {
     this.hasPendingAction = true;
     this.scrollFromInternal = true;
 
-    this.viewOffset = pos;
-    this.render();
+    // this.viewOffset = pos;
+    // this.render();
 
     this.viewOffset = await this.ensureViewportFilledAtPosition(pos);
     this.adjustScrollPosition();
@@ -327,7 +327,7 @@ export class Viewport {
   }
 
   private adjustScrollPosition(): void {
-    if (!this.enableScroll) {
+    if (!this.scrollEnabled) {
       return;
     }
 
@@ -388,15 +388,31 @@ export class Viewport {
   }
 
   private clipToVisibleRange(start: number, end: number): number {
-    const [vStart, vEnd] = this.bookView.visibleSpreadRange(start, end);
-    if (vStart < 0 || vEnd < 0) {
+    const pageRanges = this.bookView.visiblePages(start, end);
+    if (pageRanges.length === 0) {
       return start;
     }
 
-    this.visibleViewportSize = vEnd - vStart;
+    pageRanges.sort((page1: [number, number], page2: [number, number]) => {
+      const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0]),
+                                 Math.abs(this.viewOffset - page1[1]));
+      const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0]),
+                                 Math.abs(this.viewOffset - page2[1]));
+
+      return page1Dist - page2Dist;
+    });
+
+    const spreadPages = pageRanges.slice(0, this.bookView.numberOfPagesPerSpread());
+
+    let firstPage = spreadPages[0];
+    let lastPage = spreadPages[spreadPages.length - 1];
+    if (lastPage[0] < firstPage[0]) {
+      [firstPage, lastPage] = [lastPage, firstPage];
+    }
+    this.visibleViewportSize = lastPage[1] - firstPage[0];
     this.root.style.width = `${this.visibleViewportSize}px`;
 
-    return vStart;
+    return firstPage[0];
   }
 
   private onPagesReady(): void {
