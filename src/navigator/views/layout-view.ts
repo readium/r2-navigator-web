@@ -27,6 +27,7 @@ class SpineItemViewStatus {
 export class LayoutView extends View {
   private spineItemViewStatus: SpineItemViewStatus[] = [];
   private spineItemViewSizes: number[] = [];
+  private spineItemViewPageCounts: number[] = [];
 
   private host: HTMLElement;
   private layoutRoot: HTMLElement;
@@ -60,6 +61,8 @@ export class LayoutView extends View {
 
   private newContentLoaded: boolean = false;
 
+  private numOfPagesPerSpread: number = 1;
+
   public constructor(pub: Publication) {
     super();
     this.publication = pub;
@@ -79,6 +82,8 @@ export class LayoutView extends View {
 
     // tslint:disable-next-line:prefer-array-literal
     this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
+    // tslint:disable-next-line:prefer-array-literal
+    this.spineItemViewPageCounts = new Array<number>(pub.Spine.length).fill(-1);
   }
 
   // tslint:disable-next-line:no-any
@@ -157,6 +162,10 @@ export class LayoutView extends View {
       await this.rePaginate();
       this.isPageSizeChanged = false;
     }
+  }
+
+  public setNumberOfPagesPerSpread(num: number): void {
+    this.numOfPagesPerSpread = num;
   }
 
   public beginViewUpdate(): void {
@@ -405,6 +414,35 @@ export class LayoutView extends View {
     return adj;
   }
 
+  public visibleSpreadRange(start: number, end: number): [number, number] {
+    let visibleStart: number | undefined;
+    let visibleEnd: number | undefined;
+    for (const vs of this.spineItemViewStatus) {
+      if (vs.offset + vs.viewSize < start) {
+        continue;
+      }
+      if (vs.offset > end) {
+        break;
+      }
+
+      const pageCount = vs.view.getTotalPageCount();
+      for (let i = 0; i <= pageCount; i = i + 1) {
+        const offset = vs.offset + i * vs.view.getPageSize(this.pageWidth);
+        if (offset >= start && offset <= end) {
+          if (visibleStart === undefined) {
+            visibleStart = offset;
+          }
+          visibleEnd = offset;
+        }
+      }
+    }
+
+    const vStart = visibleStart === undefined ? -1 : visibleStart;
+    const vEnd = visibleEnd === undefined ? -1 : visibleEnd;
+
+    return [vStart, vEnd];
+  }
+
   private clearLoadedContent(): void {
     this.spineItemViewStatus.forEach((v: SpineItemViewStatus) => {
       this.layoutRoot.removeChild(v.viewContainer);
@@ -497,6 +535,7 @@ export class LayoutView extends View {
 
       offset += vs.viewSize;
       this.spineItemViewSizes[vs.spineItemIndex] = vs.viewSize;
+      this.spineItemViewPageCounts[vs.spineItemIndex] = vs.view.getTotalPageCount();
     }
 
     this.loadedContentRange[1] = this.paginatedRange[1] = offset;
@@ -592,6 +631,7 @@ export class LayoutView extends View {
     let viewLength: number;
     if (this.spineItemViewSizes[index] > 0) {
       viewLength = this.spineItemViewSizes[index];
+      spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
       spineItemView.loadSpineItem(this.publication.Spine[index]).then(() => {
         this.onSpineItemLoaded(spineItemView);
       });
@@ -604,6 +644,7 @@ export class LayoutView extends View {
 
       viewLength = spineItemView.getTotalSize(this.pageWidth);
       this.spineItemViewSizes[index] = viewLength;
+      this.spineItemViewPageCounts[index] = spineItemView.getTotalPageCount();
     }
 
     return {

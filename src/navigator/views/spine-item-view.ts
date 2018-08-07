@@ -202,6 +202,10 @@ export class SpineItemView extends View {
     return this.spineItemPageCount;
   }
 
+  public setTotalPageCount(count: number): void {
+    this.spineItemPageCount = count;
+  }
+
   public getTotalSize(pageWidth: number): number {
     if (this.isVertical) {
       if (this.isFixedLayout) {
@@ -211,7 +215,27 @@ export class SpineItemView extends View {
       return this.contentHeight;
     }
 
+    if (this.isFixedLayout) {
+      return this.contentViewImpl.meta_width() * this.scale;
+    }
+
     return this.spineItemPageCount * pageWidth;
+  }
+
+  public getPageSize(pageWidth: number): number {
+    if (this.isVertical) {
+      if (this.isFixedLayout) {
+        return this.contentViewImpl.meta_height() * this.scale;
+      }
+
+      return this.contentHeight;
+    }
+
+    if (this.isFixedLayout) {
+      return this.contentViewImpl.meta_width() * this.scale;
+    }
+
+    return pageWidth;
   }
 
   public getCfi(offsetMain: number, offset2nd: number): string {
@@ -397,5 +421,6 @@ export class SpineItemView extends View {
     }
 
     this.contentViewImpl.transformContentImmediate(this.scale, 0, 0);
+    this.host.style.width = `${this.contentViewImpl.meta_width() * this.scale}px`;
   }
 }

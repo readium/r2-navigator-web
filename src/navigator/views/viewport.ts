@@ -9,6 +9,8 @@ export class Viewport {
   private viewportSize2nd: number;
   private prefetchSize: number = 0;
 
+  private visibleViewportSize: number = 0;
+
   private viewOffset: number;
 
   private startPos?: PaginationInfo;
@@ -63,6 +65,7 @@ export class Viewport {
   public setViewportSize(size: number, size2nd: number): void {
     this.viewportSize = size;
     this.viewportSize2nd = size2nd;
+    this.visibleViewportSize = this.viewportSize;
   }
 
   public getViewportSize(): number {
@@ -92,7 +95,7 @@ export class Viewport {
     this.viewOffset = pos;
     this.render();
 
-    await this.ensureViewportFilledAtPosition(pos);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(pos);
     this.adjustScrollPosition();
     this.updatePositions();
 
@@ -114,10 +117,9 @@ export class Viewport {
       return;
     }
 
-    await this.ensureViewportFilledAtPosition(pos);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(pos);
     this.updatePositions();
 
-    this.viewOffset = pos;
     this.adjustScrollPosition();
     this.render();
 
@@ -137,10 +139,9 @@ export class Viewport {
       return;
     }
 
-    await this.ensureViewportFilledAtPosition(offset);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(offset);
     this.updatePositions();
 
-    this.viewOffset = offset;
     this.adjustScrollPosition();
     this.render();
 
@@ -160,17 +161,17 @@ export class Viewport {
       return;
     }
 
-    await this.ensureViewportFilledAtPosition(offset);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(offset);
     this.updatePositions();
 
-    this.viewOffset = offset;
+    this.adjustScrollPosition();
     this.render();
 
     this.onPagesReady();
   }
 
   public async nextScreen(): Promise<void> {
-    let newPos = this.viewOffset + this.viewportSize;
+    let newPos = this.viewOffset + this.visibleViewportSize;
     const loadedEndPos = this.bookView.getLoadedEndPosition();
     if (newPos > loadedEndPos && !this.bookView.hasMoreAfterEnd()) {
       newPos = loadedEndPos;
@@ -178,7 +179,7 @@ export class Viewport {
 
     if (newPos !== this.viewOffset &&
         (newPos <= loadedEndPos || this.bookView.hasMoreAfterEnd())) {
-      await this.renderAtOffset(this.viewOffset + this.viewportSize);
+      await this.renderAtOffset(this.viewOffset + this.visibleViewportSize);
     }
   }
 
@@ -373,10 +374,29 @@ export class Viewport {
     }
   }
 
-  private async ensureViewportFilledAtPosition(pos: number): Promise<void> {
+  private async ensureViewportFilledAtPosition(pos: number): Promise<number> {
     const start = pos - this.prefetchSize;
     const end = pos + this.viewportSize + this.prefetchSize;
     await this.bookView.ensureConentLoadedAtRange(start, end);
+
+    let newPos = pos;
+    if (!this.scrollEnabled) {
+      newPos = this.clipToVisibleRange(pos, pos + this.viewportSize);
+    }
+
+    return newPos;
+  }
+
+  private clipToVisibleRange(start: number, end: number): number {
+    const [vStart, vEnd] = this.bookView.visibleSpreadRange(start, end);
+    if (vStart < 0 || vEnd < 0) {
+      return start;
+    }
+
+    this.visibleViewportSize = vEnd - vStart;
+    this.root.style.width = `${this.visibleViewportSize}px`;
+
+    return vStart;
   }
 
   private onPagesReady(): void {

@@ -27,6 +27,7 @@ export class Rendition {
   private pageWidth: number;
   private pageHeight: number;
   private spreadMode: SpreadMode = SpreadMode.FitViewportAuto;
+  private numOfPagesPerSpread: number = 1;
 
   private viewAsVertical: boolean = false;
 
@@ -41,6 +42,7 @@ export class Rendition {
     let pageWidth = this.viewAsVertical ? this.viewport.getViewportSize2nd() : viewportSize;
     let pageHeight = this.viewAsVertical ? viewportSize : this.viewport.getViewportSize2nd();
 
+    let numOfPagesPerSpread: number = 1;
     if (spreadMode === SpreadMode.Freeform) {
       if (layoutSetting.pageWidth && layoutSetting.pageHeight) {
         pageWidth = layoutSetting.pageWidth;
@@ -55,6 +57,7 @@ export class Rendition {
         } else {
           pageWidth = viewportSize / 2;
         }
+        numOfPagesPerSpread = 2;
       }
     } else if (spreadMode === SpreadMode.FitViewportDoubleSpread) {
       if (this.viewAsVertical) {
@@ -62,9 +65,15 @@ export class Rendition {
       } else {
         pageWidth = viewportSize / 2;
       }
+      numOfPagesPerSpread = 2;
     }
 
     this.spreadMode = spreadMode;
+    this.numOfPagesPerSpread = numOfPagesPerSpread;
+
+    if (this.bookView) {
+      this.bookView.setNumberOfPagesPerSpread(numOfPagesPerSpread);
+    }
 
     await this.setPageSize(pageWidth, pageHeight);
   }
@@ -129,6 +138,7 @@ export class Rendition {
   public render(): Promise<void> {
     this.bookView = new LayoutView(this.pub);
     this.bookView.setPageSize(this.pageWidth, this.pageHeight);
+    this.bookView.setNumberOfPagesPerSpread(this.numOfPagesPerSpread);
     this.bookView.setVerticalLayout(this.viewAsVertical);
 
     this.viewport.setView(this.bookView);
