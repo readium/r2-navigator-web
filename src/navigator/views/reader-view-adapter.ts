@@ -117,7 +117,13 @@ export class ReadiumReaderViewAdapter {
   }
 
   public getCurrentViewType(): number {
-    return 1;
+    const pub = this.rendition.getPublication();
+    let layout = 1;
+    if (pub.Metadata.Rendition && pub.Metadata.Rendition.Layout === 'fixed') {
+      layout = 2;
+    }
+
+    return layout;
   }
 
   public addIFrameEventListener(eventName: string, callback: any,
