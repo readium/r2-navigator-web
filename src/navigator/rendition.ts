@@ -27,7 +27,7 @@ export class Rendition {
   private pageWidth: number;
   private pageHeight: number;
   private spreadMode: SpreadMode = SpreadMode.FitViewportAuto;
-  private numOfPagesPerSpread: number = 1;
+  private numOfPagesPerSpread: number = 0;
 
   private viewAsVertical: boolean = false;
 
@@ -44,6 +44,7 @@ export class Rendition {
 
     let numOfPagesPerSpread: number = 1;
     if (spreadMode === SpreadMode.Freeform) {
+      numOfPagesPerSpread = 0;
       if (layoutSetting.pageWidth && layoutSetting.pageHeight) {
         pageWidth = layoutSetting.pageWidth;
         pageHeight = layoutSetting.pageHeight;

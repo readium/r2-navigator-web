@@ -61,7 +61,7 @@ export class LayoutView extends View {
 
   private newContentLoaded: boolean = false;
 
-  private numOfPagesPerSpread: number = 1;
+  private numOfPagesPerSpread: number = 0;
 
   public constructor(pub: Publication) {
     super();

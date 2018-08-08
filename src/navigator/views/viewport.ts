@@ -388,6 +388,11 @@ export class Viewport {
   }
 
   private clipToVisibleRange(start: number, end: number): number {
+    const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
+    if (numOfPagePerSpread < 1) {
+      return start;
+    }
+
     const pageRanges = this.bookView.visiblePages(start, end);
     if (pageRanges.length === 0) {
       return start;
@@ -402,7 +407,7 @@ export class Viewport {
       return page1Dist - page2Dist;
     });
 
-    const spreadPages = pageRanges.slice(0, this.bookView.numberOfPagesPerSpread());
+    const spreadPages = pageRanges.slice(0, numOfPagePerSpread);
 
     let firstPage = spreadPages[0];
     let lastPage = spreadPages[spreadPages.length - 1];
