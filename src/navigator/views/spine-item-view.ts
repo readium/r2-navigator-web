@@ -162,10 +162,6 @@ export class SpineItemView extends View {
   }
 
   public resizeFixedLayoutPage(option: ZoomOptions, pageWidth: number, pageHeight: number): void {
-    if (option === ZoomOptions.Free) {
-      return;
-    }
-
     this.scaleOption = option;
 
     const hScale = pageWidth / this.contentViewImpl.meta_width();
@@ -176,6 +172,8 @@ export class SpineItemView extends View {
       this.scale = hScale;
     } else if (this.scaleOption === ZoomOptions.FitByHeight) {
       this.scale = vScale;
+    } else if (this.scaleOption === ZoomOptions.Free) {
+      this.scale = hScale;
     }
 
     this.updateScale();
@@ -186,7 +184,11 @@ export class SpineItemView extends View {
 
     this.contentViewImpl.setViewSettings(this.rsjViewSettings);
 
-    return this.isVertical || this.isFixedLayout
+    if (this.isFixedLayout) {
+      return Promise.resolve();
+    }
+
+    return this.isVertical
       ? this.contentSizeChangedPromise() : this.paginationChangedPromise();
   }
 

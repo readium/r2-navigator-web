@@ -5,10 +5,23 @@ import { Location } from '../location';
 import { Navigator } from '../navigator';
 import { Rendition, SpreadMode } from '../rendition';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
+import { ZoomOptions } from './types';
 
 /* tslint:disable:no-any */
 
 type ListenerFn = (...args: any[]) => void;
+
+enum ViewType {
+  VIEW_TYPE_COLUMNIZED = 1,
+  VIEW_TYPE_FIXED = 2,
+  VIEW_TYPE_SCROLLED_DOC = 3,
+  VIEW_TYPE_SCROLLED_CONTINUOUS = 4,
+}
+
+interface IZoomOption {
+  style: string;
+  scale: number;
+}
 
 export class ReadiumReaderViewAdapter {
   private rsjPackageDoc: any;
@@ -82,11 +95,7 @@ export class ReadiumReaderViewAdapter {
   }
 
   public isCurrentViewFixedLayout(): boolean {
-    if (this.rendition.getPublication().Metadata.Rendition) {
-      return this.rendition.getPublication().Metadata.Rendition.Layout === 'fixed';
-    }
-
-    return false;
+    return this.getCurrentViewType() === ViewType.VIEW_TYPE_FIXED;
   }
 
   public getLoadedContentFrames(): object[] {
@@ -116,11 +125,11 @@ export class ReadiumReaderViewAdapter {
     return ret;
   }
 
-  public getCurrentViewType(): number {
+  public getCurrentViewType(): ViewType {
     const pub = this.rendition.getPublication();
-    let layout = 1;
+    let layout = ViewType.VIEW_TYPE_COLUMNIZED;
     if (pub.Metadata.Rendition && pub.Metadata.Rendition.Layout === 'fixed') {
-      layout = 2;
+      layout = ViewType.VIEW_TYPE_FIXED;
     }
 
     return layout;
@@ -179,11 +188,32 @@ export class ReadiumReaderViewAdapter {
   }
 
   public getViewScale(): number {
+    if (this.isCurrentViewFixedLayout()) {
+      return this.rendition.getZoomScale() * 100;
+    }
+
     return 100;
   }
 
   // tslint:disable-next-line:no-empty
-  public setZoom(): void {
+  public async setZoom(options: IZoomOption): Promise<void> {
+    if (!this.isCurrentViewFixedLayout()) {
+      return;
+    }
+
+    const loc = this.navigator.getCurrentLocation();
+
+    if (options.style === 'user') {
+      this.rendition.setZoom(ZoomOptions.Free, options.scale);
+    } else if (options.style === 'fit-screen') {
+      this.rendition.setZoom(ZoomOptions.FitByPage, 1);
+    } else if (options.style === 'fit-width') {
+      this.rendition.setZoom(ZoomOptions.FitByWidth, 1);
+    }
+
+    if (loc) {
+      await this.rendition.viewport.renderAtLocation(loc);
+    }
   }
 
   public getStartCfi(): string {

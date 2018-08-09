@@ -102,16 +102,18 @@ export class Rendition {
     return undefined;
   }
 
-  public zoom(scale: number): void {
+  public setZoom(option: ZoomOptions, scale: number): void {
     if (this.bookView) {
-      this.bookView.zoom(scale);
+      this.bookView.setZoom(option, scale);
     }
   }
 
-  public setZoomOption(option: ZoomOptions): void {
+  public getZoomScale(): number {
     if (this.bookView) {
-      this.bookView.setZoomOption(option);
+      return this.bookView.getZoomScale();
     }
+
+    return 1;
   }
 
   public setViewAsVertical(v: boolean): void {

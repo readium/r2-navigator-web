@@ -208,25 +208,29 @@ export class LayoutView extends View {
     return this.rsjViewSettings;
   }
 
-  public zoom(scale: number): void {
+  public setZoom(option: ZoomOptions, scale: number): void {
     if (!this.isFixedLayout) {
       return;
     }
 
-    this.zoomScale = scale;
+    if (this.zoomOption === option && this.zoomScale === scale) {
+      return;
+    }
+
+    this.zoomOption = option;
+    if (this.zoomOption !== ZoomOptions.Free) {
+      this.zoomScale = 1;
+    } else {
+      this.zoomScale = scale;
+    }
 
     this.isPageSizeChanged = true;
     this.rePaginate();
     this.isPageSizeChanged = false;
   }
 
-  public setZoomOption(option: ZoomOptions): void {
-    if (!this.isFixedLayout || this.zoomOption === option) {
-      return;
-    }
-
-    this.zoomOption = option;
-    this.zoom(1);
+  public getZoomScale(): number {
+    return this.zoomScale;
   }
 
   public setVerticalLayout(v: boolean): void {

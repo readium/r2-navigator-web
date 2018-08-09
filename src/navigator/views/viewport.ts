@@ -1,6 +1,7 @@
 import { Location } from '../location';
 import { LayoutView, PaginationInfo } from './layout-view';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
+import { ZoomOptions } from './types';
 
 export class Viewport {
   private bookView: LayoutView;
@@ -184,7 +185,7 @@ export class Viewport {
   }
 
   public async prevScreen(): Promise<void> {
-    let newPos = this.viewOffset - this.viewportSize;
+    let newPos = this.viewOffset - this.getScaledViewportSize();
     const loadedStartPos = this.bookView.getLoadedStartPostion();
     // Ensure not to go beyond begining of the book
     if (newPos < loadedStartPos && !this.bookView.hasMoreBeforeStart()) {
@@ -209,7 +210,7 @@ export class Viewport {
       return indices;
     }
 
-    const pos = this.viewOffset + this.viewportSize;
+    const pos = this.getEndOffset();
     const endPageInfo = this.bookView.getPaginationInfoAtOffset(pos);
     if (endPageInfo.length === 0) {
       return indices;
@@ -263,7 +264,9 @@ export class Viewport {
 
   // tslint:disable-next-line:no-any
   public isElementVisible(siIndex: number, $ele: any): boolean {
-    return this.bookView.isElementVisible(siIndex, $ele, this.viewOffset, this.viewportSize);
+    return this.bookView.isElementVisible(siIndex, $ele,
+                                          this.viewOffset,
+                                          this.getScaledViewportSize());
   }
 
   // tslint:disable-next-line:no-any
@@ -318,7 +321,8 @@ export class Viewport {
       this.startPos = undefined;
     }
 
-    const endInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset + this.viewportSize);
+    const endPos = this.getEndOffset();
+    const endInfo = this.bookView.getPaginationInfoAtOffset(endPos);
     if (endInfo.length > 0) {
       this.endPos = endInfo[0];
     } else {
@@ -349,7 +353,7 @@ export class Viewport {
         transformString = `translateY(${-this.viewOffset}px)`;
       } else {
         if (this.bookView.isRightToLeft()) {
-          const offset = this.viewOffset + this.viewportSize;
+          const offset = this.getEndOffset();
           transformString = `translateX(${offset}px)`;
         } else {
           transformString = `translateX(${-this.viewOffset}px)`;
@@ -376,12 +380,12 @@ export class Viewport {
 
   private async ensureViewportFilledAtPosition(pos: number): Promise<number> {
     const start = pos - this.prefetchSize;
-    const end = pos + this.viewportSize + this.prefetchSize;
+    const end = pos + this.getScaledViewportSize() + this.prefetchSize;
     await this.bookView.ensureConentLoadedAtRange(start, end);
 
     let newPos = pos;
     if (!this.scrollEnabled) {
-      newPos = this.clipToVisibleRange(pos, pos + this.viewportSize);
+      newPos = this.clipToVisibleRange(pos, pos + this.getScaledViewportSize());
     }
 
     return newPos;
@@ -416,8 +420,17 @@ export class Viewport {
     }
     this.visibleViewportSize = lastPage[1] - firstPage[0];
     this.root.style.width = `${this.visibleViewportSize}px`;
+    this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
 
     return firstPage[0];
+  }
+
+  private getScaledViewportSize(): number {
+    return this.viewportSize * this.bookView.getZoomScale();
+  }
+
+  private getEndOffset(): number {
+    return this.viewOffset + this.getScaledViewportSize();
   }
 
   private onPagesReady(): void {
