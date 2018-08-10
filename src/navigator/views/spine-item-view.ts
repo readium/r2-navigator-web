@@ -303,8 +303,6 @@ export class SpineItemView extends View {
                                            !this.isFixedLayout,
                                            reader);
 
-    this.handleDocumentContentLoaded();
-
     getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
 
     this.contentViewImpl.render();
@@ -316,9 +314,11 @@ export class SpineItemView extends View {
     return new Promise((resolve: () => void) => {
       this.contentViewImpl.loadSpineItem(
         this.rsjSpine.items[this.spineItemIndex],
-        (success: boolean) => {
+        (success: boolean, $iframe: any, spineItem: any) => {
           if (success) {
             this.onSpineItemOnePageViewLoaded();
+            this.$iframe = $iframe;
+            this.rjsSpineItem = spineItem;
             resolve();
           }
         },
