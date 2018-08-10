@@ -279,6 +279,15 @@ export class Viewport {
     return view.getNearestCfiFromElement(element);
   }
 
+  public getViewScale(siIndex: number): number {
+    const view = this.bookView.getSpineItemView(siIndex);
+    if (!view) {
+      return 1;
+    }
+
+    return view.getScale();
+  }
+
   public beginViewUpdate(): void {
     this.bookView.beginViewUpdate();
   }

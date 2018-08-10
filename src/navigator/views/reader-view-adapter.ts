@@ -188,11 +188,12 @@ export class ReadiumReaderViewAdapter {
   }
 
   public getViewScale(): number {
-    if (this.isCurrentViewFixedLayout()) {
-      return this.rendition.getZoomScale() * 100;
+    const itemRang = this.rendition.viewport.visibleSpineItemIndexRange();
+    if (itemRang.length === 0) {
+      return this.getDefaultViewScale() * 100;
     }
 
-    return 100;
+    return this.rendition.viewport.getViewScale(itemRang[0]) * 100;
   }
 
   // tslint:disable-next-line:no-empty
