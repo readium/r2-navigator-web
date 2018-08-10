@@ -205,7 +205,10 @@ export class ReadiumReaderViewAdapter {
     const loc = this.navigator.getCurrentLocation();
 
     if (options.style === 'user') {
-      this.rendition.setZoom(ZoomOptions.Free, options.scale);
+      const oldScale = this.getViewScale() / 100;
+      const bookviewScale = this.rendition.getZoomScale();
+      const transformaedBookviewScale = bookviewScale * options.scale / oldScale;
+      this.rendition.setZoom(ZoomOptions.Free, transformaedBookviewScale);
     } else if (options.style === 'fit-screen') {
       this.rendition.setZoom(ZoomOptions.FitByPage, 1);
     } else if (options.style === 'fit-width') {
