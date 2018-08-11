@@ -31,17 +31,20 @@ export class ReadiumReaderViewAdapter {
   private rendition: Rendition;
 
   private viewRoot: HTMLElement;
+  private epubContainer: HTMLElement;
 
   private resizer: ViewportResizer;
 
   private iframeEventManager: IframeEventManager = new IframeEventManager();
 
   public constructor(rsjPackageDoc: any, rsjPackage: any,
-                     navigator: Navigator, viewRoot: HTMLElement, rendition: Rendition) {
+                     viewRoot: HTMLElement, epubContainer: HTMLElement,
+                     navigator: Navigator,  rendition: Rendition) {
     this.rsjPackageDoc = rsjPackageDoc;
     this.rsjPackage = rsjPackage;
     this.navigator = navigator;
     this.viewRoot = viewRoot;
+    this.epubContainer = epubContainer;
     this.rendition = rendition;
 
     this.resizer = new ViewportResizer(this.viewRoot, this.rendition, this.navigator);
@@ -201,6 +204,8 @@ export class ReadiumReaderViewAdapter {
     if (!this.isCurrentViewFixedLayout()) {
       return;
     }
+
+    this.epubContainer.style.overflow = 'auto';
 
     const loc = this.navigator.getCurrentLocation();
 
