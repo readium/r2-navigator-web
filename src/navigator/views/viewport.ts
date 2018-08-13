@@ -109,6 +109,8 @@ export class Viewport {
     this.render();
 
     this.onPagesReady();
+
+    await this.updatePrefetch();
   }
 
   public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
@@ -125,6 +127,8 @@ export class Viewport {
     this.render();
 
     this.onPagesReady();
+
+    await  this.updatePrefetch();
   }
 
   public async renderAtLocation(loc: Location): Promise<void> {
@@ -147,6 +151,8 @@ export class Viewport {
     this.render();
 
     this.onPagesReady();
+
+    await this.updatePrefetch();
   }
 
   public async renderAtAnchorLocation(href: string, eleId: string): Promise<void> {
@@ -169,6 +175,8 @@ export class Viewport {
     this.render();
 
     this.onPagesReady();
+
+    await this.updatePrefetch();
   }
 
   public async nextScreen(): Promise<void> {
@@ -320,6 +328,15 @@ export class Viewport {
     // this.hasPendingAction = true;
     await this.bookView.ensureConentLoadedAtRange(start, end);
     // this.hasPendingAction = false;
+  }
+
+  private async updatePrefetch(): Promise<void> {
+    const start = this.viewOffset - this.prefetchSize;
+    const end = this.viewOffset + this.getScaledViewportSize() + this.prefetchSize;
+    this.bookView.removeOutOfRangeSpineItems(start, end);
+
+    await this.bookView.ensureConentLoadedAtRange(start, end);
+    this.updatePositions();
   }
 
   private updatePositions(): void {

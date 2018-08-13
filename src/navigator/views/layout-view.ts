@@ -336,8 +336,6 @@ export class LayoutView extends View {
   }
 
   public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
-    this.removeOutOfRangeSpineItems(start, end);
-
     this.newContentLoaded = false;
 
     // first try to load spine items with known size
@@ -446,6 +444,39 @@ export class LayoutView extends View {
     }
 
     return pageRanges;
+  }
+
+  public removeOutOfRangeSpineItems(start: number, end: number): void {
+    let newStart: number = this.loadedContentRange[1];
+    let newEnd: number = this.loadedContentRange[0];
+    let hasAnyRemoved: boolean = false;
+    for (const vs of this.spineItemViewStatus) {
+      const viewEnd = vs.offset + vs.view.getTotalSize(this.pageWidth);
+      if (viewEnd < start || vs.offset > end) {
+        vs.view.unloadSpineItem();
+        this.layoutRoot.removeChild(vs.viewContainer);
+        hasAnyRemoved = true;
+      } else {
+        if (!newStart || vs.offset < newStart) {
+          newStart = vs.offset;
+        }
+        if (!newEnd || viewEnd > newEnd) {
+          newEnd = viewEnd;
+        }
+      }
+    }
+
+    if (hasAnyRemoved) {
+      if (newStart >= newEnd) {
+        this.loadedContentRange = [0, 0];
+      } else {
+        this.loadedContentRange = [newStart, newEnd];
+      }
+
+      this.spineItemViewStatus = this.spineItemViewStatus.filter((vs: SpineItemViewStatus) => {
+        return vs.view.isSpineItemInUse();
+      });
+    }
   }
 
   private clearLoadedContent(): void {
@@ -692,38 +723,7 @@ export class LayoutView extends View {
     });
   }
 
-  private removeOutOfRangeSpineItems(start: number, end: number): void {
-    let newStart: number = this.loadedContentRange[1];
-    let newEnd: number = this.loadedContentRange[0];
-    let hasAnyRemoved: boolean = false;
-    for (const vs of this.spineItemViewStatus) {
-      const viewEnd = vs.offset + vs.view.getTotalSize(this.pageWidth);
-      if (viewEnd < start || vs.offset > end) {
-        vs.view.unloadSpineItem();
-        this.layoutRoot.removeChild(vs.viewContainer);
-        hasAnyRemoved = true;
-      } else {
-        if (!newStart || vs.offset < newStart) {
-          newStart = vs.offset;
-        }
-        if (!newEnd || viewEnd > newEnd) {
-          newEnd = viewEnd;
-        }
-      }
-    }
-
-    if (hasAnyRemoved) {
-      if (newStart >= newEnd) {
-        this.loadedContentRange = [0, 0];
-      } else {
-        this.loadedContentRange = [newStart, newEnd];
-      }
-
-      this.spineItemViewStatus = this.spineItemViewStatus.filter((vs: SpineItemViewStatus) => {
-        return vs.view.isSpineItemInUse();
-      });
-    }
-  }
+  
 
   private async getSpineItemViewStatusFromHref(href: string):
                                                Promise<SpineItemViewStatus | undefined> {
