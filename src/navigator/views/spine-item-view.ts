@@ -172,8 +172,6 @@ export class SpineItemView extends View {
       this.scale = hScale;
     } else if (this.scaleOption === ZoomOptions.FitByHeight) {
       this.scale = vScale;
-    } else if (this.scaleOption === ZoomOptions.Free) {
-      this.scale = hScale;
     }
 
     this.updateScale();

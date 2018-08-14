@@ -116,6 +116,14 @@ export class Rendition {
     return 1;
   }
 
+  public getZoomOption(): ZoomOptions {
+    if (this.bookView) {
+      return this.bookView.getZoomOption();
+    }
+
+    return ZoomOptions.FitByPage;
+  }
+
   public setViewAsVertical(v: boolean): void {
     this.viewAsVertical = v;
   }

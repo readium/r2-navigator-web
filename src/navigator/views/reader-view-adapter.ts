@@ -213,7 +213,7 @@ export class ReadiumReaderViewAdapter {
       const oldScale = this.getViewScale() / 100;
       const bookviewScale = this.rendition.getZoomScale();
       const transformaedBookviewScale = bookviewScale * options.scale / oldScale;
-      this.rendition.setZoom(ZoomOptions.Free, transformaedBookviewScale);
+      this.rendition.setZoom(this.rendition.getZoomOption(), transformaedBookviewScale);
     } else if (options.style === 'fit-screen') {
       this.rendition.setZoom(ZoomOptions.FitByPage, 1);
     } else if (options.style === 'fit-width') {

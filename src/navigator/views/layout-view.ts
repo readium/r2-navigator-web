@@ -218,11 +218,7 @@ export class LayoutView extends View {
     }
 
     this.zoomOption = option;
-    if (this.zoomOption !== ZoomOptions.Free) {
-      this.zoomScale = 1;
-    } else {
-      this.zoomScale = scale;
-    }
+    this.zoomScale = scale;
 
     this.isPageSizeChanged = true;
     this.rePaginate();
@@ -231,6 +227,10 @@ export class LayoutView extends View {
 
   public getZoomScale(): number {
     return this.zoomScale;
+  }
+
+  public getZoomOption(): ZoomOptions {
+    return this.zoomOption;
   }
 
   public setVerticalLayout(v: boolean): void {
@@ -557,7 +557,7 @@ export class LayoutView extends View {
 
       if (this.isPageSizeChanged) {
         vs.viewContainer.style.width = `${this.visualPageWidth()}px`;
-        if (!this.isVertical) {
+        if (!this.isVertical || this.isFixedLayout) {
           vs.viewContainer.style.height = `${this.visualPageHeight()}px`;
         }
 
