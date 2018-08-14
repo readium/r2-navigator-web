@@ -173,9 +173,9 @@ export class ReadiumReaderViewAdapter {
       delete settings.syntheticSpread;
     }
 
-    await this.rendition.updateViewSettings(settings);
+    this.rendition.updateViewSettings(settings);
 
-    await this.rendition.viewport.endViewUpdate();
+    this.rendition.viewport.endViewUpdate();
 
     if (loc) {
       await this.rendition.viewport.renderAtLocation(loc);
@@ -463,24 +463,24 @@ class ViewportResizer {
     this.location = this.navigator.getCurrentLocation();
   }
 
-  private async handleViewportResizeTick(): Promise<void> {
-    // await this.resize();
+  private handleViewportResizeTick(): void {
+    // this.resize();
   }
 
   private async handleViewportResizeEnd(): Promise<void> {
-    await this.resize();
+    this.resize();
 
     if (this.location) {
       await this.rendition.viewport.renderAtLocation(this.location);
     }
   }
 
-  private async resize(): Promise<void> {
+  private resize(): void {
     const newWidth = this.viewRoot.clientWidth;
     const newHeight = this.viewRoot.clientHeight;
 
     this.rendition.viewport.setViewportSize(newWidth, newHeight);
-    await this.rendition.refreshPageLayout();
+    this.rendition.refreshPageLayout();
   }
 }
 

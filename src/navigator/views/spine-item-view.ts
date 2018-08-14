@@ -179,17 +179,10 @@ export class SpineItemView extends View {
     this.updateScale();
   }
 
-  public setViewSettings(viewSetting: object): Promise<void> {
+  public setViewSettings(viewSetting: object): void {
     this.rsjViewSettings = viewSetting;
 
     this.contentViewImpl.setViewSettings(this.rsjViewSettings);
-
-    if (this.isFixedLayout) {
-      return Promise.resolve();
-    }
-
-    return this.isVertical
-      ? this.contentSizeChangedPromise() : this.paginationChangedPromise();
   }
 
   public render(): void {

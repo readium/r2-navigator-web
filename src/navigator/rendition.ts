@@ -36,7 +36,7 @@ export class Rendition {
     this.viewport = new Viewport(viewport);
   }
 
-  public async setPageLayout(layoutSetting: PageLayoutSettings): Promise<void> {
+  public setPageLayout(layoutSetting: PageLayoutSettings): void {
     const spreadMode = layoutSetting.spreadMode;
     const viewportSize = this.viewport.getViewportSize();
     let pageWidth = this.viewAsVertical ? this.viewport.getViewportSize2nd() : viewportSize;
@@ -76,20 +76,20 @@ export class Rendition {
       this.bookView.setNumberOfPagesPerSpread(numOfPagesPerSpread);
     }
 
-    await this.setPageSize(pageWidth, pageHeight);
+    this.setPageSize(pageWidth, pageHeight);
   }
 
-  public async refreshPageLayout(): Promise<void> {
+  public refreshPageLayout(): void {
     if (this.spreadMode === SpreadMode.Freeform) {
       return;
     }
 
-    await this.setPageLayout({ spreadMode: this.spreadMode });
+    this.setPageLayout({ spreadMode: this.spreadMode });
   }
 
-  public async updateViewSettings(viewSettings: object): Promise<void> {
+  public updateViewSettings(viewSettings: object): void {
     if (this.bookView) {
-      await this.bookView.updateViewSettings(viewSettings);
+      this.bookView.updateViewSettings(viewSettings);
     }
   }
 
@@ -154,12 +154,12 @@ export class Rendition {
     this.bookView.setIframeLoader(iframeLoader);
   }
 
-  private async setPageSize(pageWidth: number, pageHeight: number): Promise<void> {
+  private setPageSize(pageWidth: number, pageHeight: number): void {
     this.pageWidth = pageWidth;
     this.pageHeight = pageHeight;
 
     if (this.bookView) {
-      await  this.bookView.setPageSize(this.pageWidth, this.pageHeight);
+      this.bookView.setPageSize(this.pageWidth, this.pageHeight);
     }
   }
 }

@@ -300,8 +300,8 @@ export class Viewport {
     this.bookView.beginViewUpdate();
   }
 
-  public async endViewUpdate(): Promise<void> {
-    await this.bookView.endViewUpdate();
+  public endViewUpdate(): void {
+    this.bookView.endViewUpdate();
   }
 
   private bindEvents(): void {

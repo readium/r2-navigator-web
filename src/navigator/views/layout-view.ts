@@ -147,7 +147,7 @@ export class LayoutView extends View {
     return this.newContentLoaded;
   }
 
-  public async setPageSize(width: number, height: number): Promise<void> {
+  public setPageSize(width: number, height: number): void {
     this.pageWidth = width;
     this.pageHeight = height;
     if (!this.isVertical) {
@@ -159,7 +159,7 @@ export class LayoutView extends View {
     this.isPageSizeChanged = true;
 
     if (!this.inViewUpdate) {
-      await this.rePaginate();
+      this.rePaginate();
       this.isPageSizeChanged = false;
     }
   }
@@ -176,12 +176,12 @@ export class LayoutView extends View {
     this.inViewUpdate = true;
   }
 
-  public async endViewUpdate(): Promise<void> {
+  public endViewUpdate(): void {
     if (!this.inViewUpdate) {
       return;
     }
 
-    await this.rePaginate();
+    this.rePaginate();
 
     this.inViewUpdate = false;
     this.isViewSettingChanged = false;
@@ -189,7 +189,7 @@ export class LayoutView extends View {
   }
 
   // tslint:disable-next-line:no-any
-  public async updateViewSettings(viewSetting: any): Promise<void> {
+  public updateViewSettings(viewSetting: any): void {
     if (viewSetting.hasOwnProperty('syntheticSpread')) {
       delete viewSetting.syntheticSpread;
     }
@@ -198,7 +198,7 @@ export class LayoutView extends View {
     this.isViewSettingChanged = true;
 
     if (!this.inViewUpdate) {
-      await this.rePaginate();
+      this.rePaginate();
       this.isViewSettingChanged = false;
     }
   }
@@ -541,7 +541,7 @@ export class LayoutView extends View {
     return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
   }
 
-  private async rePaginate(): Promise<void> {
+  private rePaginate(): void {
     this.spineItemViewSizes.fill(-1);
 
     if (this.spineItemViewStatus.length === 0) {
@@ -552,7 +552,7 @@ export class LayoutView extends View {
     this.loadedContentRange[0] = this.paginatedRange[0] = offset;
     for (const vs of this.spineItemViewStatus) {
       if (this.isViewSettingChanged) {
-        await vs.view.setViewSettings(this.rsjViewSettings);
+        vs.view.setViewSettings(this.rsjViewSettings);
       }
 
       if (this.isPageSizeChanged) {
