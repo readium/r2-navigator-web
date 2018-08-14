@@ -464,7 +464,7 @@ class ViewportResizer {
   }
 
   private async handleViewportResizeTick(): Promise<void> {
-    await this.resize();
+    // await this.resize();
   }
 
   private async handleViewportResizeEnd(): Promise<void> {
