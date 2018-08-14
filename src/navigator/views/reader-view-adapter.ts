@@ -47,7 +47,7 @@ export class ReadiumReaderViewAdapter {
     this.epubContainer = epubContainer;
     this.rendition = rendition;
 
-    this.resizer = new ViewportResizer(this.viewRoot, this.rendition, this.navigator);
+    this.resizer = new ViewportResizer(this.epubContainer, this.rendition, this.navigator);
   }
 
   public getReadiumPackageDocument(): any {
