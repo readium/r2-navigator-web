@@ -15,7 +15,7 @@ export class PackageDocument {
     return {
       rootUrl: this.pub.getBaseURI(),
       rendition_viewport: '',
-      rendition_layout: '',
+      rendition_layout: this.getRenditionLayout(),
       rendition_orientation: '',
       rendition_flow: '',
       rendition_spread: '',
@@ -76,6 +76,14 @@ export class PackageDocument {
 
   public getNavDocHref(): string | undefined {
     return undefined;
+  }
+
+  private getRenditionLayout(): string {
+    if (this.pub.Metadata.Rendition && this.pub.Metadata.Rendition.Layout === 'fixed') {
+      return 'pre-paginated';
+    }
+
+    return 'reflowable';
   }
 
   // tslint:disable-next-line:no-any

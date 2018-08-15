@@ -723,8 +723,6 @@ export class LayoutView extends View {
     });
   }
 
-  
-
   private async getSpineItemViewStatusFromHref(href: string):
                                                Promise<SpineItemViewStatus | undefined> {
     let retSiv: SpineItemViewStatus | undefined;
