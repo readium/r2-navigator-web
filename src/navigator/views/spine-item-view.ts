@@ -1,16 +1,15 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
-import { Globals as Readium } from '@evidentpoint/readium-shared-js';
 import { IFrameLoader } from '../iframe-loader';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
 import { ZoomOptions } from './types';
 import { View } from './view';
 
 import {
+  Globals as Readium,
   OnePageView,
   PaginationChangedEventArgs,
   ReflowableView,
   StyleCollection,
-  ViewerSettings,
 } from '@evidentpoint/readium-shared-js';
 
 export enum ContentLoadingStatus {
