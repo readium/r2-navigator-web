@@ -59,8 +59,6 @@ export class LayoutView extends View {
 
   private isRtl: boolean = false;
 
-  private newContentLoaded: boolean = false;
-
   private numOfPagesPerSpread: number = 0;
 
   public constructor(pub: Publication) {
@@ -141,10 +139,6 @@ export class LayoutView extends View {
 
   public isRightToLeft(): boolean {
     return this.isRtl;
-  }
-
-  public hasNewContentLoaded(): boolean {
-    return this.newContentLoaded;
   }
 
   public setPageSize(width: number, height: number): void {
@@ -336,8 +330,6 @@ export class LayoutView extends View {
   }
 
   public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
-    this.newContentLoaded = false;
-
     // first try to load spine items with known size
     while (end > this.getLoadedEndPosition() && this.hasMoreKnownSizeAfterEnd()) {
       await this.loadNewSpineItemAtEnd();
@@ -366,8 +358,6 @@ export class LayoutView extends View {
 
   // tslint:disable-next-line:max-line-length
   public async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number): Promise<void> {
-    this.newContentLoaded = false;
-
     let isEmpty = this.spineItemViewStatus.length === 0;
     if (!isEmpty) {
       if (this.startViewStatus().spineItemIndex > endIndex ||
@@ -653,8 +643,6 @@ export class LayoutView extends View {
   }
 
   private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
-    this.newContentLoaded = true;
-
     let spineItemView: SpineItemView;
     let spineItemViewContainer: HTMLElement;
     [spineItemView, spineItemViewContainer] =

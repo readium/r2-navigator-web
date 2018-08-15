@@ -5,14 +5,22 @@ import { EventEmitter } from 'eventemitter3';
 
 export class ReaidumEventsRelay extends EventEmitter {
 
+  private documentEventsQueue: any[] = [];
+
   public registerEvents(contentViewImpl: any): void {
     contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOAD_START, onContentDocumentLoadStart);
+    contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOADED, onContentDocumentLoaded);
     contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_UNLOADED, onContentDocumentUnloaded);
   }
 
   public unregisterEvents(contentViewImpl: any): void {
     contentViewImpl.off(Readium.Events.CONTENT_DOCUMENT_LOAD_START, onContentDocumentLoadStart);
+    contentViewImpl.off(Readium.Events.CONTENT_DOCUMENT_LOADED, onContentDocumentLoaded);
     contentViewImpl.off(Readium.Events.CONTENT_DOCUMENT_UNLOADED, onContentDocumentUnloaded);
+  }
+
+  public addContentDocumentLoadedEvent($iframe: any, spineItem: any): void {
+    this.documentEventsQueue.push([$iframe, spineItem]);
   }
 
   public triggerPaginationChanged(pageChangeData: any): void {
@@ -21,6 +29,14 @@ export class ReaidumEventsRelay extends EventEmitter {
 
   public triggerContentDocumentLoaded($iframe: any, spineItem: any): void {
     this.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
+  }
+
+  public triggerContentDocumentLoadedEvents(): void {
+    for (const evt of this.documentEventsQueue) {
+      this.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, evt[0], evt[1]);
+    }
+
+    this.documentEventsQueue = [];
   }
 }
 
@@ -32,6 +48,10 @@ function onContentDocumentLoadStart($iframe: any, spineItem: any): void {
 
 function onContentDocumentUnloaded($iframe: any, spineItem: any): void {
   relayInstance.emit(Readium.Events.CONTENT_DOCUMENT_UNLOADED, $iframe, spineItem);
+}
+
+function onContentDocumentLoaded($iframe: any, spineItem: any): void {
+  relayInstance.addContentDocumentLoadedEvent($iframe, spineItem);
 }
 
 export function getReadiumEventsRelayInstance(): ReaidumEventsRelay {

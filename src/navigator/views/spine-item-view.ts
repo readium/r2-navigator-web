@@ -306,6 +306,7 @@ export class SpineItemView extends View {
         this.rsjSpine.items[this.spineItemIndex],
         (success: boolean, $iframe: any, spineItem: any) => {
           if (success) {
+            this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
             this.onSpineItemOnePageViewLoaded();
             this.$iframe = $iframe;
             this.rjsSpineItem = spineItem;

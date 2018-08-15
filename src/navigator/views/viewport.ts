@@ -460,23 +460,12 @@ export class Viewport {
   }
 
   private onPagesReady(): void {
-    if (!this.bookView.hasNewContentLoaded()) {
-      return;
-    }
-
     const pageInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
     if (pageInfo.length === 0) {
       return;
     }
 
-    for (const p of pageInfo) {
-      const $iframe = p.view.getIframe();
-      const spineItem = p.view.getRjsSpineItem();
-      if (!$iframe) {
-        continue;
-      }
-      getReadiumEventsRelayInstance().triggerContentDocumentLoaded($iframe, spineItem);
-    }
+    getReadiumEventsRelayInstance().triggerContentDocumentLoadedEvents();
 
     const rjsPageInfo = pageInfo[0].view.getPaginationInfo();
     getReadiumEventsRelayInstance().triggerPaginationChanged(rjsPageInfo);
