@@ -108,7 +108,7 @@ export class Viewport {
     // spine item is loaded
     this.render();
 
-    this.onPagesReady();
+    await this.onPagesReady();
 
     await this.updatePrefetch();
   }
@@ -126,7 +126,7 @@ export class Viewport {
     this.adjustScrollPosition();
     this.render();
 
-    this.onPagesReady();
+    await this.onPagesReady();
 
     await  this.updatePrefetch();
   }
@@ -150,7 +150,7 @@ export class Viewport {
     this.adjustScrollPosition();
     this.render();
 
-    this.onPagesReady();
+    await this.onPagesReady();
 
     await this.updatePrefetch();
   }
@@ -174,7 +174,7 @@ export class Viewport {
     this.adjustScrollPosition();
     this.render();
 
-    this.onPagesReady();
+    await this.onPagesReady();
 
     await this.updatePrefetch();
   }
@@ -459,7 +459,11 @@ export class Viewport {
     return this.viewOffset + this.getScaledViewportSize();
   }
 
-  private onPagesReady(): void {
+  private async onPagesReady(): Promise<void> {
+    // Make sure all spine items are loaded so all CONTENT_DOCUMENT_LOADED
+    // have been emitted
+    await this.bookView.ensureLoaded();
+
     const pageInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
     if (pageInfo.length === 0) {
       return;

@@ -301,19 +301,32 @@ export class SpineItemView extends View {
 
     this.host.appendChild(this.contentViewImpl.element()[0]);
 
-    return new Promise((resolve: () => void) => {
-      this.contentViewImpl.loadSpineItem(
-        this.rsjSpine.items[this.spineItemIndex],
-        (success: boolean, $iframe: any, spineItem: any) => {
-          if (success) {
-            this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
-            this.onSpineItemOnePageViewLoaded();
-            this.$iframe = $iframe;
-            this.rjsSpineItem = spineItem;
-            resolve();
-          }
-        },
-      );
+    this.contentViewImpl.loadSpineItem(
+      this.rsjSpine.items[this.spineItemIndex],
+      (success: boolean, $iframe: any, spineItem: any) => {
+        if (success) {
+          this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
+          this.onSpineItemOnePageViewLoaded();
+          this.$iframe = $iframe;
+          this.rjsSpineItem = spineItem;
+          this.emitOnepageViewPaginationChangeEvent(spineItem);
+        }
+      },
+    );
+
+    return this.paginationChangedPromise();
+  }
+
+  private emitOnepageViewPaginationChangeEvent(spineItem: any): void {
+    this.contentViewImpl.emit(Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED, {
+      spineItem,
+      paginationInfo: { openPages: [{
+        spineItemPageIndex: 0,
+        spineItemPageCount: 1,
+        idref: '',
+        spineItemIndex: this.spineItemIndex,
+      }] },
+      initiator: this,
     });
   }
 
