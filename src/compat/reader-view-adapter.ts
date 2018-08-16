@@ -1,11 +1,11 @@
 import { Globals as Readium, Helpers } from '@evidentpoint/readium-shared-js';
 // tslint:disable-next-line:import-name
 import $ from 'jquery';
-import { Location } from '../location';
-import { Navigator } from '../navigator';
-import { Rendition, SpreadMode } from '../rendition';
-import { getReadiumEventsRelayInstance } from './readium-events-relay';
-import { ZoomOptions } from './types';
+import { Location } from '../navigator/location';
+import { Navigator } from '../navigator/navigator';
+import { Rendition, SpreadMode } from '../navigator/rendition';
+import { getReadiumEventsRelayInstance } from '../navigator/views/readium-events-relay';
+import { ZoomOptions } from '../navigator/views/types';
 
 /* tslint:disable:no-any */
 
