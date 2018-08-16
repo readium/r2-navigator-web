@@ -1,4 +1,4 @@
-import { Helpers } from '@evidentpoint/readium-shared-js';
+import { Globals as Readium, Helpers } from '@evidentpoint/readium-shared-js';
 // tslint:disable-next-line:import-name
 import $ from 'jquery';
 import { Location } from '../location';
@@ -493,6 +493,12 @@ interface IframeEventHandler {
 class IframeEventManager {
 
   private iframeEvents: Map<string, IframeEventHandler[]> = new Map();
+
+  public constructor() {
+    getReadiumEventsRelayInstance().on(Readium.Events.CONTENT_DOCUMENT_LOADED, ($iframe: any) => {
+      this.updateIframeEventsInternal($iframe[0]);
+    });
+  }
 
   public addIFrameEventListener(eventName: string, callback: any,
                                 context: any, opts: object): void {
