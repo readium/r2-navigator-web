@@ -301,8 +301,12 @@ export class SpineItemView extends View {
 
     this.host.appendChild(this.contentViewImpl.element()[0]);
 
+    const spItem = this.rsjSpine.items[this.spineItemIndex];
+    this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOAD_START,
+                              this.contentViewImpl.get$Iframe(), spItem);
+
     this.contentViewImpl.loadSpineItem(
-      this.rsjSpine.items[this.spineItemIndex],
+      spItem,
       (success: boolean, $iframe: any, spineItem: any) => {
         if (success) {
           this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
