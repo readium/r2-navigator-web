@@ -1,4 +1,4 @@
-import { Globals as Readium, Helpers } from '@evidentpoint/readium-shared-js';
+import { Globals as RsjGlobals, Helpers } from '@evidentpoint/readium-shared-js';
 // tslint:disable-next-line:import-name
 import $ from 'jquery';
 import { Location } from '../navigator/location';
@@ -6,6 +6,7 @@ import { Navigator } from '../navigator/navigator';
 import { Rendition, SpreadMode } from '../navigator/rendition';
 import { getReadiumEventsRelayInstance } from '../navigator/views/readium-events-relay';
 import { ZoomOptions } from '../navigator/views/types';
+import { Publication } from '../streamer/publication';
 
 /* tslint:disable:no-any */
 
@@ -27,27 +28,53 @@ export class ReadiumReaderViewAdapter {
   private rsjPackageDoc: any;
   private rsjPackage: any;
 
+  private publication: Publication;
   private navigator: Navigator;
   private rendition: Rendition;
 
   private viewRoot: HTMLElement;
   private epubContainer: HTMLElement;
 
+  private viewportSize: number;
+  private viewportSize2nd: number;
+
   private resizer: ViewportResizer;
 
   private iframeEventManager: IframeEventManager = new IframeEventManager();
 
-  public constructor(rsjPackageDoc: any, rsjPackage: any,
-                     viewRoot: HTMLElement, epubContainer: HTMLElement,
-                     navigator: Navigator,  rendition: Rendition) {
-    this.rsjPackageDoc = rsjPackageDoc;
-    this.rsjPackage = rsjPackage;
-    this.navigator = navigator;
+  public constructor(viewRoot: HTMLElement, epubContainer: HTMLElement) {
     this.viewRoot = viewRoot;
     this.epubContainer = epubContainer;
-    this.rendition = rendition;
 
-    this.resizer = new ViewportResizer(this.epubContainer, this.rendition, this.navigator);
+    this.viewportSize = this.epubContainer.clientWidth;
+    this.viewportSize2nd = this.epubContainer.clientHeight;
+  }
+
+  public async openPublication(pubUrl: string): Promise<void> {
+    this.viewRoot.style.width = `${this.viewportSize}px'`;
+    this.viewRoot.style.height = `${this.viewportSize2nd}px`;
+
+    this.publication = await Publication.fromURL(pubUrl);
+    this.rendition = new Rendition(this.publication, this.viewRoot);
+    this.rendition.setViewAsVertical(false);
+
+    this.rendition.viewport.setViewportSize(this.viewportSize, this.viewportSize2nd);
+    this.rendition.setPageLayout({ spreadMode: SpreadMode.FitViewportAuto });
+    this.rendition.viewport.setPrefetchSize(Math.ceil(this.viewportSize * 0.1));
+
+    this.rendition.render();
+    this.rendition.viewport.enableScroll(false);
+
+    this.navigator = new Navigator(this.rendition);
+
+    this.rsjPackageDoc = this.rendition.getReadiumPackageDocument();
+    this.rsjPackage = this.rendition.getReadiumPackage();
+
+    this.resizer = new ViewportResizer(this.epubContainer, this.rendition, this.navigator); 
+  }
+
+  public openPage(): void {
+    this.rendition.viewport.renderAtOffset(0);
   }
 
   public getReadiumPackageDocument(): any {
@@ -495,9 +522,10 @@ class IframeEventManager {
   private iframeEvents: Map<string, IframeEventHandler[]> = new Map();
 
   public constructor() {
-    getReadiumEventsRelayInstance().on(Readium.Events.CONTENT_DOCUMENT_LOADED, ($iframe: any) => {
-      this.updateIframeEventsInternal($iframe[0]);
-    });
+    getReadiumEventsRelayInstance().on(RsjGlobals.Events.CONTENT_DOCUMENT_LOADED,
+                                       ($iframe: any) => {
+                                         this.updateIframeEventsInternal($iframe[0]);
+                                       });
   }
 
   public addIFrameEventListener(eventName: string, callback: any,

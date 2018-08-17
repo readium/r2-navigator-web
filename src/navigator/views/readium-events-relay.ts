@@ -33,6 +33,10 @@ export class ReaidumEventsRelay extends EventEmitter {
 
   public triggerContentDocumentLoadedEvents(): void {
     for (const evt of this.documentEventsQueue) {
+      const $iframe = evt[0];
+      if (!$iframe[0].contentDocument || !$iframe[0].contentDocument.documentElement) {
+        continue;
+      }
       this.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, evt[0], evt[1]);
     }
 
