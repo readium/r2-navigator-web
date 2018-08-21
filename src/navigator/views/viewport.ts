@@ -1,7 +1,7 @@
 import { Location } from '../location';
 import { LayoutView, PaginationInfo } from './layout-view';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
-import { ZoomOptions } from './types';
+import { CancellationToken } from './types';
 
 export class Viewport {
   private bookView: LayoutView;
@@ -89,14 +89,14 @@ export class Viewport {
     return this.endPos;
   }
 
-  public async renderAtOffset(pos: number): Promise<void> {
+  public async renderAtOffset(pos: number, token?: CancellationToken): Promise<void> {
     this.hasPendingAction = true;
     this.scrollFromInternal = true;
 
     // this.viewOffset = pos;
     // this.render();
 
-    this.viewOffset = await this.ensureViewportFilledAtPosition(pos);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(pos, token);
     this.adjustScrollPosition();
     this.updatePositions();
 
@@ -108,60 +108,82 @@ export class Viewport {
     // spine item is loaded
     this.render();
 
-    await this.onPagesReady();
+    if (token && token.isCancelled) {
+      return;
+    }
 
-    await this.updatePrefetch();
+    await this.onPagesReady(token);
+
+    await this.updatePrefetch(token);
   }
 
-  public async renderAtSpineItem(spineItemIndex: number): Promise<void> {
-    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
+  public async renderAtSpineItem(spineItemIndex: number, token?: CancellationToken): Promise<void> {
+    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
+    if (token && token.isCancelled) {
+      return;
+    }
     const pos = this.bookView.getSpineItemViewOffset(spineItemIndex);
     if (pos === undefined) {
       return;
     }
 
-    this.viewOffset = await this.ensureViewportFilledAtPosition(pos);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(pos, token);
     this.updatePositions();
 
     this.adjustScrollPosition();
     this.render();
 
-    await this.onPagesReady();
+    if (token && token.isCancelled) {
+      return;
+    }
 
-    await  this.updatePrefetch();
+    await this.onPagesReady(token);
+
+    await  this.updatePrefetch(token);
   }
 
-  public async renderAtLocation(loc: Location): Promise<void> {
+  public async renderAtLocation(loc: Location, token?: CancellationToken): Promise<void> {
     const spineItemIndex = this.bookView.findSpineItemIndexByHref(loc.getHref());
     if (spineItemIndex < 0) {
       return;
     }
 
-    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
+    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
+    if (token && token.isCancelled) {
+      return;
+    }
 
     const offset = await this.bookView.getOffsetFromLocation(loc);
     if (offset === undefined) {
       return;
     }
 
-    this.viewOffset = await this.ensureViewportFilledAtPosition(offset);
+    this.viewOffset = await this.ensureViewportFilledAtPosition(offset, token);
     this.updatePositions();
 
     this.adjustScrollPosition();
     this.render();
 
-    await this.onPagesReady();
+    if (token && token.isCancelled) {
+      return;
+    }
 
-    await this.updatePrefetch();
+    await this.onPagesReady(token);
+
+    await this.updatePrefetch(token);
   }
 
-  public async renderAtAnchorLocation(href: string, eleId: string): Promise<void> {
+  public async renderAtAnchorLocation(href: string, eleId: string,
+                                      token?: CancellationToken): Promise<void> {
     const spineItemIndex = this.bookView.findSpineItemIndexByHref(href);
     if (spineItemIndex < 0) {
       return;
     }
 
-    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex);
+    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
+    if (token && token.isCancelled) {
+      return;
+    }
 
     const offset = await this.bookView.getOffsetFromAnchor(href, eleId);
     if (offset === undefined) {
@@ -174,12 +196,16 @@ export class Viewport {
     this.adjustScrollPosition();
     this.render();
 
-    await this.onPagesReady();
+    if (token && token.isCancelled) {
+      return;
+    }
 
-    await this.updatePrefetch();
+    await this.onPagesReady(token);
+
+    await this.updatePrefetch(token);
   }
 
-  public async nextScreen(): Promise<void> {
+  public async nextScreen(token?: CancellationToken): Promise<void> {
     let newPos = this.viewOffset + this.visibleViewportSize;
     const loadedEndPos = this.bookView.getLoadedEndPosition();
     if (newPos > loadedEndPos && !this.bookView.hasMoreAfterEnd()) {
@@ -188,11 +214,11 @@ export class Viewport {
 
     if (newPos !== this.viewOffset &&
         (newPos <= loadedEndPos || this.bookView.hasMoreAfterEnd())) {
-      await this.renderAtOffset(this.viewOffset + this.visibleViewportSize);
+      await this.renderAtOffset(this.viewOffset + this.visibleViewportSize, token);
     }
   }
 
-  public async prevScreen(): Promise<void> {
+  public async prevScreen(token?: CancellationToken): Promise<void> {
     let newPos = this.viewOffset - this.getScaledViewportSize();
     const loadedStartPos = this.bookView.getLoadedStartPostion();
     // Ensure not to go beyond begining of the book
@@ -202,12 +228,12 @@ export class Viewport {
 
     if (newPos !== this.viewOffset &&
         (newPos >= loadedStartPos || this.bookView.hasMoreBeforeStart())) {
-      await this.renderAtOffset(newPos);
+      await this.renderAtOffset(newPos, token);
     }
   }
 
-  public async ensureLoaded(): Promise<void> {
-    await this.bookView.ensureLoaded();
+  public async ensureLoaded(token?: CancellationToken): Promise<void> {
+    await this.bookView.ensureLoaded(token);
     this.updatePositions();
   }
 
@@ -330,12 +356,12 @@ export class Viewport {
     // this.hasPendingAction = false;
   }
 
-  private async updatePrefetch(): Promise<void> {
+  private async updatePrefetch(token?: CancellationToken): Promise<void> {
     const start = this.viewOffset - this.prefetchSize;
     const end = this.viewOffset + this.getScaledViewportSize() + this.prefetchSize;
     this.bookView.removeOutOfRangeSpineItems(start, end);
 
-    await this.bookView.ensureConentLoadedAtRange(start, end);
+    await this.bookView.ensureConentLoadedAtRange(start, end, token);
     this.updatePositions();
   }
 
@@ -404,10 +430,14 @@ export class Viewport {
     }
   }
 
-  private async ensureViewportFilledAtPosition(pos: number): Promise<number> {
+  private async ensureViewportFilledAtPosition(pos: number,
+                                               token?: CancellationToken): Promise<number> {
     const start = pos - this.prefetchSize;
     const end = pos + this.getScaledViewportSize() + this.prefetchSize;
-    await this.bookView.ensureConentLoadedAtRange(start, end);
+    await this.bookView.ensureConentLoadedAtRange(start, end, token);
+    if (token && token.isCancelled) {
+      return pos;
+    }
 
     let newPos = pos;
     if (!this.scrollEnabled) {
@@ -459,10 +489,13 @@ export class Viewport {
     return this.viewOffset + this.getScaledViewportSize();
   }
 
-  private async onPagesReady(): Promise<void> {
+  private async onPagesReady(token?: CancellationToken): Promise<void> {
     // Make sure all spine items are loaded so all CONTENT_DOCUMENT_LOADED
     // have been emitted
-    await this.bookView.ensureLoaded();
+    await this.bookView.ensureLoaded(token);
+    if (token && token.isCancelled) {
+      return;
+    }
 
     const pageInfo = this.bookView.getPaginationInfoAtOffset(this.viewOffset);
     if (pageInfo.length === 0) {

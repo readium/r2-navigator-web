@@ -1,7 +1,7 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { IFrameLoader } from '../iframe-loader';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
-import { ZoomOptions } from './types';
+import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
 
 import {
@@ -87,7 +87,7 @@ export class SpineItemView extends View {
     return this.contentViewImpl.getNavigator().getPageIndexDeltaForElementId(elementId);
   }
 
-  public loadSpineItem(spineItem: PublicationLink): Promise<void> {
+  public loadSpineItem(spineItem: PublicationLink, token?: CancellationToken): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = this.spine.indexOf(spineItem);
 
@@ -109,8 +109,8 @@ export class SpineItemView extends View {
     };
 
     return this.isVertical || this.isFixedLayout
-      ? this.loadSpineItemOnePageView(readiumViewParams, reader)
-      : this.loadSpineItemReflowableView(readiumViewParams, reader);
+      ? this.loadSpineItemOnePageView(readiumViewParams, reader, token)
+      : this.loadSpineItemReflowableView(readiumViewParams, reader, token);
   }
 
   public unloadSpineItem(): void {
@@ -129,13 +129,13 @@ export class SpineItemView extends View {
     return this.isFixedLayout;
   }
 
-  public ensureContentLoaded(): Promise<void> {
+  public ensureContentLoaded(token?: CancellationToken): Promise<void> {
     if (this.contentStatus === ContentLoadingStatus.Loaded) {
       return Promise.resolve();
     }
 
     if (this.contentStatus === ContentLoadingStatus.Loading) {
-      return this.paginationChangedPromise();
+      return this.paginationChangedPromise(token);
     }
 
     return Promise.reject('Not loaded');
@@ -287,7 +287,8 @@ export class SpineItemView extends View {
     return this.rjsSpineItem;
   }
 
-  private loadSpineItemOnePageView(params: any, reader: any): Promise<void> {
+  private loadSpineItemOnePageView(params: any, reader: any,
+                                   token?: CancellationToken): Promise<void> {
     this.contentViewImpl = new OnePageView(params,
                                            ['content-doc-frame'],
                                            !this.isFixedLayout,
@@ -309,16 +310,18 @@ export class SpineItemView extends View {
       spItem,
       (success: boolean, $iframe: any, spineItem: any) => {
         if (success) {
-          this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
-          this.onSpineItemOnePageViewLoaded();
-          this.$iframe = $iframe;
-          this.rjsSpineItem = spineItem;
+          if (!token || token.isCancelled) {
+            this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
+            this.onSpineItemOnePageViewLoaded();
+            this.$iframe = $iframe;
+            this.rjsSpineItem = spineItem;
+          }
           this.emitOnepageViewPaginationChangeEvent(spineItem);
         }
       },
     );
 
-    return this.paginationChangedPromise();
+    return this.paginationChangedPromise(token);
   }
 
   private emitOnepageViewPaginationChangeEvent(spineItem: any): void {
@@ -342,7 +345,8 @@ export class SpineItemView extends View {
   }
 
   // tslint:disable-next-line:no-any
-  private loadSpineItemReflowableView(params: any, reader: any): Promise<void> {
+  private loadSpineItemReflowableView(params: any, reader: any,
+                                      token?: CancellationToken): Promise<void> {
     this.contentViewImpl = new ReflowableView(params, reader);
 
     this.handleDocumentContentLoaded();
@@ -355,13 +359,14 @@ export class SpineItemView extends View {
 
     this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
 
-    return this.paginationChangedPromise();
+    return this.paginationChangedPromise(token);
   }
 
   private paginationChangedHanlder(
     paras: PaginationChangedEventArgs,
     handler: (paras: PaginationChangedEventArgs) => void,
     resolve: () => void,
+    token?: CancellationToken,
   ): void {
     const pageInfo = paras.paginationInfo.openPages[0];
     if (pageInfo.spineItemIndex === this.spineItemIndex) {
@@ -372,14 +377,18 @@ export class SpineItemView extends View {
       this.spineItemPageCount = pageInfo.spineItemPageCount;
       this.contentStatus = ContentLoadingStatus.Loaded;
       console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
+      if (token && token.isCancelled) {
+        this.host.removeChild(this.contentViewImpl.element()[0]);
+        console.log(`spine item ${this.spineItemIndex} cancelled`);
+      }
       resolve();
     }
   }
 
-  private paginationChangedPromise(): Promise<void> {
+  private paginationChangedPromise(token?: CancellationToken): Promise<void> {
     return new Promise<void>((resolve: () => void) => {
       const handler = (paras: PaginationChangedEventArgs) => {
-        this.paginationChangedHanlder(paras, handler, resolve);
+        this.paginationChangedHanlder(paras, handler, resolve, token);
       };
       this.contentViewImpl.on(
         Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,

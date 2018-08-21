@@ -4,6 +4,7 @@ import $ from 'jquery';
 import { Location } from '../navigator/location';
 import { Navigator } from '../navigator/navigator';
 import { Rendition, SpreadMode } from '../navigator/rendition';
+import { NavigationRequestManager } from '../navigator/request-manager';
 import { getReadiumEventsRelayInstance } from '../navigator/views/readium-events-relay';
 import { ZoomOptions } from '../navigator/views/types';
 import { Publication } from '../streamer/publication';
@@ -42,6 +43,8 @@ export class ReadiumReaderViewAdapter {
 
   private iframeEventManager: IframeEventManager = new IframeEventManager();
 
+  private requestManager: NavigationRequestManager = new NavigationRequestManager();
+
   public constructor(viewRoot: HTMLElement, epubContainer: HTMLElement) {
     this.viewRoot = viewRoot;
     this.epubContainer = epubContainer;
@@ -65,16 +68,20 @@ export class ReadiumReaderViewAdapter {
     this.rendition.render();
     this.rendition.viewport.enableScroll(false);
 
-    this.navigator = new Navigator(this.rendition);
+    this.navigator = new Navigator(this.rendition, this.requestManager);
 
     this.rsjPackageDoc = this.rendition.getReadiumPackageDocument();
     this.rsjPackage = this.rendition.getReadiumPackage();
 
-    this.resizer = new ViewportResizer(this.epubContainer, this.rendition, this.navigator); 
+    this.resizer = new ViewportResizer(this.epubContainer, this.rendition, this.navigator);
   }
 
-  public openPage(): void {
-    this.rendition.viewport.renderAtOffset(0);
+  public async openPage(): Promise<void> {
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.renderAtOffset(0, token);
+      },
+    );
   }
 
   public getReadiumPackageDocument(): any {

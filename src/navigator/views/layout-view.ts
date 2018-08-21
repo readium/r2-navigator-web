@@ -2,7 +2,7 @@ import { Publication } from '../../streamer';
 import { Location } from '../location';
 import { SpineItemView } from './spine-item-view';
 import { SpineItemViewFactory } from './spine-item-view-factory';
-import { ZoomOptions } from './types';
+import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
 
 // tslint:disable-next-line:no-implicit-dependencies
@@ -323,20 +323,30 @@ export class LayoutView extends View {
     return siv.offset + pageIndexOffset * this.pageWidth;
   }
 
-  public async ensureLoaded(): Promise<void> {
+  public async ensureLoaded(token?: CancellationToken): Promise<void> {
     for (const siv of this.spineItemViewStatus) {
-      await siv.view.ensureContentLoaded();
+      await siv.view.ensureContentLoaded(token);
+      if (token && token.isCancelled) {
+        break;
+      }
     }
   }
 
-  public async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
+  public async ensureConentLoadedAtRange(start: number, end: number,
+                                         token?: CancellationToken): Promise<void> {
     // first try to load spine items with known size
     while (end > this.getLoadedEndPosition() && this.hasMoreKnownSizeAfterEnd()) {
-      await this.loadNewSpineItemAtEnd();
+      await this.loadNewSpineItemAtEnd(token);
+      if (token && token.isCancelled) {
+        break;
+      }
     }
 
     while (start < this.getLoadedStartPostion() && this.hasMoreKnowSizeBeforeStart()) {
-      await this.loadNewSpineItemAtStart();
+      await this.loadNewSpineItemAtStart(token);
+      if (token && token.isCancelled) {
+        break;
+      }
     }
 
     this.updatePaginatedRange();
@@ -346,18 +356,24 @@ export class LayoutView extends View {
     }
 
     while (end > this.getLoadedEndPosition() && this.hasMoreAfterEnd()) {
-      await this.loadNewSpineItemAtEnd();
+      await this.loadNewSpineItemAtEnd(token);
+      if (token && token.isCancelled) {
+        break;
+      }
     }
 
     while (start < this.getLoadedStartPostion() && this.hasMoreBeforeStart()) {
-      await this.loadNewSpineItemAtStart();
+      await this.loadNewSpineItemAtStart(token);
+      if (token && token.isCancelled) {
+        break;
+      }
     }
 
     this.updatePaginatedRange();
   }
 
-  // tslint:disable-next-line:max-line-length
-  public async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number): Promise<void> {
+  public async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number,
+                                                   token?: CancellationToken): Promise<void> {
     let isEmpty = this.spineItemViewStatus.length === 0;
     if (!isEmpty) {
       if (this.startViewStatus().spineItemIndex > endIndex ||
@@ -368,17 +384,26 @@ export class LayoutView extends View {
     }
 
     if (isEmpty) {
-      await this.loadNewSpineItemIndexAtEnd(startIndex);
+      await this.loadNewSpineItemIndexAtEnd(startIndex, token);
+      if (token && token.isCancelled) {
+        return;
+      }
     }
 
     const existingStartIndex = this.startViewStatus().spineItemIndex;
     for (let i = existingStartIndex; i > startIndex; i = i - 1) {
-      await this.loadNewSpineItemAtStart();
+      await this.loadNewSpineItemAtStart(token);
+      if (token && token.isCancelled) {
+        return;
+      }
     }
 
     const existingEndIndex = this.endViewStatus().spineItemIndex;
     for (let i = existingEndIndex; i < endIndex; i = i + 1) {
-      await this.loadNewSpineItemAtEnd();
+      await this.loadNewSpineItemAtEnd(token);
+      if (token && token.isCancelled) {
+        return;
+      }
     }
   }
 
@@ -580,7 +605,7 @@ export class LayoutView extends View {
     }
   }
 
-  private async loadNewSpineItemAtEnd(): Promise<void> {
+  private async loadNewSpineItemAtEnd(token?: CancellationToken): Promise<void> {
     let newSpineItemIndex: number;
 
     if (this.spineItemViewStatus.length === 0) {
@@ -593,11 +618,15 @@ export class LayoutView extends View {
       return;
     }
 
-    await this.loadNewSpineItemIndexAtEnd(newSpineItemIndex);
+    await this.loadNewSpineItemIndexAtEnd(newSpineItemIndex, token);
   }
 
-  private async loadNewSpineItemIndexAtEnd(index: number): Promise<void> {
-    const newViewStatus = await this.loadNewSpineItem(index);
+  private async loadNewSpineItemIndexAtEnd(index: number,
+                                           token?: CancellationToken): Promise<void> {
+    const newViewStatus = await this.loadNewSpineItem(index, token);
+    if (!newViewStatus) {
+      return;
+    }
 
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
@@ -612,7 +641,7 @@ export class LayoutView extends View {
     this.postionSpineItemView(newViewStatus);
   }
 
-  private async loadNewSpineItemAtStart(): Promise<void> {
+  private async loadNewSpineItemAtStart(token?: CancellationToken): Promise<void> {
     let newSpineItemIndex: number;
 
     if (this.spineItemViewStatus.length === 0) {
@@ -625,11 +654,15 @@ export class LayoutView extends View {
       return;
     }
 
-    await this.loadNewSpineItemIndexAtStart(newSpineItemIndex);
+    await this.loadNewSpineItemIndexAtStart(newSpineItemIndex, token);
   }
 
-  private async loadNewSpineItemIndexAtStart(index: number): Promise<void> {
-    const newViewStatus = await this.loadNewSpineItem(index);
+  private async loadNewSpineItemIndexAtStart(index: number,
+                                             token?: CancellationToken): Promise<void> {
+    const newViewStatus = await this.loadNewSpineItem(index, token);
+    if (!newViewStatus) {
+      return;
+    }
 
     newViewStatus.offset = this.spineItemViewStatus.length === 0 ?
                            0 : this.spineItemViewStatus[0].offset;
@@ -642,7 +675,12 @@ export class LayoutView extends View {
     this.postionSpineItemView(newViewStatus);
   }
 
-  private async loadNewSpineItem(index: number): Promise<SpineItemViewStatus> {
+  private async loadNewSpineItem(index: number,
+                                 token?: CancellationToken):
+                                 Promise<SpineItemViewStatus | undefined> {
+    if (token && token.isCancelled) {
+      return undefined;
+    }
     let spineItemView: SpineItemView;
     let spineItemViewContainer: HTMLElement;
     [spineItemView, spineItemViewContainer] =
@@ -656,19 +694,31 @@ export class LayoutView extends View {
     if (this.spineItemViewSizes[index] > 0) {
       viewLength = this.spineItemViewSizes[index];
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
-      spineItemView.loadSpineItem(this.publication.Spine[index]).then(() => {
-        this.onSpineItemLoaded(spineItemView);
+      spineItemView.loadSpineItem(this.publication.Spine[index], token).then(() => {
+        if (token && token.isCancelled) {
+          this.layoutRoot.removeChild(spineItemViewContainer);
+        } else {
+          this.onSpineItemLoaded(spineItemView);
+        }
       });
     } else {
       this.hasUnknownSizeSpineItemLoading = true;
-      await spineItemView.loadSpineItem(this.publication.Spine[index]);
+      await spineItemView.loadSpineItem(this.publication.Spine[index], token);
       this.hasUnknownSizeSpineItemLoading = false;
 
-      this.onSpineItemLoaded(spineItemView);
+      if (token && token.isCancelled) {
+        this.layoutRoot.removeChild(spineItemViewContainer);
+      } else {
+        this.onSpineItemLoaded(spineItemView);
+      }
 
       viewLength = spineItemView.getTotalSize(this.pageWidth);
       this.spineItemViewSizes[index] = viewLength;
       this.spineItemViewPageCounts[index] = spineItemView.getTotalPageCount();
+    }
+
+    if (token && token.isCancelled) {
+      return undefined;
     }
 
     return {

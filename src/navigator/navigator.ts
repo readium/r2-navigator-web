@@ -1,6 +1,7 @@
 import { Publication } from '../streamer';
 import { Location } from './location';
 import { Rendition } from './rendition';
+import { NavigationRequestManager } from './request-manager';
 import { PaginationInfo } from './views/layout-view';
 
 export class Navigator {
@@ -8,17 +9,28 @@ export class Navigator {
 
   private pub: Publication;
 
-  constructor(rendition: Rendition) {
+  private requestManager: NavigationRequestManager;
+
+  constructor(rendition: Rendition, requestManager?: NavigationRequestManager) {
     this.rendition = rendition;
     this.pub = rendition.getPublication();
+    this.requestManager = requestManager ? requestManager : new NavigationRequestManager();
   }
 
   public async nextScreen(): Promise<void> {
-    await this.rendition.viewport.nextScreen();
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.nextScreen(token);
+      },
+    );
   }
 
   public async previousScreen(): Promise<void> {
-    await this.rendition.viewport.prevScreen();
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.prevScreen(token);
+      },
+    );
   }
 
   public async ensureLoaded(): Promise<void> {
@@ -38,11 +50,19 @@ export class Navigator {
   }
 
   public async gotoLocation(loc: Location): Promise<void> {
-    await this.rendition.viewport.renderAtLocation(loc);
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.renderAtLocation(loc, token);
+      },
+    );
   }
 
   public async gotoAnchorLocation(href: string, eleId: string): Promise<void> {
-    await this.rendition.viewport.renderAtAnchorLocation(href, eleId);
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.renderAtAnchorLocation(href, eleId, token);
+      },
+    );
   }
 
   public async getScreenBeginAsync(): Promise<Location | undefined | null> {
