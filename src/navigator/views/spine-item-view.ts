@@ -377,10 +377,6 @@ export class SpineItemView extends View {
       this.spineItemPageCount = pageInfo.spineItemPageCount;
       this.contentStatus = ContentLoadingStatus.Loaded;
       console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
-      if (token && token.isCancelled) {
-        this.host.removeChild(this.contentViewImpl.element()[0]);
-        console.log(`spine item ${this.spineItemIndex} cancelled`);
-      }
       resolve();
     }
   }

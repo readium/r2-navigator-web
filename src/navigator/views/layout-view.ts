@@ -336,37 +336,33 @@ export class LayoutView extends View {
                                          token?: CancellationToken): Promise<void> {
     // first try to load spine items with known size
     while (end > this.getLoadedEndPosition() && this.hasMoreKnownSizeAfterEnd()) {
-      await this.loadNewSpineItemAtEnd(token);
       if (token && token.isCancelled) {
         break;
       }
+      await this.loadNewSpineItemAtEnd(token);
     }
 
     while (start < this.getLoadedStartPostion() && this.hasMoreKnowSizeBeforeStart()) {
-      await this.loadNewSpineItemAtStart(token);
       if (token && token.isCancelled) {
         break;
       }
+      await this.loadNewSpineItemAtStart(token);
     }
 
     this.updatePaginatedRange();
 
-    if (this.hasUnknownSizeSpineItemLoading) {
-      return;
-    }
-
     while (end > this.getLoadedEndPosition() && this.hasMoreAfterEnd()) {
-      await this.loadNewSpineItemAtEnd(token);
       if (token && token.isCancelled) {
         break;
       }
+      await this.loadNewSpineItemAtEnd(token);
     }
 
     while (start < this.getLoadedStartPostion() && this.hasMoreBeforeStart()) {
-      await this.loadNewSpineItemAtStart(token);
       if (token && token.isCancelled) {
         break;
       }
+      await this.loadNewSpineItemAtStart(token);
     }
 
     this.updatePaginatedRange();
@@ -469,7 +465,9 @@ export class LayoutView extends View {
       const viewEnd = vs.offset + vs.view.getTotalSize(this.pageWidth);
       if (viewEnd < start || vs.offset > end) {
         vs.view.unloadSpineItem();
-        this.layoutRoot.removeChild(vs.viewContainer);
+        if (this.layoutRoot.contains(vs.viewContainer)) {
+          this.layoutRoot.removeChild(vs.viewContainer);
+        }
         hasAnyRemoved = true;
       } else {
         if (!newStart || vs.offset < newStart) {
@@ -695,11 +693,7 @@ export class LayoutView extends View {
       viewLength = this.spineItemViewSizes[index];
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
       spineItemView.loadSpineItem(this.publication.Spine[index], token).then(() => {
-        if (token && token.isCancelled) {
-          this.layoutRoot.removeChild(spineItemViewContainer);
-        } else {
-          this.onSpineItemLoaded(spineItemView);
-        }
+        this.onSpineItemLoaded(spineItemView);
       });
     } else {
       this.hasUnknownSizeSpineItemLoading = true;
@@ -707,6 +701,7 @@ export class LayoutView extends View {
       this.hasUnknownSizeSpineItemLoading = false;
 
       if (token && token.isCancelled) {
+        console.log(`spine item ${index} cancelled and removed`);
         this.layoutRoot.removeChild(spineItemViewContainer);
       } else {
         this.onSpineItemLoaded(spineItemView);
