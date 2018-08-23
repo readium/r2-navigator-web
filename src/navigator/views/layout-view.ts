@@ -470,10 +470,10 @@ export class LayoutView extends View {
         }
         hasAnyRemoved = true;
       } else {
-        if (!newStart || vs.offset < newStart) {
+        if (vs.offset < newStart) {
           newStart = vs.offset;
         }
-        if (!newEnd || viewEnd > newEnd) {
+        if (viewEnd > newEnd) {
           newEnd = viewEnd;
         }
       }
