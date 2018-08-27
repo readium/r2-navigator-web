@@ -1,4 +1,5 @@
 import { Publication } from '../streamer';
+import { IContentViewFactory } from './views/content-view/content-view-factory';
 import { LayoutView } from './views/layout-view';
 import { ZoomOptions } from './views/types';
 import { Viewport } from './views/viewport';
@@ -29,11 +30,14 @@ export class Rendition {
   private spreadMode: SpreadMode = SpreadMode.FitViewportAuto;
   private numOfPagesPerSpread: number = 0;
 
+  private contentViewFactory: IContentViewFactory;
+
   private viewAsVertical: boolean = false;
 
-  constructor(pub: Publication, viewport: HTMLElement) {
+  constructor(pub: Publication, viewport: HTMLElement, cvFactory: IContentViewFactory) {
     this.pub = pub;
     this.viewport = new Viewport(viewport);
+    this.contentViewFactory = cvFactory;
   }
 
   public setPageLayout(layoutSetting: PageLayoutSettings): void {
@@ -136,18 +140,18 @@ export class Rendition {
     return this.pub;
   }
 
-  // tslint:disable-next-line:no-any
-  public getReadiumPackageDocument(): any {
-    return this.bookView.getRsjPackageDocument();
-  }
+  // // tslint:disable-next-line:no-any
+  // public getReadiumPackageDocument(): any {
+  //   return this.bookView.getRsjPackageDocument();
+  // }
 
-  // tslint:disable-next-line:no-any
-  public getReadiumPackage(): any {
-    return this.bookView.getRsjPackage();
-  }
+  // // tslint:disable-next-line:no-any
+  // public getReadiumPackage(): any {
+  //   return this.bookView.getRsjPackage();
+  // }
 
   public render(): Promise<void> {
-    this.bookView = new LayoutView(this.pub);
+    this.bookView = new LayoutView(this.pub, this.contentViewFactory);
     this.bookView.setPageSize(this.pageWidth, this.pageHeight);
     this.bookView.setNumberOfPagesPerSpread(this.numOfPagesPerSpread);
     this.bookView.setVerticalLayout(this.viewAsVertical);
@@ -158,9 +162,9 @@ export class Rendition {
   }
 
   // tslint:disable-next-line:no-any
-  public setIframeLoader(iframeLoader: any): void {
-    this.bookView.setIframeLoader(iframeLoader);
-  }
+  // public setIframeLoader(iframeLoader: any): void {
+  //   this.bookView.setIframeLoader(iframeLoader);
+  // }
 
   private setPageSize(pageWidth: number, pageHeight: number): void {
     this.pageWidth = pageWidth;

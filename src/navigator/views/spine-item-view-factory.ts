@@ -1,49 +1,22 @@
 import { Publication } from '../../streamer';
-import { PackageDocument } from '../../streamer/readium-shared-js-impl/package-document';
-import { IFrameLoader } from '../iframe-loader';
+import { IContentViewFactory } from './content-view/content-view-factory';
 import { SpineItemView } from './spine-item-view';
 
-// tslint:disable-next-line:no-implicit-dependencies
-import { Package as ReadiumPackage, ViewerSettings } from '@evidentpoint/readium-shared-js';
-
 export class SpineItemViewFactory {
-  public iframeLoader: IFrameLoader;
-
   private publication: Publication;
 
-  // tslint:disable-next-line:no-any
-  private rsjPackage: any;
-
-  // tslint:disable-next-line:no-any
-  private rsjPackageDoc: any;
-
-  // tslint:disable-next-line:no-any
-  private rsjViewSettings: any;
+  private contentViewFactory: IContentViewFactory;
 
   private isFixedLayout: boolean = false;
 
   private isVertical: boolean = false;
 
   // tslint:disable-next-line:no-any
-  public constructor(pub: Publication, rsjViewSettings: any, isFixedLayout: boolean) {
+  public constructor(pub: Publication, isFixedLayout: boolean,
+                     cvFactory: IContentViewFactory) {
     this.publication = pub;
-    this.rsjViewSettings = rsjViewSettings;
     this.isFixedLayout = isFixedLayout;
-    this.iframeLoader = new IFrameLoader(this.publication.getBaseURI());
-
-    this.rsjPackageDoc = new PackageDocument(this.publication);
-    this.rsjPackage = new ReadiumPackage({ ...this.rsjPackageDoc.getSharedJsPackageData() });
-    this.rsjPackage.spine.handleLinear(true);
-  }
-
-  // tslint:disable-next-line:no-any
-  public getRsjPackageDocument(): any {
-    return this.rsjPackageDoc;
-  }
-
-  // tslint:disable-next-line:no-any
-  public getRsjPackage(): any {
-    return this.rsjPackage;
+    this.contentViewFactory = cvFactory;
   }
 
   public setVerticalLayout(v: boolean): void {
@@ -51,12 +24,10 @@ export class SpineItemViewFactory {
   }
 
   public createSpineItemView(pageWidth: number, pageHeight: number): [SpineItemView, HTMLElement] {
-    const spineItemView = new SpineItemView(this.iframeLoader,
-                                            this.publication.Spine,
-                                            this.rsjPackage.spine,
-                                            this.rsjViewSettings,
+    const spineItemView = new SpineItemView(this.publication.Spine,
                                             this.isVertical,
-                                            this.isFixedLayout);
+                                            this.isFixedLayout,
+                                            this.contentViewFactory);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.style.position = 'absolute';
     spineItemViewContainer.style.width = `${pageWidth}px`;

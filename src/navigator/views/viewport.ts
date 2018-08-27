@@ -1,6 +1,8 @@
 import { Location } from '../location';
+import { R1ContentView } from './content-view/r1-content-view';
 import { LayoutView, PaginationInfo } from './layout-view';
 import { getReadiumEventsRelayInstance } from './readium-events-relay';
+import { SpineItemView } from './spine-item-view';
 import { CancellationToken } from './types';
 
 export class Viewport {
@@ -256,62 +258,76 @@ export class Viewport {
     return indices;
   }
 
-  // tslint:disable-next-line:no-any
-  public getRangeCfiFromDomRange(spineItemIndex: number, range: Range): any {
-    const view = this.bookView.getSpineItemView(spineItemIndex);
-    if (!view) {
-      return undefined;
-    }
-
-    return view.getRangeCfiFromDomRange(range);
+  public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
+    return  this.bookView.getSpineItemView(spineItemIndex);
   }
 
   // tslint:disable-next-line:no-any
-  public getVisibleElements(siIndex: number, selector: string): any {
-    const view = this.bookView.getSpineItemView(siIndex);
-    if (!view) {
-      return undefined;
-    }
+  // public getRangeCfiFromDomRange(spineItemIndex: number, range: Range): any {
+  //   const view = this.bookView.getSpineItemView(spineItemIndex);
+  //   if (!view) {
+  //     return undefined;
+  //   }
 
-    return view.getVisibleElements(selector, true);
-  }
-
-  // tslint:disable-next-line:no-any
-  public getElements(siIndex: number, selector: string): any {
-    const view = this.bookView.getSpineItemView(siIndex);
-    if (!view) {
-      return undefined;
-    }
-
-    return view.getElements(selector);
-  }
+  //   return view.getRangeCfiFromDomRange(range);
+  // }
 
   // tslint:disable-next-line:no-any
-  public getElementById(siIndex: number, id: string): any {
-    const view = this.bookView.getSpineItemView(siIndex);
-    if (!view) {
-      return undefined;
-    }
+  // public getVisibleElements(siIndex: number, selector: string): any {
+  //   const view = this.bookView.getSpineItemView(siIndex);
+  //   if (!view) {
+  //     return undefined;
+  //   }
 
-    return view.getElementById(id);
-  }
-
-  // tslint:disable-next-line:no-any
-  public isElementVisible(siIndex: number, $ele: any): boolean {
-    return this.bookView.isElementVisible(siIndex, $ele,
-                                          this.viewOffset,
-                                          this.getScaledViewportSize());
-  }
+  //   return view.getVisibleElements(selector, true);
+  // }
 
   // tslint:disable-next-line:no-any
-  public getNearestCfiFromElement(siIndex: number, element: any): any {
-    const view = this.bookView.getSpineItemView(siIndex);
-    if (!view) {
-      return undefined;
-    }
+  // public getElements(siIndex: number, selector: string): any {
+  //   const view = this.bookView.getSpineItemView(siIndex);
+  //   if (!view) {
+  //     return undefined;
+  //   }
 
-    return view.getNearestCfiFromElement(element);
-  }
+  //   return view.getElements(selector);
+  // }
+
+  // tslint:disable-next-line:no-any
+  // public getElementById(siIndex: number, id: string): any {
+  //   const view = this.bookView.getSpineItemView(siIndex);
+  //   if (!view) {
+  //     return undefined;
+  //   }
+
+  //   return view.getElementById(id);
+  // }
+
+  // tslint:disable-next-line:no-any
+  // public isElementVisible(siIndex: number, $ele: any): boolean {
+  // tslint:disable-next-line:max-line-length
+  //   if (!this.bookView.isSpineItemVisible(siIndex, this.viewOffset, this.getScaledViewportSize())) {
+  //     return false;
+  //   }
+
+  //   const view = this.bookView.getSpineItemView(siIndex);
+  //   if (!view) {
+  //     return false;
+  //   }
+
+  //   const offset = this.bookView.getOffsetInSpineItemView(siIndex, this.viewOffset);
+
+  //   return view.isElementVisible($ele, offset, 0);
+  // }
+
+  // tslint:disable-next-line:no-any
+  // public getNearestCfiFromElement(siIndex: number, element: any): any {
+  //   const view = this.bookView.getSpineItemView(siIndex);
+  //   if (!view) {
+  //     return undefined;
+  //   }
+
+  //   return view.getNearestCfiFromElement(element);
+  // }
 
   public getViewScale(siIndex: number): number {
     const view = this.bookView.getSpineItemView(siIndex);
@@ -504,7 +520,9 @@ export class Viewport {
 
     getReadiumEventsRelayInstance().triggerContentDocumentLoadedEvents();
 
-    const rjsPageInfo = pageInfo[0].view.getPaginationInfo();
+    const contentView = <R1ContentView>(pageInfo[0].view.getContentView());
+
+    const rjsPageInfo = contentView.getPaginationInfo();
     getReadiumEventsRelayInstance().triggerPaginationChanged(rjsPageInfo);
   }
 }

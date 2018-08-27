@@ -1,16 +1,9 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
-import { IFrameLoader } from '../iframe-loader';
-import { getReadiumEventsRelayInstance } from './readium-events-relay';
+import { IContentView } from './content-view/content-view';
+import { IContentViewFactory } from './content-view/content-view-factory';
+
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
-
-import {
-  Globals as Readium,
-  OnePageView,
-  PaginationChangedEventArgs,
-  ReflowableView,
-  StyleCollection,
-} from '@evidentpoint/readium-shared-js';
 
 export enum ContentLoadingStatus {
   NotLoaded,
@@ -23,14 +16,9 @@ export enum ContentLoadingStatus {
 export class SpineItemView extends View {
   protected host: HTMLElement;
 
-  protected iframeLoader: IFrameLoader;
-
   protected spine: PublicationLink[];
-  // tslint:disable-next-line:no-any
-  protected rsjSpine: any;
 
-  // tslint:disable-next-line:no-any
-  protected rsjViewSettings: any;
+  protected cvFactory: IContentViewFactory;
 
   protected spineItem: PublicationLink;
   protected spineItemIndex: number;
@@ -48,27 +36,23 @@ export class SpineItemView extends View {
 
   protected contentHeight: number = 0;
 
-  protected contentViewImpl: any;
-  protected $iframe: any;
-  protected rjsSpineItem: any;
+  protected contentView: IContentView;
 
   public constructor(
-    iframeLoader: IFrameLoader,
     spine: PublicationLink[],
-    // tslint:disable-next-line:no-any
-    rsjSpine: any,
-    // tslint:disable-next-line:no-any
-    rsjViewSetting: any,
     isVertical: boolean,
     isFixedLayout: boolean,
+    cvFactory: IContentViewFactory,
   ) {
     super();
-    this.iframeLoader = iframeLoader;
     this.spine = spine;
-    this.rsjSpine = rsjSpine;
-    this.rsjViewSettings = rsjViewSetting;
     this.isVertical = isVertical;
     this.isFixedLayout = isFixedLayout;
+    this.cvFactory = cvFactory;
+  }
+
+  public getContentView(): IContentView {
+    return this.contentView;
   }
 
   public getPageIndexOffsetFromCfi(cfi: string): number {
@@ -76,7 +60,7 @@ export class SpineItemView extends View {
       return 0;
     }
 
-    return this.contentViewImpl.getPageIndexOffsetFromCfi(cfi);
+    return this.contentView.getPageIndexOffsetFromCfi(cfi);
   }
 
   public getPageIndexOffsetFromElementId(elementId: string): number {
@@ -84,40 +68,24 @@ export class SpineItemView extends View {
       return 0;
     }
 
-    return this.contentViewImpl.getNavigator().getPageIndexDeltaForElementId(elementId);
+    return this.contentView.getPageIndexOffsetFromElementId(elementId);
   }
 
-  public loadSpineItem(spineItem: PublicationLink, token?: CancellationToken): Promise<void> {
-    this.spineItem = spineItem;
-    this.spineItemIndex = this.spine.indexOf(spineItem);
-
-    const readiumViewParams = {
-      $viewport: this.host,
-      spine: this.rsjSpine,
-      userStyles: new StyleCollection(),
-      bookStyles: new StyleCollection(),
-      iframeLoader: this.iframeLoader,
-      expandDocumentFullWidth: true,
-    };
-
+  public async loadSpineItem(spineItem: PublicationLink, token?: CancellationToken): Promise<void> {
+    this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);
+    this.contentView.attachToHost(this.host);
     this.contentStatus = ContentLoadingStatus.Loading;
+    await this.contentView.loadSpineItem(spineItem, this.spine.indexOf(spineItem), token);
 
-    const reader = {
-      fonts: {},
-      viewerSettings: () => this.rsjViewSettings,
-      needsFixedLayoutScalerWorkAround: () => false,
-    };
-
-    return this.isVertical || this.isFixedLayout
-      ? this.loadSpineItemOnePageView(readiumViewParams, reader, token)
-      : this.loadSpineItemReflowableView(readiumViewParams, reader, token);
+    this.spineItemPageCount = this.contentView.spineItemPageCount();
+    this.contentStatus = ContentLoadingStatus.Loaded;
   }
 
   public unloadSpineItem(): void {
     while (this.host.firstChild) {
       this.host.removeChild(this.host.firstChild);
     }
-    getReadiumEventsRelayInstance().unregisterEvents(this.contentViewImpl);
+    this.contentView.unloadSpineItem();
     this.isInUse = false;
   }
 
@@ -135,7 +103,7 @@ export class SpineItemView extends View {
     }
 
     if (this.contentStatus === ContentLoadingStatus.Loading) {
-      return this.paginationChangedPromise(token);
+      return this.contentView.spineItemLoadedPromise(token);
     }
 
     return Promise.reject('Not loaded');
@@ -145,10 +113,8 @@ export class SpineItemView extends View {
     if (this.isFixedLayout) {
       this.resizeFixedLayoutPage(this.scaleOption, pageWidth, pageHeight);
     } else if (!this.isVertical) {
-      this.contentViewImpl.onViewportResize();
-
-      const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
-      this.spineItemPageCount = pageInfo.spineItemPageCount;
+      this.contentView.onResize();
+      this.spineItemPageCount = this.contentView.spineItemPageCount();
     }
   }
 
@@ -163,8 +129,8 @@ export class SpineItemView extends View {
   public resizeFixedLayoutPage(option: ZoomOptions, pageWidth: number, pageHeight: number): void {
     this.scaleOption = option;
 
-    const hScale = pageWidth / this.contentViewImpl.meta_width();
-    const vScale = pageHeight / this.contentViewImpl.meta_height();
+    const hScale = pageWidth / this.contentView.metaWidth();
+    const vScale = pageHeight / this.contentView.metaHeight();
     if (this.scaleOption === ZoomOptions.FitByPage) {
       this.scale = this.isVertical ? hScale : Math.min(hScale, vScale);
     } else if (this.scaleOption === ZoomOptions.FitByWidth) {
@@ -177,13 +143,12 @@ export class SpineItemView extends View {
   }
 
   public setViewSettings(viewSetting: object): void {
-    this.rsjViewSettings = viewSetting;
-
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings);
+    this.contentView.setViewSettings(viewSetting);
+    this.spineItemPageCount = this.contentView.spineItemPageCount();
   }
 
   public render(): void {
-    this.contentViewImpl.render();
+    this.contentView.render();
   }
 
   public attachToHost(host: HTMLElement): void {
@@ -201,241 +166,179 @@ export class SpineItemView extends View {
   public getTotalSize(pageWidth: number): number {
     if (this.isVertical) {
       if (this.isFixedLayout) {
-        return this.contentViewImpl.meta_height() * this.scale;
+        return this.contentView.metaHeight() * this.scale;
       }
 
       return this.contentHeight;
     }
 
     if (this.isFixedLayout) {
-      return this.contentViewImpl.meta_width() * this.scale;
+      return this.contentView.metaWidth() * this.scale;
     }
 
-    return this.spineItemPageCount * pageWidth;
+    return this.contentView.spineItemPageCount() * pageWidth;
   }
 
   public getPageSize(pageWidth: number): number {
     if (this.isVertical) {
       if (this.isFixedLayout) {
-        return this.contentViewImpl.meta_height() * this.scale;
+        return this.contentView.metaHeight() * this.scale;
       }
 
       return this.contentHeight;
     }
 
     if (this.isFixedLayout) {
-      return this.contentViewImpl.meta_width() * this.scale;
+      return this.contentView.metaWidth() * this.scale;
     }
 
     return pageWidth;
   }
 
   public getCfi(offsetMain: number, offset2nd: number): string {
-    const navLogic = this.contentViewImpl.getNavigator();
-
-    const visOffset = this.isVertical ? { top: -offsetMain, left: offset2nd } :
-                                        { top: offset2nd, left: -offsetMain };
-
-    return navLogic.getFirstVisibleCfi(visOffset);
+    return this.contentView.getCfi(offsetMain, offset2nd);
   }
 
-  public getPaginationInfo(): object {
-    return {
-      paginationInfo: this.contentViewImpl.getPaginationInfo(),
-      initiator: this,
-      spineItem: this.contentViewImpl.getLoadedSpineItems()[0],
-      elementId: undefined,
-    };
-  }
+  // public getPaginationInfo(): object {
+  //   return {
+  //     paginationInfo: this.contentViewImpl.getPaginationInfo(),
+  //     initiator: this,
+  //     spineItem: this.contentViewImpl.getLoadedSpineItems()[0],
+  //     elementId: undefined,
+  //   };
+  // }
 
-  public getRangeCfiFromDomRange(range: Range): any {
-    return this.contentViewImpl.getRangeCfiFromDomRange(range);
-  }
+  // public getRangeCfiFromDomRange(range: Range): any {
+  //   return this.contentViewImpl.getRangeCfiFromDomRange(range);
+  // }
 
-  public getVisibleElements(selector: string, includeSpineItems: boolean): any {
-    return this.contentViewImpl.getVisibleElements(selector, includeSpineItems);
-  }
+  // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
+  //   return this.contentViewImpl.getVisibleElements(selector, includeSpineItems);
+  // }
 
-  public getElements(selector: string): any {
-    return this.contentViewImpl.getElements(this.spineItem.Href, selector);
-  }
+  // public getElements(selector: string): any {
+  //   return this.contentViewImpl.getElements(this.spineItem.Href, selector);
+  // }
 
-  public getElementById(id: string): any {
-    return this.contentViewImpl.getElementById(this.spineItem.Href, id);
-  }
+  // public getElementById(id: string): any {
+  //   return this.contentViewImpl.getElementById(this.spineItem.Href, id);
+  // }
 
-  public isElementVisible($ele: any, offsetMain: number, offset2nd: number): boolean {
-    const navLogic = this.contentViewImpl.getNavigator();
+  // public isElementVisible($ele: any, offsetMain: number, offset2nd: number): boolean {
+  //   const navLogic = this.contentViewImpl.getNavigator();
 
-    const visOffset = this.isVertical ? { top: -offsetMain, left: offset2nd } :
-                                        { top: offset2nd, left: -offsetMain };
+  //   const visOffset = this.isVertical ? { top: -offsetMain, left: offset2nd } :
+  //                                       { top: offset2nd, left: -offsetMain };
 
-    return navLogic.isElementVisible($ele, visOffset);
-  }
+  //   return navLogic.isElementVisible($ele, visOffset);
+  // }
 
-  public getNearestCfiFromElement(element: any): any {
-    const navLogic = this.contentViewImpl.getNavigator();
+  // public getNearestCfiFromElement(element: any): any {
+  //   const navLogic = this.contentViewImpl.getNavigator();
 
-    return navLogic.getNearestCfiFromElement(element);
-  }
+  //   return navLogic.getNearestCfiFromElement(element);
+  // }
 
-  public getIframe(): any {
-    return this.$iframe;
-  }
+  // public getIframe(): any {
+  //   return this.$iframe;
+  // }
 
-  public getRjsSpineItem(): any {
-    return this.rjsSpineItem;
-  }
-
-  private loadSpineItemOnePageView(params: any, reader: any,
-                                   token?: CancellationToken): Promise<void> {
-    this.contentViewImpl = new OnePageView(params,
-                                           ['content-doc-frame'],
-                                           !this.isFixedLayout,
-                                           reader);
-
-    getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
-
-    this.contentViewImpl.render();
-
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
-
-    this.host.appendChild(this.contentViewImpl.element()[0]);
-
-    const spItem = this.rsjSpine.items[this.spineItemIndex];
-    this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOAD_START,
-                              this.contentViewImpl.get$Iframe(), spItem);
-
-    this.contentViewImpl.loadSpineItem(
-      spItem,
-      (success: boolean, $iframe: any, spineItem: any) => {
-        if (success) {
-          if (!token || token.isCancelled) {
-            this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
-            this.onSpineItemOnePageViewLoaded();
-            this.$iframe = $iframe;
-            this.rjsSpineItem = spineItem;
-          }
-          this.emitOnepageViewPaginationChangeEvent(spineItem);
-        }
-      },
-    );
-
-    return this.paginationChangedPromise(token);
-  }
-
-  private emitOnepageViewPaginationChangeEvent(spineItem: any): void {
-    this.contentViewImpl.emit(Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED, {
-      spineItem,
-      paginationInfo: { openPages: [{
-        spineItemPageIndex: 0,
-        spineItemPageCount: 1,
-        idref: '',
-        spineItemIndex: this.spineItemIndex,
-      }] },
-      initiator: this,
-    });
-  }
-
-  private onSpineItemOnePageViewLoaded(): void {
-    this.spineItemPageCount = 1;
-    this.contentViewImpl.resizeIFrameToContent();
-    this.contentHeight = this.contentViewImpl.getCalculatedPageHeight();
-    this.contentStatus = ContentLoadingStatus.Loaded;
-  }
+  // public getRjsSpineItem(): any {
+  //   return this.rjsSpineItem;
+  // }
 
   // tslint:disable-next-line:no-any
-  private loadSpineItemReflowableView(params: any, reader: any,
-                                      token?: CancellationToken): Promise<void> {
-    this.contentViewImpl = new ReflowableView(params, reader);
+  // private loadSpineItemReflowableView(params: any, reader: any,
+  //                                     token?: CancellationToken): Promise<void> {
+  //   this.contentViewImpl = new ReflowableView(params, reader);
 
-    this.handleDocumentContentLoaded();
+  //   this.handleDocumentContentLoaded();
 
-    getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
+  //   getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
 
-    this.contentViewImpl.render();
+  //   this.contentViewImpl.render();
 
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
+  //   this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
 
-    this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
+  //   this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
 
-    return this.paginationChangedPromise(token);
-  }
+  //   return this.paginationChangedPromise(token);
+  // }
 
-  private paginationChangedHanlder(
-    paras: PaginationChangedEventArgs,
-    handler: (paras: PaginationChangedEventArgs) => void,
-    resolve: () => void,
-    token?: CancellationToken,
-  ): void {
-    const pageInfo = paras.paginationInfo.openPages[0];
-    if (pageInfo.spineItemIndex === this.spineItemIndex) {
-      this.contentViewImpl.removeListener(
-        Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
-        handler,
-      );
-      this.spineItemPageCount = pageInfo.spineItemPageCount;
-      this.contentStatus = ContentLoadingStatus.Loaded;
-      console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
-      resolve();
-    }
-  }
+  // private paginationChangedHanlder(
+  //   paras: PaginationChangedEventArgs,
+  //   handler: (paras: PaginationChangedEventArgs) => void,
+  //   resolve: () => void,
+  //   token?: CancellationToken,
+  // ): void {
+  //   const pageInfo = paras.paginationInfo.openPages[0];
+  //   if (pageInfo.spineItemIndex === this.spineItemIndex) {
+  //     this.contentViewImpl.removeListener(
+  //       Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+  //       handler,
+  //     );
+  //     this.spineItemPageCount = pageInfo.spineItemPageCount;
+  //     this.contentStatus = ContentLoadingStatus.Loaded;
+  //     console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
+  //     resolve();
+  //   }
+  // }
 
-  private paginationChangedPromise(token?: CancellationToken): Promise<void> {
-    return new Promise<void>((resolve: () => void) => {
-      const handler = (paras: PaginationChangedEventArgs) => {
-        this.paginationChangedHanlder(paras, handler, resolve, token);
-      };
-      this.contentViewImpl.on(
-        Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
-        handler,
-      );
-    });
-  }
+  // private paginationChangedPromise(token?: CancellationToken): Promise<void> {
+  //   return new Promise<void>((resolve: () => void) => {
+  //     const handler = (paras: PaginationChangedEventArgs) => {
+  //       this.paginationChangedHanlder(paras, handler, resolve, token);
+  //     };
+  //     this.contentViewImpl.on(
+  //       Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
+  //       handler,
+  //     );
+  //   });
+  // }
 
-  private handleDocumentContentLoaded(): void {
-    this.contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOADED,
-                            ($iframe: any, spineItem: any) => {
-                              this.$iframe = $iframe;
-                              this.rjsSpineItem = spineItem;
-                            });
-  }
+  // private handleDocumentContentLoaded(): void {
+  //   this.contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOADED,
+  //                           ($iframe: any, spineItem: any) => {
+  //                             this.$iframe = $iframe;
+  //                             this.rjsSpineItem = spineItem;
+  //                           });
+  // }
 
-  private contentSizeChangedHandler(iframe: any, spineItem: any, handler: any,
-                                    resolve: () => void): void {
-    if (this.rsjSpine.items[this.spineItemIndex] !== spineItem) {
-      return;
-    }
+  // private contentSizeChangedHandler(iframe: any, spineItem: any, handler: any,
+  //                                   resolve: () => void): void {
+  //   if (this.rsjSpine.items[this.spineItemIndex] !== spineItem) {
+  //     return;
+  //   }
 
-    this.contentViewImpl.resizeIFrameToContent();
-    this.contentHeight = this.contentViewImpl.getCalculatedPageHeight();
+  //   this.contentViewImpl.resizeIFrameToContent();
+  //   this.contentHeight = this.contentViewImpl.getCalculatedPageHeight();
 
-    this.contentViewImpl.removeListener(
-      OnePageView.Events.CONTENT_SIZE_CHANGED,
-      handler,
-    );
-    resolve();
-  }
+  //   this.contentViewImpl.removeListener(
+  //     OnePageView.Events.CONTENT_SIZE_CHANGED,
+  //     handler,
+  //   );
+  //   resolve();
+  // }
 
-  private contentSizeChangedPromise(): Promise<void> {
-    return new Promise<void>((resolve: () => void) => {
-      // tslint:disable-next-line:no-any
-      const handler = (iframe: any, spineItem: any) => {
-        this.contentSizeChangedHandler(iframe, spineItem, handler, resolve);
-      };
-      this.contentViewImpl.on(
-        OnePageView.Events.CONTENT_SIZE_CHANGED,
-        handler,
-      );
-    });
-  }
+  // private contentSizeChangedPromise(): Promise<void> {
+  //   return new Promise<void>((resolve: () => void) => {
+  //     // tslint:disable-next-line:no-any
+  //     const handler = (iframe: any, spineItem: any) => {
+  //       this.contentSizeChangedHandler(iframe, spineItem, handler, resolve);
+  //     };
+  //     this.contentViewImpl.on(
+  //       OnePageView.Events.CONTENT_SIZE_CHANGED,
+  //       handler,
+  //     );
+  //   });
+  // }
 
   private updateScale(): void {
     if (!this.isFixedLayout) {
       return;
     }
 
-    this.contentViewImpl.transformContentImmediate(this.scale, 0, 0);
-    this.host.style.width = `${this.contentViewImpl.meta_width() * this.scale}px`;
+    this.contentView.scale(this.scale);
+    this.host.style.width = `${this.contentView.metaWidth() * this.scale}px`;
   }
 }

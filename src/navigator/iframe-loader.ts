@@ -33,7 +33,7 @@ export class IFrameLoader {
     });
   }
 
-  public async fetchContentDocument(src: string): Promise<string> {
+  private async fetchContentDocument(src: string): Promise<string> {
     const resp = await fetch(src);
 
     return resp.text();

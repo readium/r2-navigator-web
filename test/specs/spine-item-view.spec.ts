@@ -2,6 +2,8 @@
 import { assert } from 'chai';
 import { ReadingSystem } from '../../src/navigator';
 import { IFrameLoader } from '../../src/navigator/iframe-loader';
+// tslint:disable-next-line:max-line-length
+import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { Publication } from '../../src/streamer';
 import { PackageDocument } from '../../src/streamer/readium-shared-js-impl/package-document';
@@ -13,6 +15,7 @@ describe('SpineItemView', () => {
   let viewportDiv: HTMLElement;
   let iframeLoader: IFrameLoader;
   let publication: Publication;
+  let contentFactory: R1ContentViewFactory;
   // tslint:disable-next-line:no-any
   let rsjPackage: any;
   // tslint:disable-next-line:no-any
@@ -43,6 +46,8 @@ describe('SpineItemView', () => {
       '/fixtures/publications/metamorphosis/manifest.json',
     );
 
+    contentFactory = new R1ContentViewFactory(publication);
+
     iframeLoader = new IFrameLoader(publication.getBaseURI());
 
     const packageDoc = new PackageDocument(publication);
@@ -54,12 +59,10 @@ describe('SpineItemView', () => {
   });
 
   const createSpineItemView = (pageWidth: number, pageHeight: number) => {
-    const spineItemView = new SpineItemView(iframeLoader,
-                                            publication.Spine,
-                                            rsjPackage.spine,
-                                            rsjViewSettings,
+    const spineItemView = new SpineItemView(publication.Spine,
                                             false,
-                                            false);
+                                            false,
+                                            contentFactory);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', 'spine-item-view');
     spineItemViewContainer.style.position = 'absolute';

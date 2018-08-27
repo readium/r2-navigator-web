@@ -1,5 +1,6 @@
 import { Publication } from '../streamer';
 import { Rendition } from './rendition';
+import { R1ContentViewFactory } from './views/content-view/r1-content-view-factory';
 
 export class ReadingSystem {
   private viewport: HTMLElement;
@@ -9,6 +10,6 @@ export class ReadingSystem {
   }
 
   public openRendition(pub: Publication): Rendition {
-    return new Rendition(pub, this.viewport);
+    return new Rendition(pub, this.viewport, new R1ContentViewFactory(pub));
   }
 }

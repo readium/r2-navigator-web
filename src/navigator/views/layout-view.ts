@@ -1,12 +1,10 @@
 import { Publication } from '../../streamer';
 import { Location } from '../location';
+import { IContentViewFactory } from './content-view/content-view-factory';
 import { SpineItemView } from './spine-item-view';
 import { SpineItemViewFactory } from './spine-item-view-factory';
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
-
-// tslint:disable-next-line:no-implicit-dependencies
-import { ViewerSettings } from '@evidentpoint/readium-shared-js';
 
 export class PaginationInfo {
   public spineItemIndex: number;
@@ -34,8 +32,8 @@ export class LayoutView extends View {
 
   private publication: Publication;
 
-  // tslint:disable-next-line:no-any
-  private rsjViewSettings: any = new ViewerSettings({ syntheticSpread: 'single' });
+  private contentFactory: IContentViewFactory;
+
   private isViewSettingChanged: boolean = false;
 
   private loadedContentRange: [number, number] = [0, 0];
@@ -61,9 +59,10 @@ export class LayoutView extends View {
 
   private numOfPagesPerSpread: number = 0;
 
-  public constructor(pub: Publication) {
+  public constructor(pub: Publication, cvFactory: IContentViewFactory) {
     super();
     this.publication = pub;
+    this.contentFactory = cvFactory;
     this.initSpineItemViews();
 
     if (this.publication.Metadata.Rendition) {
@@ -75,23 +74,13 @@ export class LayoutView extends View {
     }
 
     this.spineItemViewFactory = new SpineItemViewFactory(pub,
-                                                         this.rsjViewSettings,
-                                                         this.isFixedLayout);
+                                                         this.isFixedLayout,
+                                                         cvFactory);
 
     // tslint:disable-next-line:prefer-array-literal
     this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
     // tslint:disable-next-line:prefer-array-literal
     this.spineItemViewPageCounts = new Array<number>(pub.Spine.length).fill(-1);
-  }
-
-  // tslint:disable-next-line:no-any
-  public getRsjPackageDocument(): any {
-    return this.spineItemViewFactory.getRsjPackageDocument();
-  }
-
-  // tslint:disable-next-line:no-any
-  public getRsjPackage(): any {
-    return this.spineItemViewFactory.getRsjPackage();
   }
 
   public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
@@ -115,8 +104,7 @@ export class LayoutView extends View {
   }
 
   // tslint:disable-next-line:no-any
-  public isElementVisible(siIndex: number, $ele: any,
-                          viewOffset: number, viewportSize: number): boolean {
+  public isSpineItemVisible(siIndex: number, viewOffset: number, viewportSize: number): boolean {
     const viewStatus = this.spineItemViewStatus.find((status: SpineItemViewStatus) => {
       return status.spineItemIndex === siIndex;
     });
@@ -130,7 +118,19 @@ export class LayoutView extends View {
       return false;
     }
 
-    return viewStatus.view.isElementVisible($ele, viewOffset - viewStatus.offset, 0);
+    return true;
+  }
+
+  public getOffsetInSpineItemView(siIndex: number, viewOffset: number): number | undefined {
+    const viewStatus = this.spineItemViewStatus.find((status: SpineItemViewStatus) => {
+      return status.spineItemIndex === siIndex;
+    });
+
+    if (!viewStatus) {
+      return undefined;
+    }
+
+    return viewOffset - viewStatus.offset;
   }
 
   public findSpineItemIndexByHref(href: string): number {
@@ -188,7 +188,7 @@ export class LayoutView extends View {
       delete viewSetting.syntheticSpread;
     }
 
-    this.rsjViewSettings.update(viewSetting);
+    this.contentFactory.viewSettings().update(viewSetting);
     this.isViewSettingChanged = true;
 
     if (!this.inViewUpdate) {
@@ -199,7 +199,7 @@ export class LayoutView extends View {
 
   // tslint:disable-next-line:no-any
   public viewSettings() : any {
-    return this.rsjViewSettings;
+    return this.contentFactory.viewSettings();
   }
 
   public setZoom(option: ZoomOptions, scale: number): void {
@@ -403,11 +403,6 @@ export class LayoutView extends View {
     }
   }
 
-  // tslint:disable-next-line:no-any
-  public setIframeLoader(iframeLoader: any): void {
-    this.spineItemViewFactory.iframeLoader = iframeLoader;
-  }
-
   public adjustLoadedConentRangeToPositive(): number {
     if (this.spineItemViewStatus.length === 0) {
       return 0;
@@ -565,7 +560,7 @@ export class LayoutView extends View {
     this.loadedContentRange[0] = this.paginatedRange[0] = offset;
     for (const vs of this.spineItemViewStatus) {
       if (this.isViewSettingChanged) {
-        vs.view.setViewSettings(this.rsjViewSettings);
+        vs.view.setViewSettings(this.contentFactory.viewSettings());
       }
 
       if (this.isPageSizeChanged) {
