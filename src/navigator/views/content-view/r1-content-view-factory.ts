@@ -44,4 +44,12 @@ export class R1ContentViewFactory implements IContentViewFactory {
   public viewSettings(): any {
     return this.rsjViewSettings;
   }
+
+  public getReadiumPackageDocument(): any {
+    return this.rsjPackageDoc;
+  }
+
+  public getReadiumPackage(): any {
+    return this.rsjPackage;
+  }
 }

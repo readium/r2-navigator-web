@@ -1,9 +1,10 @@
 import { Location } from '../location';
-import { R1ContentView } from './content-view/r1-content-view';
+import { IContentView } from './content-view/content-view';
 import { LayoutView, PaginationInfo } from './layout-view';
-import { getReadiumEventsRelayInstance } from './readium-events-relay';
 import { SpineItemView } from './spine-item-view';
 import { CancellationToken } from './types';
+
+type VisiblePagesReadyCallbackType = (cv: IContentView) => void;
 
 export class Viewport {
   private bookView: LayoutView;
@@ -26,6 +27,8 @@ export class Viewport {
   private scrollEnabled: boolean = false;
 
   private scrollFromInternal: boolean = false;
+
+  private visiblePagesReadyCallbacks: VisiblePagesReadyCallbackType[] = [];
 
   constructor(root: HTMLElement) {
     this.root = root;
@@ -260,6 +263,14 @@ export class Viewport {
 
   public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
     return  this.bookView.getSpineItemView(spineItemIndex);
+  }
+
+  public getOffsetInSpineItemView(siIndex: number): number | undefined {
+    return this.bookView.getOffsetInSpineItemView(siIndex, this.viewOffset);
+  }
+
+  public onVisiblePagesReady(callback: (cv: IContentView) => void): void {
+    this.visiblePagesReadyCallbacks.push(callback);
   }
 
   // tslint:disable-next-line:no-any
@@ -518,11 +529,9 @@ export class Viewport {
       return;
     }
 
-    getReadiumEventsRelayInstance().triggerContentDocumentLoadedEvents();
-
-    const contentView = <R1ContentView>(pageInfo[0].view.getContentView());
-
-    const rjsPageInfo = contentView.getPaginationInfo();
-    getReadiumEventsRelayInstance().triggerPaginationChanged(rjsPageInfo);
+    const contentView = pageInfo[0].view.getContentView();
+    for (const callback of this.visiblePagesReadyCallbacks) {
+      callback(contentView);
+    }
   }
 }

@@ -9,3 +9,4 @@ export { getReadiumEventsRelayInstance } from './views/readium-events-relay';
 export { NavigationRequestManager } from './request-manager';
 export { IContentViewFactory } from './views/content-view/content-view-factory';
 export { R1ContentViewFactory } from './views/content-view/r1-content-view-factory';
+export { R1ContentView } from './views/content-view/r1-content-view';
