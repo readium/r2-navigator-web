@@ -1,5 +1,5 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
-import * as EpubCfi from 'readium-cfi-js';
+import { Interpreter } from '@evidentpoint/readium-cfi-js';
 import { Publication } from '../publication';
 
 export class PackageDocument {
@@ -255,7 +255,7 @@ export class PackageDocument {
     const splitCfi = rawCfi.split('!');
 
     // tslint:disable-next-line:max-line-length
-    const $spineItemElement =  EpubCfi.Interpreter.getTargetElementWithPartialCFI(`epubcfi(${splitCfi[0]})`, this.packageDom);
+    const $spineItemElement =  Interpreter.getTargetElementWithPartialCFI(`epubcfi(${splitCfi[0]})`, this.packageDom);
     const contentCFI = splitCfi[1];
     let idref = $spineItemElement.attr('idref');
     idref = this.itemHrefFromId(idref);
