@@ -1,10 +1,10 @@
 {
-  "name": "readium-ng",
-  "version": "0.0.2",
-  "description": "Readium Next Generation",
-  "main": "./dist/readium-ng.umd.js",
-  "module": "./dist/readium-ng.esm.js",
-  "types": "./dist/readium-ng.d.ts",
+  "name": "r2-navigator-web",
+  "version": "0.0.3",
+  "description": "A Readium Navigator module for the web, written in TypeScript",
+  "main": "./dist/r2-navigator-web.umd.js",
+  "module": "./dist/r2-navigator-web.esm.js",
+  "types": "./dist/r2-navigator-web.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
