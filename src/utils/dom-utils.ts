@@ -1,4 +1,4 @@
-export function height(ele: HTMLElement, win?: Window): number {
+export function height(ele: HTMLElement | SVGElement, win?: Window): number {
   const winInUse = win ? win : window;
   const valStr = winInUse.getComputedStyle(ele).getPropertyValue('height');
 

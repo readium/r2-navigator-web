@@ -82,10 +82,10 @@ export class SpineItemView extends View {
   }
 
   public unloadSpineItem(): void {
+    this.contentView.unloadSpineItem();
     while (this.host.firstChild) {
       this.host.removeChild(this.host.firstChild);
     }
-    this.contentView.unloadSpineItem();
     this.isInUse = false;
   }
 

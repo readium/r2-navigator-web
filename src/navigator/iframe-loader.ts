@@ -1,5 +1,10 @@
 import { URL } from 'isomorphic-url-shim';
 
+interface IR1AttachedDataType {
+  // tslint:disable-next-line:no-any
+  spineItem: any;
+}
+
 export class IFrameLoader {
   private publicationURI?: string;
 
@@ -20,7 +25,7 @@ export class IFrameLoader {
     // tslint:disable-next-line:no-any
     context: any,
     // tslint:disable-next-line:no-any
-    attachedData: any,
+    attachedData: string | IR1AttachedDataType,
   ): void {
     const baseURI = this.publicationURI || iframe.baseURI || document.baseURI || location.href;
     iframe.setAttribute('data-baseUri', baseURI);
@@ -28,8 +33,19 @@ export class IFrameLoader {
 
     const contentUri = new URL(src, baseURI).toString();
 
+    let contentType = 'text/html';
+    // tslint:disable-next-line:no-any
+    if ((<any>(attachedData)).spineItem !== undefined) {
+      const data = <IR1AttachedDataType>(attachedData);
+      if (data.spineItem.media_type && data.spineItem.media_type.length) {
+        contentType = data.spineItem.media_type;
+      }
+    } else {
+      contentType = <string>(attachedData);
+    }
+
     this.fetchContentDocument(contentUri).then((contentData: string) => {
-      this.loadIframeWithDocument(iframe, contentUri, contentData, attachedData, callback);
+      this.loadIframeWithDocument(iframe, contentUri, contentData, contentType, callback);
     });
   }
 
@@ -66,17 +82,12 @@ export class IFrameLoader {
     iframe: HTMLIFrameElement,
     contentDocumentURI: string,
     contentDocumentData: string,
-    // tslint:disable-next-line:no-any
-    attachedData: any,
+    contentType: string,
     // tslint:disable-next-line:no-any
     callback: any,
   ): void {
     let documentDataUri: string = '';
     if (!this.isIE) {
-      let contentType = 'text/html';
-      if (attachedData.spineItem.media_type && attachedData.spineItem.media_type.length) {
-        contentType = attachedData.spineItem.media_type;
-      }
       const basedContentData = this.injectBaseHref(
         contentDocumentData,
         contentType,
