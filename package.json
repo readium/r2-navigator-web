@@ -1,5 +1,5 @@
 {
-  "name": "r2-navigator-web",
+  "name": "@evidentpoint/r2-navigator-web",
   "version": "0.0.3",
   "description": "A Readium Navigator module for the web, written in TypeScript",
   "main": "./dist/r2-navigator-web.umd.js",
