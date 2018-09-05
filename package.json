@@ -73,5 +73,8 @@
     "isomorphic-url-shim": "^1.0.2",
     "eventemitter3": "^2.0.3",
     "jquery": "^3.3.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
