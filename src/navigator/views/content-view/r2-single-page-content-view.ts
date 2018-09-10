@@ -1,36 +1,18 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
-import { IFrameLoader } from '../../iframe-loader';
 import { CancellationToken } from '../types';
-import { IContentView } from './content-view';
+import { R2ContentView } from './r2-content-view';
 
 import * as DomUtils from '../../../utils/dom-utils';
 
 type Size = [number, number];
 
-type IframeLoadedCallback = (success: boolean) => void;
-
-export class R2SinglePageContentView implements IContentView  {
-  private host: HTMLElement;
-
-  private iframeContainer: HTMLElement;
+export class R2SinglePageContentView extends R2ContentView  {
   private iframeScaler: HTMLElement;
-  private iframe: HTMLIFrameElement;
 
   private ePubHtml: HTMLHtmlElement | SVGElement | null = null;
   private ePubBody: HTMLBodyElement| null = null;
 
-  private iframeLoader: IFrameLoader;
-
-  private iframeLoadedCallbacks: IframeLoadedCallback[] = [];
-
-  private spineItem: PublicationLink;
-  private spineItemIndex: number;
-
   private metaSize: Size = [0, 0];
-
-  public constructor(loader: IFrameLoader) {
-    this.iframeLoader = loader;
-  }
 
   public element(): HTMLElement {
     return this.iframeContainer;
@@ -58,9 +40,7 @@ export class R2SinglePageContentView implements IContentView  {
 
     this.host.appendChild(this.iframeContainer);
 
-    this.iframeContainer.style.transform = 'none';
-    this.iframe.width = '100%';
-    this.iframe.height = '100%';
+    this.setupIframe();
   }
 
   public async loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
@@ -94,18 +74,6 @@ export class R2SinglePageContentView implements IContentView  {
     throw new Error('Method not implemented.');
   }
 
-  public async spineItemLoadedPromise(token?: CancellationToken | undefined): Promise<void> {
-    return this.iframeLoadedPromise();
-  }
-
-  public unloadSpineItem(): void {
-    this.host.removeChild(this.iframeContainer);
-  }
-
-  public attachToHost(host: HTMLElement): void {
-    this.host = host;
-  }
-
   public setViewSettings(viewSetting: object): void {
     throw new Error('Method not implemented.');
   }
@@ -122,7 +90,7 @@ export class R2SinglePageContentView implements IContentView  {
     throw new Error('Method not implemented.');
   }
 
-  private onIframeLoaded(success: boolean): void {
+  protected onIframeLoaded(success: boolean): void {
     const epubContentDocument = this.iframe.contentDocument;
     if (epubContentDocument) {
       this.ePubHtml = epubContentDocument.querySelector('html');
@@ -138,20 +106,7 @@ export class R2SinglePageContentView implements IContentView  {
     const contHeight = this.contentDocHeight();
     this.setHeight(contHeight);
 
-    for (const callback of this.iframeLoadedCallbacks) {
-      callback(success);
-    }
-    this.iframeLoadedCallbacks = [];
-  }
-
-  private iframeLoadedPromise(token?: CancellationToken): Promise<void> {
-    return new Promise<void>((resolve: () => void) => {
-      const listener = (success: boolean) => {
-        resolve();
-      };
-
-      this.iframeLoadedCallbacks.push(listener);
-    });
+    super.onIframeLoaded(success);
   }
 
   private contentDocHeight(): number {
@@ -279,16 +234,6 @@ export class R2SinglePageContentView implements IContentView  {
     }
 
     return undefined;
-  }
-
-  private hideIframe(): void {
-    this.iframe.style.visibility = 'hidden';
-  }
-
-  private showIFrame(): void {
-    this.iframe.style.visibility = 'visible';
-    this.iframe.style.left = '0px';
-    this.iframe.style.top = '0px';
   }
 
   private transform(scale: number, left: number, top: number): void {
