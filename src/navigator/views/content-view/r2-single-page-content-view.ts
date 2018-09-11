@@ -9,7 +9,7 @@ type Size = [number, number];
 export class R2SinglePageContentView extends R2ContentView  {
   private iframeScaler: HTMLElement;
 
-  private ePubHtml: HTMLHtmlElement | SVGElement | null = null;
+  private ePubRoot: HTMLHtmlElement | SVGElement | null = null;
   private ePubBody: HTMLBodyElement| null = null;
 
   private metaSize: Size = [0, 0];
@@ -93,11 +93,11 @@ export class R2SinglePageContentView extends R2ContentView  {
   protected onIframeLoaded(success: boolean): void {
     const epubContentDocument = this.iframe.contentDocument;
     if (epubContentDocument) {
-      this.ePubHtml = epubContentDocument.querySelector('html');
-      if (!this.ePubHtml) {
-        this.ePubHtml = epubContentDocument.querySelector('svg');
+      this.ePubRoot = epubContentDocument.querySelector('html');
+      if (!this.ePubRoot) {
+        this.ePubRoot = epubContentDocument.querySelector('svg');
       } else {
-        this.ePubBody = this.ePubHtml.querySelector('body');
+        this.ePubBody = this.ePubRoot.querySelector('body');
       }
     }
 
@@ -116,10 +116,10 @@ export class R2SinglePageContentView extends R2ContentView  {
     if (win && doc) {
       return Math.round(DomUtils.height(doc.documentElement, win));
     }
-    if (this.ePubHtml) {
+    if (this.ePubRoot) {
       console.error('getContentDocHeight ??');
 
-      return DomUtils.height(this.ePubHtml);
+      return DomUtils.height(this.ePubRoot);
     }
 
     return 0;
@@ -254,11 +254,11 @@ export class R2SinglePageContentView extends R2ContentView  {
         && needsFixedLayoutScalerWorkAround) {
 
         // See https://github.com/readium/readium-shared-js/issues/285
-      if (this.ePubHtml) {
-        this.ePubHtml.style.transform = enable3D ? `scale3D(${scale}, ${scale}, 0)` :
+      if (this.ePubRoot) {
+        this.ePubRoot.style.transform = enable3D ? `scale3D(${scale}, ${scale}, 0)` :
                                                    `scale(${scale})`;
-        this.ePubHtml.style.minWidth = `${this.metaWidth()}px`;
-        this.ePubHtml.style.minHeight = `${this.metaHeight()}px`;
+        this.ePubRoot.style.minWidth = `${this.metaWidth()}px`;
+        this.ePubRoot.style.minHeight = `${this.metaHeight()}px`;
       }
 
       if (this.ePubBody) {
@@ -281,16 +281,16 @@ export class R2SinglePageContentView extends R2ContentView  {
     // Chrome workaround: otherwise text is sometimes invisible
     // (probably a rendering glitch due to the 3D transform graphics backend?)
     // _$epubHtml.css("visibility", "hidden"); // "flashing" in two-page spread mode is annoying :(
-    if (this.ePubHtml) {
-      this.ePubHtml.style.opacity = '0.9999';
+    if (this.ePubRoot) {
+      this.ePubRoot.style.opacity = '0.9999';
     }
 
     this.showIFrame();
 
     setTimeout(
       () => {
-        if (this.ePubHtml) {
-          this.ePubHtml.style.opacity = '1';
+        if (this.ePubRoot) {
+          this.ePubRoot.style.opacity = '1';
         }
       },
       0);

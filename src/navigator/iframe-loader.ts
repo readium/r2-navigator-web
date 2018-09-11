@@ -55,12 +55,9 @@ export class IFrameLoader {
     return resp.text();
   }
 
-  private injectBaseHref(sourceText: string, contentType: string, href: string): string {
+  private inject(sourceText: string, contentType: string, href: string): string {
     const parser = new DOMParser();
     const doc = parser.parseFromString(sourceText, contentType);
-
-    const baseElement = doc.createElement('base');
-    baseElement.href = href;
 
     const headElement = doc.querySelector('head');
     if (!headElement) {
@@ -69,13 +66,40 @@ export class IFrameLoader {
       return sourceText;
     }
 
-    headElement.insertBefore(baseElement, headElement.firstChild);
+    this.injectBaseHref(doc, headElement, href);
+    // this.injectReadiumCss(doc, headElement);
 
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
     }
 
     return doc.documentElement.outerHTML;
+  }
+
+  private injectBaseHref(doc: Document, headEle: HTMLHeadElement, href: string): void {
+    const baseElement = doc.createElement('base');
+    baseElement.href = href;
+
+    headEle.insertBefore(baseElement, headEle.firstChild);
+  }
+
+  private injectReadiumCss(doc: Document, headEle: HTMLHeadElement): void {
+    const beforeCss = this.creatCssLink('/assets/readium-css/ReadiumCSS-before.css');
+    const defaultCss = this.creatCssLink('/assets/readium-css/ReadiumCSS-default.css');
+    const afterCss = this.creatCssLink('/assets/readium-css/ReadiumCSS-after.css');
+
+    headEle.appendChild(beforeCss);
+    headEle.appendChild(defaultCss);
+    headEle.appendChild(afterCss);
+  }
+
+  private creatCssLink(href: string): HTMLLinkElement {
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.type = 'text/css';
+    cssLink.href = href;
+
+    return cssLink;
   }
 
   private loadIframeWithDocument(
@@ -88,7 +112,7 @@ export class IFrameLoader {
   ): void {
     let documentDataUri: string = '';
     if (!this.isIE) {
-      const basedContentData = this.injectBaseHref(
+      const basedContentData = this.inject(
         contentDocumentData,
         contentType,
         new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
