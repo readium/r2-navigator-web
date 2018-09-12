@@ -13,6 +13,8 @@ export class R2MultiPageContentView extends R2ContentView {
     this.host.appendChild(this.iframeContainer);
 
     this.setupIframe();
+
+    this.useReadiumCss = true;
   }
 
   protected onIframeLoaded(success: boolean): void {

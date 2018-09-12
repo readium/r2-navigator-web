@@ -41,6 +41,8 @@ export class R2SinglePageContentView extends R2ContentView  {
     this.host.appendChild(this.iframeContainer);
 
     this.setupIframe();
+
+    this.useReadiumCss = false;
   }
 
   public async loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,

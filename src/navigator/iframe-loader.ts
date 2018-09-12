@@ -5,6 +5,10 @@ interface IR1AttachedDataType {
   spineItem: any;
 }
 
+interface ILoaderConfig {
+  useReadiumCss?: boolean;
+}
+
 export class IFrameLoader {
   private publicationURI?: string;
 
@@ -22,8 +26,7 @@ export class IFrameLoader {
     src: string,
     // tslint:disable-next-line:no-any
     callback: any,
-    // tslint:disable-next-line:no-any
-    context: any,
+    config: ILoaderConfig,
     // tslint:disable-next-line:no-any
     attachedData: string | IR1AttachedDataType,
   ): void {
@@ -45,7 +48,7 @@ export class IFrameLoader {
     }
 
     this.fetchContentDocument(contentUri).then((contentData: string) => {
-      this.loadIframeWithDocument(iframe, contentUri, contentData, contentType, callback);
+      this.loadIframeWithDocument(iframe, contentUri, contentData, contentType, config, callback);
     });
   }
 
@@ -55,7 +58,10 @@ export class IFrameLoader {
     return resp.text();
   }
 
-  private inject(sourceText: string, contentType: string, href: string): string {
+  private inject(sourceText: string,
+                 contentType: string,
+                 href: string,
+                 config: ILoaderConfig): string {
     const parser = new DOMParser();
     const doc = parser.parseFromString(sourceText, contentType);
 
@@ -67,7 +73,9 @@ export class IFrameLoader {
     }
 
     this.injectBaseHref(doc, headElement, href);
-    // this.injectReadiumCss(doc, headElement);
+    if (config.useReadiumCss === true) {
+      this.injectReadiumCss(doc, headElement);
+    }
 
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
@@ -107,6 +115,7 @@ export class IFrameLoader {
     contentDocumentURI: string,
     contentDocumentData: string,
     contentType: string,
+    config: ILoaderConfig,
     // tslint:disable-next-line:no-any
     callback: any,
   ): void {
@@ -116,6 +125,7 @@ export class IFrameLoader {
         contentDocumentData,
         contentType,
         new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
+        config,
       );
       documentDataUri = window.URL.createObjectURL(
         new Blob([basedContentData], { type: contentType }),

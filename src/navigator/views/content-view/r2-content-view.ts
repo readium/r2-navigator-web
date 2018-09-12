@@ -19,6 +19,8 @@ export class R2ContentView implements IContentView {
   protected spineItemIndex: number;
   protected spineItemPgCount: number = 1;
 
+  protected useReadiumCss: boolean = true;
+
   public constructor(loader: IFrameLoader) {
     this.iframeLoader = loader;
   }
@@ -40,8 +42,11 @@ export class R2ContentView implements IContentView {
       this.onIframeLoaded(success);
     };
 
-    this.iframeLoader.loadIframe(this.iframe, spineItem.Href, onIframeContentLoaded,
-                                 {}, spineItem.TypeLink);
+    this.iframeLoader.loadIframe(this.iframe,
+                                 spineItem.Href,
+                                 onIframeContentLoaded,
+                                 { useReadiumCss: this.useReadiumCss },
+                                 spineItem.TypeLink);
 
     return this.iframeLoadedPromise();
   }
