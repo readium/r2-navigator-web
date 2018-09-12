@@ -20,7 +20,51 @@ export class R2MultiPageContentView extends R2ContentView {
       this.ePubHtml = epubContentDocument.querySelector('html');
     }
 
+    this.paginate();
+
     this.showIFrame();
     super.onIframeLoaded(success);
+  }
+
+  private paginate(): void {
+    if (!this.ePubHtml) {
+      return;
+    }
+
+    const hostSize = this.getHostSize();
+    if (hostSize === null) {
+      return;
+    }
+
+    const [hostWidth, hostHeight] = hostSize;
+
+    this.iframe.style.height = `${hostWidth}px`;
+
+    this.ePubHtml.style.height = `${hostHeight}px`;
+
+    this.ePubHtml.style.margin = '0px';
+    this.ePubHtml.style.padding = '0px';
+    this.ePubHtml.style.border = '0px';
+
+    this.ePubHtml.style.columnWidth = `${hostWidth}px`;
+    this.ePubHtml.style.columnGap = '0px';
+    this.ePubHtml.style.columnCount = 'auto';
+    this.ePubHtml.style.columnFill = 'auto';
+
+    const fullWidth = this.ePubHtml.scrollWidth;
+    this.iframe.width = `${fullWidth}px`;
+
+    this.spineItemPgCount = Math.round(fullWidth / hostWidth);
+  }
+
+  private getHostSize(): [number, number] | null {
+    if (!this.host.style.width || !this.host.style.height) {
+      return null;
+    }
+
+    const width = parseFloat(this.host.style.width);
+    const height = parseFloat(this.host.style.height);
+
+    return [width, height];
   }
 }

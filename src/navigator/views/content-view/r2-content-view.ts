@@ -17,6 +17,7 @@ export class R2ContentView implements IContentView {
 
   protected spineItem: PublicationLink;
   protected spineItemIndex: number;
+  protected spineItemPgCount: number = 1;
 
   public constructor(loader: IFrameLoader) {
     this.iframeLoader = loader;
@@ -82,7 +83,7 @@ export class R2ContentView implements IContentView {
   }
 
   public spineItemPageCount(): number {
-    return 1;
+    return this.spineItemPgCount;
   }
 
   public getPageIndexOffsetFromCfi(cfi: string): number {
