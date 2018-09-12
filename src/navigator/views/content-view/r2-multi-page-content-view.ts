@@ -2,6 +2,7 @@ import { R2ContentView } from './r2-content-view';
 
 export class R2MultiPageContentView extends R2ContentView {
   protected ePubHtml: HTMLHtmlElement | null = null;
+  protected ePubBody: HTMLBodyElement | null = null;
 
   public render(): void {
     this.iframeContainer = document.createElement('div');
@@ -18,6 +19,9 @@ export class R2MultiPageContentView extends R2ContentView {
     const epubContentDocument = this.iframe.contentDocument;
     if (epubContentDocument) {
       this.ePubHtml = epubContentDocument.querySelector('html');
+      if (this.ePubHtml) {
+        this.ePubBody = this.ePubHtml.querySelector('body');
+      }
     }
 
     this.paginate();
@@ -27,7 +31,7 @@ export class R2MultiPageContentView extends R2ContentView {
   }
 
   private paginate(): void {
-    if (!this.ePubHtml) {
+    if (!this.ePubHtml || !this.ePubBody) {
       return;
     }
 
@@ -38,13 +42,16 @@ export class R2MultiPageContentView extends R2ContentView {
 
     const [hostWidth, hostHeight] = hostSize;
 
-    this.iframe.style.height = `${hostWidth}px`;
+    this.iframe.style.height = `${hostHeight}px`;
 
     this.ePubHtml.style.height = `${hostHeight}px`;
 
     this.ePubHtml.style.margin = '0px';
     this.ePubHtml.style.padding = '0px';
     this.ePubHtml.style.border = '0px';
+
+    this.ePubBody.style.margin = '0px';
+    this.ePubBody.style.padding = '0px';
 
     this.ePubHtml.style.columnWidth = `${hostWidth}px`;
     this.ePubHtml.style.columnGap = '0px';
