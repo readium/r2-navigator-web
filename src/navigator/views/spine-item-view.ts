@@ -79,6 +79,7 @@ export class SpineItemView extends View {
 
     this.spineItemPageCount = this.contentView.spineItemPageCount();
     this.contentStatus = ContentLoadingStatus.Loaded;
+    this.contentHeight = this.contentView.calculatedHeight();
   }
 
   public unloadSpineItem(): void {

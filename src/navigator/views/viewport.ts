@@ -22,7 +22,7 @@ export class Viewport {
 
   private root: HTMLElement;
 
-  private hasPendingAction: boolean = false;
+  private scrollRequestToken?: CancellationToken;
 
   private scrollEnabled: boolean = false;
 
@@ -95,7 +95,6 @@ export class Viewport {
   }
 
   public async renderAtOffset(pos: number, token?: CancellationToken): Promise<void> {
-    this.hasPendingAction = true;
     this.scrollFromInternal = true;
 
     // this.viewOffset = pos;
@@ -105,7 +104,6 @@ export class Viewport {
     this.adjustScrollPosition();
     this.updatePositions();
 
-    this.hasPendingAction = false;
     this.scrollFromInternal = false;
 
     // This call is important since the viewoffset and
@@ -370,17 +368,22 @@ export class Viewport {
       const end = this.viewOffset + this.viewportSize + this.prefetchSize;
       if (end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) {
         await this.ensureConentLoadedAtRange(start, end);
+        this.adjustScrollPosition();
       } else if (start <= this.bookView.getLoadedStartPostion() &&
                  this.bookView.hasMoreBeforeStart()) {
         await this.ensureConentLoadedAtRange(start, end);
+        this.adjustScrollPosition();
       }
     });
   }
 
   private async ensureConentLoadedAtRange(start: number, end: number): Promise<void> {
-    // this.hasPendingAction = true;
-    await this.bookView.ensureConentLoadedAtRange(start, end);
-    // this.hasPendingAction = false;
+    if (this.scrollRequestToken) {
+      this.scrollRequestToken.isCancelled = true;
+    }
+    this.scrollRequestToken = new CancellationToken();
+    await this.bookView.ensureConentLoadedAtRange(start, end, this.scrollRequestToken);
+    this.scrollRequestToken = undefined;
   }
 
   private async updatePrefetch(token?: CancellationToken): Promise<void> {
