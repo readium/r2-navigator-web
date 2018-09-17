@@ -10,6 +10,7 @@ export class CancellationToken {
 
 export enum SettingName {
   ColumnGap = 'column-gap', // number,
+  SpreadMode = 'spread-mode', // string
   FontFamily = 'font-family', // string
   FontSize = 'font-size', // number
   ReadingMode = 'reading-mode', // string

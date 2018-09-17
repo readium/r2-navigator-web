@@ -113,7 +113,7 @@ export class R2ContentView implements IContentView {
   }
 
   public onResize(): void {
-    throw new Error('Method not implemented.');
+    return;
   }
 
   protected setupIframe(): void {

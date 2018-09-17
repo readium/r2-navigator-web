@@ -33,9 +33,7 @@ export class LayoutView extends View {
 
   private publication: Publication;
 
-  private contentFactory: IContentViewFactory;
-
-  private vs: ViewSettings = new ViewSettings();
+  private vs: ViewSettings;
   private isViewSettingChanged: boolean = false;
 
   private loadedContentRange: [number, number] = [0, 0];
@@ -61,10 +59,10 @@ export class LayoutView extends View {
 
   private numOfPagesPerSpread: number = 0;
 
-  public constructor(pub: Publication, cvFactory: IContentViewFactory) {
+  public constructor(pub: Publication, vs: ViewSettings, cvFactory: IContentViewFactory) {
     super();
     this.publication = pub;
-    this.contentFactory = cvFactory;
+    this.vs = vs;
     this.initSpineItemViews();
 
     if (this.publication.Metadata.Rendition) {
@@ -184,14 +182,10 @@ export class LayoutView extends View {
     this.isPageSizeChanged = false;
   }
 
-  public updateViewSettings(settings: ISettingEntry[]): void {
+  public updateViewSettings(): void {
     // if (viewSetting.hasOwnProperty('syntheticSpread')) {
     //   delete viewSetting.syntheticSpread;
     // }
-
-    // this.contentFactory.viewSettings().update(viewSetting);
-
-    this.vs.updateSetting(settings);
 
     this.isViewSettingChanged = true;
 
@@ -199,10 +193,6 @@ export class LayoutView extends View {
       this.rePaginate();
       this.isViewSettingChanged = false;
     }
-  }
-
-  public viewSettings() : ViewSettings {
-    return this.vs;
   }
 
   public setZoom(option: ZoomOptions, scale: number): void {

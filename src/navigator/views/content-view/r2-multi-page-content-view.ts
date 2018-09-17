@@ -18,22 +18,11 @@ export class R2MultiPageContentView extends R2ContentView {
 
   public setViewSettings(viewSetting: ViewSettings): void {
     super.setViewSettings(viewSetting);
+    this.paginate();
+  }
 
-    if (!this.ePubHtml) {
-      return;
-    }
-
-    const hostSize = this.getHostSize();
-    if (hostSize === null) {
-      return;
-    }
-
-    const [hostWidth, hostHeight] = hostSize;
-
-    const fullWidth = this.ePubHtml.scrollWidth;
-    this.iframe.width = `${fullWidth}px`;
-
-    this.spineItemPgCount = Math.round(fullWidth / hostWidth);
+  public onResize(): void {
+    this.paginate();
   }
 
   protected onIframeLoaded(success: boolean): void {

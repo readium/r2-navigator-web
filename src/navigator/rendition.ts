@@ -1,7 +1,7 @@
 import { Publication } from '../streamer';
 import { IContentViewFactory } from './views/content-view/content-view-factory';
 import { LayoutView } from './views/layout-view';
-import { ISettingEntry, ZoomOptions } from './views/types';
+import { ISettingEntry, SettingName, ZoomOptions } from './views/types';
 import { ViewSettings } from './views/view-settings';
 import { Viewport } from './views/viewport';
 
@@ -34,6 +34,8 @@ export class Rendition {
   private contentViewFactory: IContentViewFactory;
 
   private viewAsVertical: boolean = false;
+
+  private vs: ViewSettings = new ViewSettings();
 
   constructor(pub: Publication, viewport: HTMLElement, cvFactory: IContentViewFactory) {
     this.pub = pub;
@@ -93,17 +95,34 @@ export class Rendition {
   }
 
   public updateViewSettings(settings: ISettingEntry[]): void {
+    this.vs.updateSetting(settings);
+
+    let spreadMode: SpreadMode | null = null;
+    for (const s of settings) {
+      if (s.name === SettingName.SpreadMode) {
+        spreadMode = this.stringToSpreadMode(s.value);
+        if (!spreadMode && spreadMode === this.spreadMode) {
+          spreadMode = null;
+        }
+      }
+    }
+
     if (this.bookView) {
-      this.bookView.updateViewSettings(settings);
+      this.bookView.beginViewUpdate();
+    }
+
+    if (spreadMode !== null) {
+      this.setPageLayout({ spreadMode });
+    }
+
+    if (this.bookView) {
+      this.bookView.updateViewSettings();
+      this.bookView.endViewUpdate();
     }
   }
 
-  public viewSettings(): ViewSettings | undefined {
-    if (this.bookView) {
-      return this.bookView.viewSettings();
-    }
-
-    return undefined;
+  public viewSettings(): ViewSettings {
+    return this.vs;
   }
 
   public setZoom(option: ZoomOptions, scale: number): void {
@@ -151,7 +170,7 @@ export class Rendition {
   // }
 
   public render(): Promise<void> {
-    this.bookView = new LayoutView(this.pub, this.contentViewFactory);
+    this.bookView = new LayoutView(this.pub, this.vs, this.contentViewFactory);
     this.bookView.setPageSize(this.pageWidth, this.pageHeight);
     this.bookView.setNumberOfPagesPerSpread(this.numOfPagesPerSpread);
     this.bookView.setVerticalLayout(this.viewAsVertical);
@@ -173,5 +192,18 @@ export class Rendition {
     if (this.bookView) {
       this.bookView.setPageSize(this.pageWidth, this.pageHeight);
     }
+  }
+
+  private stringToSpreadMode(val: string): SpreadMode | null {
+    let mode: SpreadMode | null = null;
+    if (val === 'auto') {
+      mode = SpreadMode.FitViewportAuto;
+    } else if (val === 'single') {
+      mode = SpreadMode.FitViewportSingleSpread;
+    } else if (val === 'double') {
+      mode = SpreadMode.FitViewportDoubleSpread;
+    }
+
+    return mode;
   }
 }
