@@ -1,6 +1,7 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { IFrameLoader } from '../../iframe-loader';
-import { CancellationToken } from '../types';
+import { CancellationToken, ISettingEntry } from '../types';
+import { ViewSettings } from '../view-settings';
 import { IContentView } from './content-view';
 
 type IframeLoadedCallback = (success: boolean) => void;
@@ -19,6 +20,9 @@ export class R2ContentView implements IContentView {
   protected spineItemIndex: number;
   protected spineItemPgCount: number = 1;
 
+  protected ePubHtml: HTMLHtmlElement | null = null;
+  protected ePubBody: HTMLBodyElement | null = null;
+
   protected useReadiumCss: boolean = true;
 
   public constructor(loader: IFrameLoader) {
@@ -30,6 +34,7 @@ export class R2ContentView implements IContentView {
   }
 
   public loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+                       viewSettings: ViewSettings,
                        token?: CancellationToken | undefined): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = spineItemIndex;
@@ -63,8 +68,12 @@ export class R2ContentView implements IContentView {
     this.host = host;
   }
 
-  public setViewSettings(viewSetting: object): void {
-    throw new Error('Method not implemented.');
+  public setViewSettings(viewSetting: ViewSettings): void {
+    if (!this.ePubHtml) {
+      return;
+    }
+
+    viewSetting.updateView(this.ePubHtml);
   }
 
   public scale(scale: number): void {
@@ -84,7 +93,7 @@ export class R2ContentView implements IContentView {
   }
 
   public calculatedHeight(): number {
-    throw new Error('Method not implemented.');
+    return 0;
   }
 
   public spineItemPageCount(): number {

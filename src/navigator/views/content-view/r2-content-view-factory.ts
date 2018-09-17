@@ -8,7 +8,6 @@ import { R2MultiPageContentView } from './r2-multi-page-content-view';
 import { R2SinglePageContentView } from './r2-single-page-content-view';
 
 export class R2ContentViewFactory implements IContentViewFactory {
-
   private iframeLoader: IFrameLoader;
 
   public constructor(pub: Publication) {
@@ -21,10 +20,5 @@ export class R2ContentViewFactory implements IContentViewFactory {
     }
 
     return new R2MultiPageContentView(this.iframeLoader);
-  }
-
-  // tslint:disable-next-line:no-any
-  public viewSettings(): any {
-    throw new Error('Method not implemented.');
   }
 }

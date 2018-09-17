@@ -11,6 +11,7 @@ import { CancellationToken } from '../types';
 
 export class R1MultiPageContentView extends R1ContentView {
   protected loadSpineItemContentViewImpl(params: any, reader: any,
+                                         rsjViewerSettings: any,
                                          token?: CancellationToken): Promise<void> {
     this.contentViewImpl = new ReflowableView(params, reader);
 
@@ -20,7 +21,7 @@ export class R1MultiPageContentView extends R1ContentView {
 
     this.contentViewImpl.render();
 
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
+    this.contentViewImpl.setViewSettings(rsjViewerSettings, true);
 
     this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
 

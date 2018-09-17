@@ -3,16 +3,33 @@ import {
   Globals as Readium,
   PaginationChangedEventArgs,
   StyleCollection,
+  ViewerSettings,
 } from '@evidentpoint/readium-shared-js';
 
 import { IFrameLoader } from '../../iframe-loader';
 import { getReadiumEventsRelayInstance } from '../readium-events-relay';
-import { CancellationToken } from '../types';
+import { CancellationToken, SettingName } from '../types';
+import { ViewSettings } from '../view-settings';
 import { IContentView } from './content-view';
 
 // tslint:disable:no-any
 
+interface IR1ViewerSettingValueConverter {
+  name: string;
+  // tslint:disable-next-line:prefer-method-signature
+  valueConverter: (val: any) => any;
+}
+
+function genericValueConverter(value: any): any {
+  return value;
+}
+
 export class R1ContentView implements IContentView {
+  protected readonly R1_SETTING_MAP: Map<string, IR1ViewerSettingValueConverter> = new Map([
+    [SettingName.ColumnGap, { name: 'columnGap', valueConverter: genericValueConverter }],
+    [SettingName.FontSize, { name: 'fontSize', valueConverter: genericValueConverter }],
+  ]);
+
   protected iframeLoader: IFrameLoader;
 
   protected host: HTMLElement;
@@ -20,7 +37,6 @@ export class R1ContentView implements IContentView {
   protected contentViewImpl: any;
 
   protected rsjSpine: any;
-  protected rsjViewSettings: any;
   protected $iframe: any;
   protected rjsSpineItem: any;
 
@@ -28,10 +44,9 @@ export class R1ContentView implements IContentView {
   protected spineItemIndex: number;
   protected spineItemPgCount: number = 1;
 
-  public constructor(iframeLoader: IFrameLoader, rsjSpine: any, rsjViewSetting: any) {
+  public constructor(iframeLoader: IFrameLoader, rsjSpine: any) {
     this.iframeLoader = iframeLoader;
     this.rsjSpine = rsjSpine;
-    this.rsjViewSettings = rsjViewSetting;
   }
 
   public attachToHost(host: HTMLElement): void {
@@ -113,6 +128,7 @@ export class R1ContentView implements IContentView {
   }
 
   public async loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+                             viewSettings: ViewSettings,
                              token?: CancellationToken): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = spineItemIndex;
@@ -126,13 +142,15 @@ export class R1ContentView implements IContentView {
       expandDocumentFullWidth: true,
     };
 
+    const rsjVs = this.rsjViewerSettings(viewSettings);
+
     const reader = {
       fonts: {},
-      viewerSettings: () => this.rsjViewSettings,
+      viewerSettings: () => rsjVs,
       needsFixedLayoutScalerWorkAround: () => false,
     };
 
-    return this.loadSpineItemContentViewImpl(readiumViewParams, reader, token);
+    return this.loadSpineItemContentViewImpl(readiumViewParams, reader, rsjVs, token);
   }
 
   public spineItemLoadedPromise(token?: CancellationToken): Promise<void> {
@@ -143,10 +161,8 @@ export class R1ContentView implements IContentView {
     getReadiumEventsRelayInstance().unregisterEvents(this.contentViewImpl);
   }
 
-  public setViewSettings(viewSetting: object): void {
-    this.rsjViewSettings = viewSetting;
-
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings);
+  public setViewSettings(viewSetting: ViewSettings): void {
+    this.contentViewImpl.setViewSettings(this.rsjViewerSettings(viewSetting));
 
     const pageInfo = this.contentViewImpl.getPaginationInfo().openPages[0];
     this.spineItemPgCount = pageInfo.spineItemPageCount;
@@ -164,6 +180,7 @@ export class R1ContentView implements IContentView {
   }
 
   protected loadSpineItemContentViewImpl(params: any, reader: any,
+                                         rsjViewerSettings: any,
                                          token?: CancellationToken): Promise<void> {
     // Should be provided in subclass
     return Promise.resolve();
@@ -197,5 +214,22 @@ export class R1ContentView implements IContentView {
         handler,
       );
     });
+  }
+
+  protected rsjViewerSettings(vs: ViewSettings): any {
+    const rjs: object = {};
+    Object.defineProperty(rjs, 'syntheticSpread', { value: 'single' });
+
+    const settingEntries = vs.getAllSettings();
+    for (const setting of settingEntries) {
+      const converter = this.R1_SETTING_MAP.get(setting.name);
+      if (converter) {
+        const r1Name = converter.name;
+        const r1Value = converter.valueConverter(setting.value);
+        Object.defineProperty(rjs, r1Name, { value:r1Value });
+      }
+    }
+
+    return new ViewerSettings(rjs);
   }
 }

@@ -1,6 +1,7 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { IContentView } from './content-view/content-view';
 import { IContentViewFactory } from './content-view/content-view-factory';
+import { ViewSettings } from './view-settings';
 
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
@@ -71,11 +72,16 @@ export class SpineItemView extends View {
     return this.contentView.getPageIndexOffsetFromElementId(elementId);
   }
 
-  public async loadSpineItem(spineItem: PublicationLink, token?: CancellationToken): Promise<void> {
+  public async loadSpineItem(spineItem: PublicationLink,
+                             viewSettings: ViewSettings,
+                             token?: CancellationToken): Promise<void> {
     this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);
     this.contentView.attachToHost(this.host);
     this.contentStatus = ContentLoadingStatus.Loading;
-    await this.contentView.loadSpineItem(spineItem, this.spine.indexOf(spineItem), token);
+    await this.contentView.loadSpineItem(spineItem,
+                                         this.spine.indexOf(spineItem),
+                                         viewSettings,
+                                         token);
 
     this.spineItemPageCount = this.contentView.spineItemPageCount();
     this.contentStatus = ContentLoadingStatus.Loaded;
@@ -143,7 +149,7 @@ export class SpineItemView extends View {
     this.updateScale();
   }
 
-  public setViewSettings(viewSetting: object): void {
+  public setViewSettings(viewSetting: ViewSettings): void {
     this.contentView.setViewSettings(viewSetting);
     this.spineItemPageCount = this.contentView.spineItemPageCount();
   }

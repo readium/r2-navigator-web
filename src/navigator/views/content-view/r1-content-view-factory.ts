@@ -32,13 +32,11 @@ export class R1ContentViewFactory implements IContentViewFactory {
     if (isFixedLayout || isVertical) {
       return new R1SinglePageContentView(this.iframeLoader,
                                          this.rsjPackage.spine,
-                                         this.rsjViewSettings,
                                          isFixedLayout);
     }
 
     return new R1MultiPageContentView(this.iframeLoader,
-                                      this.rsjPackage.spine,
-                                      this.rsjViewSettings);
+                                      this.rsjPackage.spine);
   }
 
   public viewSettings(): any {

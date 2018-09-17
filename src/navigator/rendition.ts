@@ -1,7 +1,8 @@
 import { Publication } from '../streamer';
 import { IContentViewFactory } from './views/content-view/content-view-factory';
 import { LayoutView } from './views/layout-view';
-import { ZoomOptions } from './views/types';
+import { ISettingEntry, ZoomOptions } from './views/types';
+import { ViewSettings } from './views/view-settings';
 import { Viewport } from './views/viewport';
 
 export enum SpreadMode {
@@ -91,14 +92,13 @@ export class Rendition {
     this.setPageLayout({ spreadMode: this.spreadMode });
   }
 
-  public updateViewSettings(viewSettings: object): void {
+  public updateViewSettings(settings: ISettingEntry[]): void {
     if (this.bookView) {
-      this.bookView.updateViewSettings(viewSettings);
+      this.bookView.updateViewSettings(settings);
     }
   }
 
-  // tslint:disable-next-line:no-any
-  public viewSettings(): any {
+  public viewSettings(): ViewSettings | undefined {
     if (this.bookView) {
       return this.bookView.viewSettings();
     }

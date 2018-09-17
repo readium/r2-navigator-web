@@ -3,8 +3,9 @@ import { Location } from '../location';
 import { IContentViewFactory } from './content-view/content-view-factory';
 import { SpineItemView } from './spine-item-view';
 import { SpineItemViewFactory } from './spine-item-view-factory';
-import { CancellationToken, ZoomOptions } from './types';
+import { CancellationToken, ISettingEntry, ZoomOptions } from './types';
 import { View } from './view';
+import { ViewSettings } from './view-settings';
 
 export class PaginationInfo {
   public spineItemIndex: number;
@@ -34,6 +35,7 @@ export class LayoutView extends View {
 
   private contentFactory: IContentViewFactory;
 
+  private vs: ViewSettings = new ViewSettings();
   private isViewSettingChanged: boolean = false;
 
   private loadedContentRange: [number, number] = [0, 0];
@@ -182,13 +184,15 @@ export class LayoutView extends View {
     this.isPageSizeChanged = false;
   }
 
-  // tslint:disable-next-line:no-any
-  public updateViewSettings(viewSetting: any): void {
-    if (viewSetting.hasOwnProperty('syntheticSpread')) {
-      delete viewSetting.syntheticSpread;
-    }
+  public updateViewSettings(settings: ISettingEntry[]): void {
+    // if (viewSetting.hasOwnProperty('syntheticSpread')) {
+    //   delete viewSetting.syntheticSpread;
+    // }
 
-    this.contentFactory.viewSettings().update(viewSetting);
+    // this.contentFactory.viewSettings().update(viewSetting);
+
+    this.vs.updateSetting(settings);
+
     this.isViewSettingChanged = true;
 
     if (!this.inViewUpdate) {
@@ -197,9 +201,8 @@ export class LayoutView extends View {
     }
   }
 
-  // tslint:disable-next-line:no-any
-  public viewSettings() : any {
-    return this.contentFactory.viewSettings();
+  public viewSettings() : ViewSettings {
+    return this.vs;
   }
 
   public setZoom(option: ZoomOptions, scale: number): void {
@@ -560,7 +563,7 @@ export class LayoutView extends View {
     this.loadedContentRange[0] = this.paginatedRange[0] = offset;
     for (const vs of this.spineItemViewStatus) {
       if (this.isViewSettingChanged) {
-        vs.view.setViewSettings(this.contentFactory.viewSettings());
+        vs.view.setViewSettings(this.vs);
       }
 
       if (this.isPageSizeChanged) {
@@ -687,12 +690,12 @@ export class LayoutView extends View {
     if (this.spineItemViewSizes[index] > 0) {
       viewLength = this.spineItemViewSizes[index];
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
-      spineItemView.loadSpineItem(this.publication.Spine[index], token).then(() => {
+      spineItemView.loadSpineItem(this.publication.Spine[index], this.vs, token).then(() => {
         this.onSpineItemLoaded(spineItemView);
       });
     } else {
       this.hasUnknownSizeSpineItemLoading = true;
-      await spineItemView.loadSpineItem(this.publication.Spine[index], token);
+      await spineItemView.loadSpineItem(this.publication.Spine[index], this.vs, token);
       this.hasUnknownSizeSpineItemLoading = false;
 
       if (token && token.isCancelled) {

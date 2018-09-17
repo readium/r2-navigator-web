@@ -1,8 +1,7 @@
+import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
 export class R2MultiPageContentView extends R2ContentView {
-  protected ePubHtml: HTMLHtmlElement | null = null;
-  protected ePubBody: HTMLBodyElement | null = null;
 
   public render(): void {
     this.iframeContainer = document.createElement('div');
@@ -15,6 +14,26 @@ export class R2MultiPageContentView extends R2ContentView {
     this.setupIframe();
 
     this.useReadiumCss = true;
+  }
+
+  public setViewSettings(viewSetting: ViewSettings): void {
+    super.setViewSettings(viewSetting);
+
+    if (!this.ePubHtml) {
+      return;
+    }
+
+    const hostSize = this.getHostSize();
+    if (hostSize === null) {
+      return;
+    }
+
+    const [hostWidth, hostHeight] = hostSize;
+
+    const fullWidth = this.ePubHtml.scrollWidth;
+    this.iframe.width = `${fullWidth}px`;
+
+    this.spineItemPgCount = Math.round(fullWidth / hostWidth);
   }
 
   protected onIframeLoaded(success: boolean): void {

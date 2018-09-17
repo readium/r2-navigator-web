@@ -13,9 +13,9 @@ import { CancellationToken } from '../types';
 export class R1SinglePageContentView extends R1ContentView {
   protected isFixedLayout: boolean;
 
-  public constructor(iframeLoader: IFrameLoader, rsjSpine: any, rsjViewSetting: any,
+  public constructor(iframeLoader: IFrameLoader, rsjSpine: any,
                      isFixedLayout: boolean) {
-    super(iframeLoader, rsjSpine, rsjViewSetting);
+    super(iframeLoader, rsjSpine);
     this.isFixedLayout = isFixedLayout;
   }
 
@@ -40,6 +40,7 @@ export class R1SinglePageContentView extends R1ContentView {
   }
 
   protected loadSpineItemContentViewImpl(params: any, reader: any,
+                                         rsjViewerSettings: any,
                                          token?: CancellationToken): Promise<void> {
     this.contentViewImpl = new OnePageView(params,
                                            ['content-doc-frame'],
@@ -50,7 +51,7 @@ export class R1SinglePageContentView extends R1ContentView {
 
     this.contentViewImpl.render();
 
-    this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
+    this.contentViewImpl.setViewSettings(rsjViewerSettings, true);
 
     this.host.appendChild(this.element());
 

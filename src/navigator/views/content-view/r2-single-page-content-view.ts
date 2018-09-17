@@ -1,5 +1,6 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { CancellationToken } from '../types';
+import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
 import * as DomUtils from '../../../utils/dom-utils';
@@ -9,8 +10,8 @@ type Size = [number, number];
 export class R2SinglePageContentView extends R2ContentView  {
   private iframeScaler: HTMLElement;
 
-  private ePubRoot: HTMLHtmlElement | SVGElement | null = null;
-  private ePubBody: HTMLBodyElement| null = null;
+  private ePubSvg: SVGElement | null = null;
+  private ePubRoot: SVGElement | HTMLElement | null = null;
 
   private metaSize: Size = [0, 0];
 
@@ -46,6 +47,7 @@ export class R2SinglePageContentView extends R2ContentView  {
   }
 
   public async loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+                             viewSettings: ViewSettings,
                              token?: CancellationToken): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = spineItemIndex;
@@ -76,10 +78,6 @@ export class R2SinglePageContentView extends R2ContentView  {
     throw new Error('Method not implemented.');
   }
 
-  public setViewSettings(viewSetting: object): void {
-    throw new Error('Method not implemented.');
-  }
-
   public scale(scale: number): void {
     this.transform(scale, 0, 0);
   }
@@ -95,13 +93,14 @@ export class R2SinglePageContentView extends R2ContentView  {
   protected onIframeLoaded(success: boolean): void {
     const epubContentDocument = this.iframe.contentDocument;
     if (epubContentDocument) {
-      this.ePubRoot = epubContentDocument.querySelector('html');
-      if (!this.ePubRoot) {
-        this.ePubRoot = epubContentDocument.querySelector('svg');
+      this.ePubHtml = epubContentDocument.querySelector('html');
+      if (!this.ePubHtml) {
+        this.ePubSvg = epubContentDocument.querySelector('svg');
       } else {
-        this.ePubBody = this.ePubRoot.querySelector('body');
+        this.ePubBody = this.ePubHtml.querySelector('body');
       }
     }
+    this.ePubRoot = this.ePubHtml || this.ePubSvg;
 
     this.updateMetaSize();
 
@@ -118,6 +117,7 @@ export class R2SinglePageContentView extends R2ContentView  {
     if (win && doc) {
       return Math.round(DomUtils.height(doc.documentElement, win));
     }
+
     if (this.ePubRoot) {
       console.error('getContentDocHeight ??');
 

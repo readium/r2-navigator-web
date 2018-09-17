@@ -1,10 +1,12 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { CancellationToken } from '../types';
+import { ViewSettings } from '../view-settings';
 
 export interface IContentView {
   render(): void;
 
   loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+                viewSettings: ViewSettings,
                 token?: CancellationToken): Promise<void>;
 
   spineItemLoadedPromise(token?: CancellationToken): Promise<void>;
@@ -13,7 +15,7 @@ export interface IContentView {
 
   attachToHost(host: HTMLElement): void;
 
-  setViewSettings(viewSetting: object): void;
+  setViewSettings(viewSetting: ViewSettings): void;
   scale(scale: number): void;
 
   element(): HTMLElement;
