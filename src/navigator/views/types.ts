@@ -9,8 +9,13 @@ export class CancellationToken {
 }
 
 export enum SettingName {
-  ColumnGap = 'column-gap',
-  FontSize = 'font-size',
+  ColumnGap = 'column-gap', // number,
+  FontFamily = 'font-family', // string
+  FontSize = 'font-size', // number
+  ReadingMode = 'reading-mode', // string
+  TextColor = 'text-color', // string
+  BackgroundColor = 'background-color', // string
+  TextAlign = 'text-align', // string
 }
 
 export interface ISettingEntry {

@@ -3,26 +3,30 @@ import { ISettingEntry, SettingName } from './types';
 interface IReadiumCSSSettingValueConverter {
   name: string;
   // tslint:disable-next-line:prefer-method-signature no-any
-  valueConverter: (val: any) => string;
+  converter: (val: any) => string;
 }
 
-function stringValueConverter(value: string): string {
+function stringConverter(value: string): string {
   return value;
 }
 
 // tslint:disable-next-line:no-any
-function genericValueConverter(value: any): string {
+function genericConverter(value: any): string {
   return `${value}`;
 }
 
-function percentValueConverter(value: number): string {
+function percentConverter(value: number): string {
   return `${value}%`;
 }
 
 export class ViewSettings {
   private readonly READIUM_CSS_VAR_MAP: Map<string, IReadiumCSSSettingValueConverter> = new Map([
-    [SettingName.ColumnGap, { name: 'column-gap', valueConverter: genericValueConverter }],
-    [SettingName.FontSize, { name:'--RS__baseFontSize', valueConverter: percentValueConverter }],
+    [SettingName.ColumnGap, { name: 'column-gap', converter: genericConverter }],
+    [SettingName.FontSize, { name:'--USER__fontSize', converter: percentConverter }],
+    [SettingName.FontFamily, { name:'--USER__fontFamily', converter: stringConverter }],
+    [SettingName.ReadingMode, { name:'--USER__appearance', converter: stringConverter }],
+    [SettingName.TextColor, { name: '--USER__textColor', converter: stringConverter }],
+    [SettingName.BackgroundColor, { name: '--USER__backgroundColor', converter: stringConverter }],
   ]);
 
   // tslint:disable-next-line:no-any
@@ -53,7 +57,7 @@ export class ViewSettings {
   private setCss(view: HTMLElement, varName: string, varVal: any): void {
     const cssConverter = this.READIUM_CSS_VAR_MAP.get(varName);
     if (cssConverter) {
-      view.style.setProperty(cssConverter.name, cssConverter.valueConverter(varVal));
+      view.style.setProperty(cssConverter.name, cssConverter.converter(varVal));
     }
   }
 
