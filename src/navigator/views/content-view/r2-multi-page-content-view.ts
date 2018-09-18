@@ -1,3 +1,4 @@
+import { triggerLayout } from '../../../utils/dom-utils';
 import { SettingName } from '../types';
 import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
@@ -77,6 +78,9 @@ export class R2MultiPageContentView extends R2ContentView {
     this.ePubHtml.style.columnGap = `${columnGap}px`;
     this.ePubHtml.style.columnCount = 'auto';
     this.ePubHtml.style.columnFill = 'auto';
+
+    // This workaround is required for triggering layout changes in Safari
+    triggerLayout(this.iframe);
 
     const fullWidth = this.ePubHtml.scrollWidth;
     this.iframe.width = `${fullWidth}px`;
