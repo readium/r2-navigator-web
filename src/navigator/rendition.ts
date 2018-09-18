@@ -41,6 +41,8 @@ export class Rendition {
     this.pub = pub;
     this.viewport = new Viewport(viewport);
     this.contentViewFactory = cvFactory;
+
+    this.initDefaultViewSettings();
   }
 
   public setPageLayout(layoutSetting: PageLayoutSettings): void {
@@ -180,10 +182,10 @@ export class Rendition {
     return Promise.resolve();
   }
 
-  // tslint:disable-next-line:no-any
-  // public setIframeLoader(iframeLoader: any): void {
-  //   this.bookView.setIframeLoader(iframeLoader);
-  // }
+  private initDefaultViewSettings(): void {
+    const columnGapSetting = { name: SettingName.ColumnGap, value: 20 };
+    this.vs.updateSetting([columnGapSetting]);
+  }
 
   private setPageSize(pageWidth: number, pageHeight: number): void {
     this.pageWidth = pageWidth;

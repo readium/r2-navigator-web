@@ -1,6 +1,6 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { IFrameLoader } from '../../iframe-loader';
-import { CancellationToken, ISettingEntry } from '../types';
+import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
 import { IContentView } from './content-view';
 
@@ -24,6 +24,7 @@ export class R2ContentView implements IContentView {
   protected ePubBody: HTMLBodyElement | null = null;
 
   protected useReadiumCss: boolean = true;
+  protected vs: ViewSettings;
 
   public constructor(loader: IFrameLoader) {
     this.iframeLoader = loader;
@@ -38,6 +39,7 @@ export class R2ContentView implements IContentView {
                        token?: CancellationToken | undefined): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = spineItemIndex;
+    this.vs = viewSettings;
 
     this.render();
 

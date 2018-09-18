@@ -53,6 +53,15 @@ export class ViewSettings {
     });
   }
 
+  public getSetting<T>(name: SettingName): T | undefined {
+    const val = this.settings.get(name);
+    if (val === undefined) {
+      return undefined;
+    }
+
+    return <T>(val);
+  }
+
   // tslint:disable-next-line:no-any
   private setCss(view: HTMLElement, varName: string, varVal: any): void {
     const cssConverter = this.READIUM_CSS_VAR_MAP.get(varName);

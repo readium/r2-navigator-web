@@ -1,3 +1,4 @@
+import { SettingName } from '../types';
 import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
@@ -63,8 +64,16 @@ export class R2MultiPageContentView extends R2ContentView {
     this.ePubBody.style.margin = '0px';
     this.ePubBody.style.padding = '0px';
 
-    this.ePubHtml.style.columnWidth = `${hostWidth}px`;
-    this.ePubHtml.style.columnGap = '0px';
+    const gapValue = this.vs.getSetting<number>(SettingName.ColumnGap);
+    const columnGap = gapValue === undefined ? 0 : gapValue;
+    const columnWidth = hostWidth - columnGap;
+    const edgeMargin = columnGap / 2;
+
+    this.ePubHtml.style.left = `${edgeMargin}px`;
+    this.ePubHtml.style.right = `${edgeMargin}px`;
+
+    this.ePubHtml.style.columnWidth = `${columnWidth}px`;
+    this.ePubHtml.style.columnGap = `${columnGap}px`;
     this.ePubHtml.style.columnCount = 'auto';
     this.ePubHtml.style.columnFill = 'auto';
 
