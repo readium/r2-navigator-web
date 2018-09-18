@@ -9,6 +9,7 @@ export class R2MultiPageContentView extends R2ContentView {
     this.iframe = document.createElement('iframe');
 
     this.iframeContainer.appendChild(this.iframe);
+    this.iframeContainer.style.position = 'absolute';
 
     this.host.appendChild(this.iframeContainer);
 
@@ -69,8 +70,8 @@ export class R2MultiPageContentView extends R2ContentView {
     const columnWidth = hostWidth - columnGap;
     const edgeMargin = columnGap / 2;
 
-    this.ePubHtml.style.left = `${edgeMargin}px`;
-    this.ePubHtml.style.right = `${edgeMargin}px`;
+    this.iframeContainer.style.left = `${edgeMargin}px`;
+    this.iframeContainer.style.right = `${edgeMargin}px`;
 
     this.ePubHtml.style.columnWidth = `${columnWidth}px`;
     this.ePubHtml.style.columnGap = `${columnGap}px`;
@@ -80,7 +81,7 @@ export class R2MultiPageContentView extends R2ContentView {
     const fullWidth = this.ePubHtml.scrollWidth;
     this.iframe.width = `${fullWidth}px`;
 
-    this.spineItemPgCount = Math.round(fullWidth / hostWidth);
+    this.spineItemPgCount = Math.round(fullWidth + columnGap / hostWidth);
   }
 
   private getHostSize(): [number, number] | null {
