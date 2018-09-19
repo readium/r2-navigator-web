@@ -74,6 +74,8 @@ export class R2MultiPageContentView extends R2ContentView {
     this.iframeContainer.style.left = `${edgeMargin}px`;
     this.iframeContainer.style.right = `${edgeMargin}px`;
 
+    // Have to set width to make Firefox paginate correctly
+    this.ePubHtml.style.width = `${columnWidth}px`;
     this.ePubHtml.style.columnWidth = `${columnWidth}px`;
     this.ePubHtml.style.columnGap = `${columnGap}px`;
     this.ePubHtml.style.columnCount = 'auto';
@@ -85,7 +87,7 @@ export class R2MultiPageContentView extends R2ContentView {
     const fullWidth = this.ePubHtml.scrollWidth;
     this.iframe.width = `${fullWidth}px`;
 
-    this.spineItemPgCount = Math.round(fullWidth + columnGap / hostWidth);
+    this.spineItemPgCount = Math.round((fullWidth + columnGap) / hostWidth);
   }
 
   private getHostSize(): [number, number] | null {
