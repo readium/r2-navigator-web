@@ -1,25 +1,17 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { ReadingSystem } from '../../src/navigator';
-import { IFrameLoader } from '../../src/navigator/iframe-loader';
 // tslint:disable-next-line:max-line-length
 import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
+import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
-import { PackageDocument } from '../../src/streamer/readium-shared-js-impl/package-document';
-
-// tslint:disable-next-line:no-implicit-dependencies
-import { Package as ReadiumPackage, ViewerSettings } from '@evidentpoint/readium-shared-js';
 
 describe('SpineItemView', () => {
   let viewportDiv: HTMLElement;
-  let iframeLoader: IFrameLoader;
   let publication: Publication;
   let contentFactory: R1ContentViewFactory;
-  // tslint:disable-next-line:no-any
-  let rsjPackage: any;
-  // tslint:disable-next-line:no-any
-  let rsjViewSettings: any;
+  let viewSettings: ViewSettings;
 
   before(() => {
     const head = document.querySelector('head');
@@ -47,15 +39,7 @@ describe('SpineItemView', () => {
     );
 
     contentFactory = new R1ContentViewFactory(publication);
-
-    iframeLoader = new IFrameLoader(publication.getBaseURI());
-
-    const packageDoc = new PackageDocument(publication);
-    rsjPackage = new ReadiumPackage({ ...packageDoc.getSharedJsPackageData() });
-    rsjPackage.spine.handleLinear(true);
-
-    rsjViewSettings = new ViewerSettings({ syntheticSpread: 'single' });
-
+    viewSettings = new ViewSettings();
   });
 
   const createSpineItemView = (pageWidth: number, pageHeight: number) => {
@@ -84,13 +68,13 @@ describe('SpineItemView', () => {
     it('loadSpineItem()', async () => {
       const pageWidth = 400;
       const siv = createSpineItemView(pageWidth, 800);
-      await siv.loadSpineItem(publication.Spine[0]);
+      await siv.loadSpineItem(publication.Spine[0], viewSettings);
       const pageSize = siv.getTotalSize(pageWidth);
 
       assert.equal(pageSize, 400);
 
       const siv4 = createSpineItemView(pageWidth, 800);
-      await siv4.loadSpineItem(publication.Spine[4]);
+      await siv4.loadSpineItem(publication.Spine[4], viewSettings);
       const page4Size = siv4.getTotalSize(pageWidth);
 
       assert.equal(page4Size, 7600);
@@ -100,7 +84,7 @@ describe('SpineItemView', () => {
     it('getCfi()', async () => {
       const pageWidth = 400;
       const siv4 = createSpineItemView(pageWidth, 800);
-      await siv4.loadSpineItem(publication.Spine[4]);
+      await siv4.loadSpineItem(publication.Spine[4], viewSettings);
 
       const cfi1 = siv4.getCfi(0, 0);
       console.log(cfi1);

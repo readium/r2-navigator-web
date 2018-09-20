@@ -1,13 +1,15 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { LayoutView, ReadingSystem } from '../../src/navigator';
+import { LayoutView, ReadingSystem, SettingName } from '../../src/navigator';
 // tslint:disable-next-line:max-line-length
 import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
+import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
 
 describe('LayoutView', () => {
   let viewportDiv: HTMLElement;
   let layoutView: LayoutView;
+  let vs: ViewSettings;
 
   before(() => {
     const head = document.querySelector('head');
@@ -33,7 +35,9 @@ describe('LayoutView', () => {
     const publication = await Publication.fromURL(
       '/fixtures/publications/metamorphosis/manifest.json',
     );
-    layoutView = new LayoutView(publication, new R1ContentViewFactory(publication));
+
+    vs = new ViewSettings();
+    layoutView = new LayoutView(publication, vs, new R1ContentViewFactory(publication));
 
     layoutView.setPageSize(200, 400);
     layoutView.attachToHost(viewportDiv);
@@ -82,7 +86,8 @@ describe('LayoutView', () => {
       assert.equal(layoutView.getLoadedStartPostion(), 0);
       assert.equal(layoutView.getLoadedEndPosition(), 17000);
 
-      layoutView.updateViewSettings({ fontSize: 60 });
+      vs.updateSetting([{ name: SettingName.FontSize, value: 60 }]);
+      layoutView.updateViewSettings();
 
       assert.equal(layoutView.getLoadedStartPostion(), 0);
       assert.equal(layoutView.getLoadedEndPosition(), 6200);

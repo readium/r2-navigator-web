@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import { LayoutView, Viewport } from '../../src/navigator';
 // tslint:disable-next-line:max-line-length
 import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
+import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
 
 describe('Viewport', () => {
@@ -30,7 +31,9 @@ describe('Viewport', () => {
     const publication = await Publication.fromURL(
       '/fixtures/publications/metamorphosis/manifest.json',
     );
-    layoutView = new LayoutView(publication, new R1ContentViewFactory(publication));
+
+    const vs = new ViewSettings();
+    layoutView = new LayoutView(publication, vs, new R1ContentViewFactory(publication));
     layoutView.setPageSize(400, 400);
 
     viewport.setView(layoutView);
