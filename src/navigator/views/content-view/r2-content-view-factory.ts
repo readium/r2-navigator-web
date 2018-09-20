@@ -10,8 +10,8 @@ import { R2SinglePageContentView } from './r2-single-page-content-view';
 export class R2ContentViewFactory implements IContentViewFactory {
   private iframeLoader: IFrameLoader;
 
-  public constructor(pub: Publication) {
-    this.iframeLoader = new IFrameLoader(pub.getBaseURI());
+  public constructor(loader: IFrameLoader) {
+    this.iframeLoader = loader;
   }
 
   public createContentView(isFixedLayout: boolean, isVertical: boolean): IContentView {

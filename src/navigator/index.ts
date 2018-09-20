@@ -12,3 +12,4 @@ export { R1ContentViewFactory } from './views/content-view/r1-content-view-facto
 export { R1ContentView } from './views/content-view/r1-content-view';
 export { R2ContentViewFactory } from './views/content-view/r2-content-view-factory';
 export { R2SinglePageContentView } from './views/content-view/r2-single-page-content-view';
+export { IFrameLoader } from './iframe-loader';

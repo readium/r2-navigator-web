@@ -14,11 +14,17 @@ export class IFrameLoader {
 
   private isIE: boolean;
 
+  private readiumCssBasePath?: string;
+
   constructor(publicationURI?: string) {
     this.publicationURI = publicationURI;
     this.isIE =
       window.navigator.userAgent.indexOf('Trident') > 0 ||
       window.navigator.userAgent.indexOf('Edge') > 0;
+  }
+
+  public setReadiumCssBasePath(path: string): void {
+    this.readiumCssBasePath = path;
   }
 
   public loadIframe(
@@ -92,9 +98,12 @@ export class IFrameLoader {
   }
 
   private injectReadiumCss(doc: Document, headEle: HTMLHeadElement): void {
-    const beforeCss = this.creatCssLink('/assets/readium-css/ReadiumCSS-before.css');
-    const defaultCss = this.creatCssLink('/assets/readium-css/ReadiumCSS-default.css');
-    const afterCss = this.creatCssLink('/assets/readium-css/ReadiumCSS-after.css');
+    if (!this.readiumCssBasePath) {
+      return;
+    }
+    const beforeCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-before.css`);
+    const defaultCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-default.css`);
+    const afterCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-after.css`);
 
     headEle.appendChild(beforeCss);
     headEle.appendChild(defaultCss);
