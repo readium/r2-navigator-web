@@ -92,6 +92,10 @@ export class HostEnv {
     return this.layoutView;
   }
 
+  public getIframe(): HTMLIFrameElement {
+    return <HTMLIFrameElement>(this.viewportDiv.querySelector('iframe'));
+  }
+
   public clear(): void {
     document.body.removeChild(this.viewportDiv);
   }

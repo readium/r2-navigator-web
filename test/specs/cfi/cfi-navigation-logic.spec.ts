@@ -33,7 +33,7 @@ describe('SpineItemView', () => {
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
       await hostEnv.loadSpineItem(siv4, 4);
 
-      const iframe = <HTMLIFrameElement>(hostEnv.getViewportDiv().querySelector('iframe'));
+      const iframe = hostEnv.getIframe();
       const doc = <Document>(iframe.contentDocument);
 
       const left = pageWidth;
