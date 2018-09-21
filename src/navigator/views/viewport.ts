@@ -382,8 +382,11 @@ export class Viewport {
       this.scrollRequestToken.isCancelled = true;
     }
     this.scrollRequestToken = new CancellationToken();
-    await this.bookView.ensureConentLoadedAtRange(start, end, this.scrollRequestToken);
-    this.scrollRequestToken = undefined;
+    const t = this.scrollRequestToken;
+    await this.bookView.ensureConentLoadedAtRange(start, end, t);
+    if (this.scrollRequestToken === t) {
+      this.scrollRequestToken = undefined;
+    }
   }
 
   private async updatePrefetch(token?: CancellationToken): Promise<void> {
