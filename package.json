@@ -17,7 +17,7 @@
     "test:debug": "npm run test:start -- --singleRun=false",
     "test:watch": "echo \"not implemented\"",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
-    "watch": "npm run build -- -w"
+    "watch": "npm run build:src -- -w"
   },
   "keywords": [
     "Readium"
