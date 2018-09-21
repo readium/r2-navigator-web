@@ -7,7 +7,9 @@
   "types": "./dist/r2-navigator-web.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "npm run clean && rollup -c",
+    "build": "npm run clean && npm run build:src && npm run build:types",
+    "build:src": "rollup -c",
+    "build:types": "dts-bundle --configJson dts-bundle.json",
     "test": "npm run test:build && npm run test:start",
     "test:clean": "rimraf test/dist",
     "test:build": "npm run test:clean && cd test && webpack",

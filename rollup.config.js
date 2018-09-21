@@ -1,7 +1,6 @@
 import typescript2 from 'rollup-plugin-typescript2';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import execute from 'rollup-plugin-execute';
 
 const pkg = require('./package.json');
 
@@ -35,6 +34,5 @@ export default {
     resolve(),
     commonjs(),
     typescript2(),
-    execute('dts-bundle --configJson dts-bundle.json')
   ]
 };
