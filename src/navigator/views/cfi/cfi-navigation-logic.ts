@@ -1,0 +1,99 @@
+import * as EPUBcfi from '@evidentpoint/readium-cfi-js';
+import {
+  ElementBlacklistedChecker,
+  ElementVisibilityChecker,
+  IVisibleElementInfo,
+} from './element-checker';
+import { Rect } from './rect';
+
+export class CfiNavigationLogic {
+  private rootDocument: Document;
+
+  private elementChecker: ElementBlacklistedChecker;
+
+  public constructor(doc: Document, eleChecker: ElementBlacklistedChecker) {
+    this.rootDocument = doc;
+    this.elementChecker = eleChecker;
+  }
+
+  public getCfiFromElement(element: Element): string {
+    let cfi = EPUBcfi.Generator.generateElementCFIComponent(
+                element,
+                this.elementChecker.getClassBlacklist(),
+                this.elementChecker.getElementBlacklist(),
+                this.elementChecker.getIdBlacklist(),
+              );
+
+    if (cfi[0] === '!') {
+      cfi = cfi.substring(1);
+    }
+
+    return cfi;
+  }
+
+  public getFirstVisibleCfi(viewport: Rect): string | null {
+    const visChecker = new ElementVisibilityChecker(this.rootDocument,
+                                                    viewport,
+                                                    this.elementChecker);
+    const visibleEleInfo = visChecker.findFirstVisibleElement();
+
+    return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport);
+  }
+
+  private findVisibleLeafNodeCfi(visNode: IVisibleElementInfo, viewport: Rect): string | null {
+    const element = visNode.element;
+    const textNode = visNode.textNode;
+
+    // if a valid text node is found, try to generate a CFI with range offsets
+    if (textNode && this.isValidTextNode(textNode)) {
+      const visChecker = new ElementVisibilityChecker(this.rootDocument,
+                                                      viewport,
+                                                      this.elementChecker);
+      const visibleRange = visChecker.getVisibleTextRange(textNode, true);
+
+      return this.generateCfiFromRange(visibleRange);
+    }
+
+    if (element) {
+      return this.getCfiFromElement(element);
+    }
+
+    return null;
+  }
+
+  private isValidTextNode(node: Node): boolean {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return this.isValidTextNodeContent(node.nodeValue);
+    }
+
+    return false;
+  }
+
+  private isValidTextNodeContent(text: string | null): boolean {
+    if (text === null) {
+      return false;
+    }
+
+    return !!text.trim().length;
+  }
+
+  private generateCfiFromRange(range: Range): string {
+    if (range.collapsed && range.startContainer.nodeType === Node.TEXT_NODE) {
+      return EPUBcfi.Generator.generateCharacterOffsetCFIComponent(
+        range.startContainer, range.startOffset,
+        ['cfi-marker'], [], ['MathJax_Message', 'MathJax_SVG_Hidden']);
+    }
+
+    if (range.collapsed) {
+      return this.getCfiFromElement(<Element>(range.startContainer));
+    }
+
+    return EPUBcfi.Generator.generateRangeComponent(
+        range.startContainer, range.startOffset,
+        range.endContainer, range.endOffset,
+        this.elementChecker.getClassBlacklist(),
+        this.elementChecker.getElementBlacklist(),
+        this.elementChecker.getIdBlacklist());
+  }
+
+}

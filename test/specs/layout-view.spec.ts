@@ -1,15 +1,12 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { LayoutView, ReadingSystem, SettingName } from '../../src/navigator';
+import { LayoutView, SettingName } from '../../src/navigator';
 // tslint:disable-next-line:max-line-length
-import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
-import { ViewSettings } from '../../src/navigator/views/view-settings';
-import { Publication } from '../../src/streamer';
+import { HostEnv } from '../helpers/host-env';
 
 describe('LayoutView', () => {
-  let viewportDiv: HTMLElement;
   let layoutView: LayoutView;
-  let vs: ViewSettings;
+  let hostEnv: HostEnv;
 
   before(() => {
     const head = document.querySelector('head');
@@ -20,31 +17,14 @@ describe('LayoutView', () => {
   });
 
   beforeEach(async () => {
-    viewportDiv = document.createElement('div');
-    viewportDiv.setAttribute('id', 'viewport');
-
-    document.body.appendChild(viewportDiv);
-
-    const rs = new ReadingSystem();
-
-    const viewport = document.getElementById('viewport');
-    if (viewport) {
-      rs.initRenderer(viewport);
-    }
-
-    const publication = await Publication.fromURL(
-      '/fixtures/publications/metamorphosis/manifest.json',
-    );
-
-    vs = new ViewSettings();
-    layoutView = new LayoutView(publication, vs, new R1ContentViewFactory(publication));
-
+    hostEnv = new HostEnv();
+    await hostEnv.openPublicationR1('/fixtures/publications/metamorphosis/manifest.json');
+    layoutView = hostEnv.getLayoutView();
     layoutView.setPageSize(200, 400);
-    layoutView.attachToHost(viewportDiv);
   });
 
   afterEach(() => {
-    document.body.removeChild(viewportDiv);
+    hostEnv.clear();
   });
 
   describe('#LayoutView', () => {
@@ -86,7 +66,7 @@ describe('LayoutView', () => {
       assert.equal(layoutView.getLoadedStartPostion(), 0);
       assert.equal(layoutView.getLoadedEndPosition(), 17000);
 
-      vs.updateSetting([{ name: SettingName.FontSize, value: 60 }]);
+      hostEnv.getViewSettings().updateSetting([{ name: SettingName.FontSize, value: 60 }]);
       layoutView.updateViewSettings();
 
       assert.equal(layoutView.getLoadedStartPostion(), 0);

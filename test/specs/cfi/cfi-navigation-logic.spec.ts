@@ -1,8 +1,8 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import {
-  ElementVisibilityChecker,
-} from '../../../src/navigator/views/cfi/element-checker';
+  CfiNavigationLogic,
+} from '../../../src/navigator/views/cfi/cfi-navigation-logic';
 import { Rect } from '../../../src/navigator/views/cfi/rect';
 
 import { HostEnv } from '../../helpers/host-env';
@@ -39,15 +39,10 @@ describe('SpineItemView', () => {
       const left = pageWidth;
       const right = left + pageWidth;
       const viewportRect = new Rect(left, 0, right, 800);
-      const visChecker = new ElementVisibilityChecker(doc,
-                                                      viewportRect,
-                                                      hostEnv.getElementChecker());
-      const visEle = visChecker.findFirstVisibleElement();
-      // console.log(visEle.textNode);
-      assert.isNotNull(visEle.textNode);
+      const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
+      const firstVisCfi = navLogic.getFirstVisibleCfi(viewportRect);
 
-      const range = visChecker.getVisibleTextRange(<Node>visEle.textNode, true);
-      assert.equal(range.startOffset, 118);
+      assert.equal(firstVisCfi, '/4/2[chapter-i]/4/8/1:118');
     });
   });
 });
