@@ -366,13 +366,11 @@ export class Viewport {
 
       const start = this.viewOffset - this.prefetchSize;
       const end = this.viewOffset + this.viewportSize + this.prefetchSize;
-      if (end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) {
+      if ((end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) ||
+         (start <= this.bookView.getLoadedStartPostion() && this.bookView.hasMoreBeforeStart())) {
         await this.ensureConentLoadedAtRange(start, end);
         this.adjustScrollPosition();
-      } else if (start <= this.bookView.getLoadedStartPostion() &&
-                 this.bookView.hasMoreBeforeStart()) {
-        await this.ensureConentLoadedAtRange(start, end);
-        this.adjustScrollPosition();
+        this.render();
       }
     });
   }
@@ -420,7 +418,9 @@ export class Viewport {
       return;
     }
 
+    this.scrollFromInternal = true;
     const adjustment = this.bookView.adjustLoadedConentRangeToPositive();
+    this.scrollFromInternal = false;
     if (adjustment === 0) {
       return;
     }

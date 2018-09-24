@@ -63,9 +63,9 @@ export class R1SinglePageContentView extends R1ContentView {
       spItem,
       (success: boolean, $iframe: any, spineItem: any) => {
         if (success) {
+          this.onSpineItemOnePageViewLoaded();
           if (!token || !token.isCancelled) {
             this.contentViewImpl.emit(Readium.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
-            this.onSpineItemOnePageViewLoaded();
             this.$iframe = $iframe;
             this.rjsSpineItem = spineItem;
           }
