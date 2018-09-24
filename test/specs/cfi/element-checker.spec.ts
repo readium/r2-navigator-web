@@ -7,7 +7,7 @@ import { Rect } from '../../../src/navigator/views/cfi/rect';
 
 import { HostEnv } from '../../helpers/host-env';
 
-describe('SpineItemView', () => {
+describe('ElementChecker', () => {
   let hostEnv: HostEnv;
 
   before(() => {
@@ -27,7 +27,7 @@ describe('SpineItemView', () => {
     hostEnv.clear();
   });
 
-  describe('#ElementVisibilityChecker', () => {
+  describe('ElementVisibilityChecker', () => {
     it('findFirstVisibleElement()', async () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800);

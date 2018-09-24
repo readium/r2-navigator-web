@@ -29,7 +29,12 @@ export class ElementBlacklistedChecker {
     return this.elementBlacklist;
   }
 
-  public isElementBlacklisted(element: Element): boolean {
+  public isElementBlacklisted(node: Node | null): boolean {
+    if (!node || node.nodeType !== Node.ELEMENT_NODE) {
+      return false;
+    }
+
+    const element = <Element>node;
     const clsAttr = element.getAttribute('class');
     const classList = clsAttr ? clsAttr.split(' ') : [];
 
@@ -56,11 +61,14 @@ export class ElementBlacklistedChecker {
 export class ElementVisibilityChecker {
   private rootDoc: Document;
 
-  private viewport: Rect;
+  private viewport?: Rect;
 
-  private elementChecker: ElementBlacklistedChecker;
+  private elementChecker?: ElementBlacklistedChecker;
 
-  public constructor(doc: Document, viewport: Rect, eleChecker: ElementBlacklistedChecker) {
+  private isRtl: boolean = false;
+  private isVwm: boolean = false;
+
+  public constructor(doc: Document, viewport?: Rect, eleChecker?: ElementBlacklistedChecker) {
     this.rootDoc = doc;
     this.viewport = viewport;
     this.elementChecker = eleChecker;
@@ -77,7 +85,7 @@ export class ElementVisibilityChecker {
     const mask = NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT;
     const filter = (node: Node): number => {
       if (node.nodeType === Node.ELEMENT_NODE) {
-        if (this.elementChecker.isElementBlacklisted(<Element>(node))) {
+        if (this.elementChecker && this.elementChecker.isElementBlacklisted(<Element>(node))) {
           return NodeFilter.FILTER_REJECT;
         }
       }
@@ -165,6 +173,94 @@ export class ElementVisibilityChecker {
     return resultRange;
   }
 
+  public getElementStartOffset(ele: Node): number | null {
+    const rects = this.getNodeRectangles(ele);
+    if (rects.length === 0) {
+      return null;
+    }
+
+    return this.isVwm ? rects[0].top : rects[0].left;
+  }
+
+  public findNearestElement(ele: Node): [Node | null, boolean] {
+    let siblingTextNodesAndSelf;
+    if (!ele.parentNode) {
+      siblingTextNodesAndSelf = [ele];
+    } else {
+      siblingTextNodesAndSelf = Array.from(ele.parentNode.childNodes).filter((n) => {
+        return n === ele || this.isValidTextNode(n);
+      });
+    }
+
+    let collapseToStart = false;
+    const indexOfSelf = siblingTextNodesAndSelf.indexOf(ele);
+    let nearestNode = siblingTextNodesAndSelf[indexOfSelf - 1];
+    if (!nearestNode) {
+      nearestNode = siblingTextNodesAndSelf[indexOfSelf + 1];
+      collapseToStart = true;
+    }
+    if (!nearestNode && ele.nodeType === Node.ELEMENT_NODE) {
+      const prevLeaves = this.getLeafNodeElements((<Element>ele).previousElementSibling);
+      nearestNode = prevLeaves[prevLeaves.length - 1];
+      if (!nearestNode) {
+        collapseToStart = true;
+        nearestNode = this.getLeafNodeElements((<Element>ele).nextElementSibling)[0];
+      }
+    }
+
+    let chosenNode: Node | null = null;
+
+    // Prioritize text node use
+    if (this.isValidTextNode(nearestNode) || this.isElementNode(nearestNode)) {
+      chosenNode = nearestNode;
+    } else if (this.isElementNode(ele)) {
+      const element = <Element>ele;
+      if (element.previousElementSibling) {
+        chosenNode = element.previousElementSibling;
+      } else if (element.nextElementSibling) {
+        chosenNode = element.nextElementSibling;
+      }
+    }
+
+    if (chosenNode) {
+      chosenNode = ele.parentNode;
+    }
+
+    return [chosenNode, collapseToStart];
+  }
+
+  public getLeafNodeElements(root: Node | null): Node[] {
+    const leafNodeElements: Node[] = [];
+    if (!root) {
+      return leafNodeElements;
+    }
+
+    const nodeIterator = document.createNodeIterator(
+      root,
+      // tslint:disable-next-line:no-bitwise
+      NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+      { acceptNode: (): number => { return NodeFilter.FILTER_ACCEPT; } },
+      false,
+    );
+
+    let node = nodeIterator.nextNode();
+    while (node) {
+      const isLeafNode = node.nodeType === Node.ELEMENT_NODE &&
+                                           (<Element>(node)).childElementCount === 0 &&
+                                           !this.isValidTextNodeContent(node.textContent);
+      if (isLeafNode || this.isValidTextNode(node)) {
+        const element = (node.nodeType === Node.TEXT_NODE) ? node.parentNode : node;
+        if (!this.elementChecker ||
+            !this.elementChecker.isElementBlacklisted(element)) {
+          leafNodeElements.push(node);
+        }
+        node = nodeIterator.nextNode();
+      }
+    }
+
+    return leafNodeElements;
+  }
+
   private checkVisibility(ele: Node, calcPercent: boolean): number | null {
     const eleRects = this.getNodeRectangles(ele);
     if (eleRects.length === 0) {
@@ -208,6 +304,10 @@ export class ElementVisibilityChecker {
   }
 
   private calcVisibility(rects: Rect[], calcPercent: boolean): number {
+    if (!this.viewport) {
+      return 0;
+    }
+
     let visPercent = 0;
     for (const r of rects) {
       if (r.intersect(this.viewport)) {
@@ -265,5 +365,13 @@ export class ElementVisibilityChecker {
     }
 
     return !!text.trim().length;
+  }
+
+  private isElementNode(node: Node | null): boolean {
+    if (!node) {
+      return false;
+    }
+
+    return node.nodeType === Node.ELEMENT_NODE;
   }
 }
