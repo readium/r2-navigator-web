@@ -58,7 +58,9 @@ export class CfiNavigationLogic {
   }
 
   public isRangeCfi(partialCfi: string): boolean {
-    return EPUBcfi.Interpreter.isRangeCfi(this.wrapCfi(partialCfi));
+    const cfi = this.wrapCfi(partialCfi);
+
+    return EPUBcfi.Interpreter.isRangeCfi(cfi) || EPUBcfi.Interpreter.hasTextTerminus(cfi);
   }
 
   private findVisibleLeafNodeCfi(visNode: IVisibleElementInfo, viewport: Rect): string | null {
