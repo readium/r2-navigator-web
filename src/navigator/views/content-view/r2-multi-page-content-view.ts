@@ -1,9 +1,13 @@
 import { triggerLayout } from '../../../utils/dom-utils';
+import { Rect } from '../cfi/rect';
 import { SettingName } from '../types';
 import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
 export class R2MultiPageContentView extends R2ContentView {
+
+  private hostWidth: number;
+  private hostHeight: number;
 
   public render(): void {
     this.iframeContainer = document.createElement('div');
@@ -22,6 +26,14 @@ export class R2MultiPageContentView extends R2ContentView {
   public setViewSettings(viewSetting: ViewSettings): void {
     super.setViewSettings(viewSetting);
     this.paginate();
+  }
+
+  public getCfi(offsetMain: number, offset2nd: number): string {
+    const right = offsetMain + this.hostWidth;
+    const bottom = offset2nd + this.hostHeight;
+    const cfi = this.cfiNavLogic.getFirstVisibleCfi(new Rect(offsetMain, offset2nd, right, bottom));
+
+    return cfi ? cfi : '';
   }
 
   public onResize(): void {
@@ -53,11 +65,12 @@ export class R2MultiPageContentView extends R2ContentView {
       return;
     }
 
-    const [hostWidth, hostHeight] = hostSize;
+    this.hostWidth = hostSize[0];
+    this.hostHeight = hostSize[1];
 
-    this.iframe.style.height = `${hostHeight}px`;
+    this.iframe.style.height = `${this.hostHeight}px`;
 
-    this.ePubHtml.style.height = `${hostHeight}px`;
+    this.ePubHtml.style.height = `${this.hostHeight}px`;
 
     this.ePubHtml.style.margin = '0px';
     this.ePubHtml.style.padding = '0px';
@@ -68,7 +81,7 @@ export class R2MultiPageContentView extends R2ContentView {
 
     const gapValue = this.vs.getSetting<number>(SettingName.ColumnGap);
     const columnGap = gapValue === undefined ? 0 : gapValue;
-    const columnWidth = hostWidth - columnGap;
+    const columnWidth = this.hostWidth - columnGap;
     const edgeMargin = columnGap / 2;
 
     this.iframeContainer.style.left = `${edgeMargin}px`;
@@ -87,7 +100,7 @@ export class R2MultiPageContentView extends R2ContentView {
     const fullWidth = this.ePubHtml.scrollWidth;
     this.iframe.width = `${fullWidth}px`;
 
-    this.spineItemPgCount = Math.round((fullWidth + columnGap) / hostWidth);
+    this.spineItemPgCount = Math.round((fullWidth + columnGap) / this.hostWidth);
   }
 
   private getHostSize(): [number, number] | null {

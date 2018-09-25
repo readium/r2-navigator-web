@@ -1,5 +1,7 @@
 import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { IFrameLoader } from '../../iframe-loader';
+import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
+import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
 import { IContentView } from './content-view';
@@ -25,6 +27,9 @@ export class R2ContentView implements IContentView {
 
   protected useReadiumCss: boolean = true;
   protected vs: ViewSettings;
+
+  protected elementChecker: ElementBlacklistedChecker;
+  protected cfiNavLogic: CfiNavigationLogic;
 
   public constructor(loader: IFrameLoader) {
     this.iframeLoader = loader;
@@ -149,5 +154,8 @@ export class R2ContentView implements IContentView {
       callback(success);
     }
     this.iframeLoadedCallbacks = [];
+
+    const doc = <Document>this.iframe.contentDocument;
+    this.cfiNavLogic = new CfiNavigationLogic(doc, this.elementChecker);
   }
 }
