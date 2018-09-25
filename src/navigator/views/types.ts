@@ -24,3 +24,18 @@ export interface ISettingEntry {
   // tslint:disable-next-line:no-any
   value: any;
 }
+
+const SETTING_NAME_MAP: Map<string, SettingName> = new Map([
+  [SettingName.BackgroundColor, SettingName.BackgroundColor],
+  [SettingName.ColumnGap, SettingName.ColumnGap],
+  [SettingName.FontFamily, SettingName.FontFamily],
+  [SettingName.FontSize, SettingName.FontSize],
+  [SettingName.ReadingMode, SettingName.ReadingMode],
+  [SettingName.SpreadMode, SettingName.SpreadMode],
+  [SettingName.TextAlign, SettingName.TextAlign],
+  [SettingName.TextColor, SettingName.TextColor],
+]);
+
+export function stringToSettingName(val: string): SettingName | undefined {
+  return SETTING_NAME_MAP.get(val);
+}
