@@ -40,6 +40,24 @@ export class CfiNavigationLogic {
     return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport);
   }
 
+  public getPageIndexByCfi(cfi: string, pageDimension: number): number | null {
+    if (this.isRangeCfi(cfi)) {
+      const range = this.getNodeRangeInfoFromCfi(cfi);
+      if (range) {
+        return this.getPageIndexFromRange(range, pageDimension);
+      }
+
+      return null;
+    }
+
+    const ele = this.getElementByCfi(cfi);
+    if (ele) {
+      return this.getPageIndexFromElement(ele, pageDimension);
+    }
+
+    return null;
+  }
+
   public getElementByCfi(cfi: string): Node | null {
     return this.getElementByPartialCfi(cfi);
   }
@@ -55,6 +73,13 @@ export class CfiNavigationLogic {
     }
 
     return pageIndex;
+  }
+
+  public getPageIndexFromRange(range: Range, pageDimension: number): number | null {
+    const visCheck = new ElementVisibilityChecker(this.rootDocument);
+    const offset = visCheck.getRangeStartOffset(range);
+
+    return offset !== null ? Math.floor(offset / pageDimension) : null;
   }
 
   public isRangeCfi(partialCfi: string): boolean {
@@ -152,8 +177,76 @@ export class CfiNavigationLogic {
     return $element[0];
   }
 
+  private getNodeRangeInfoFromCfi(cfi: string): Range | null {
+    const wrappedCfi = this.wrapCfi(cfi);
+    // tslint:disable-next-line:no-any
+    let nodeResult: any;
+    if (EPUBcfi.Interpreter.isRangeCfi(wrappedCfi)) {
+      try {
+        //noinspection JSUnresolvedVariable
+        nodeResult = EPUBcfi.Interpreter.getRangeTargetElements(
+          wrappedCfi, this.rootDocument,
+          this.elementChecker.getClassBlacklist(),
+          this.elementChecker.getElementBlacklist(),
+          this.elementChecker.getIdBlacklist(),
+        );
+      } catch (ex) {
+        // EPUBcfi.Interpreter can throw a SyntaxError
+      }
+
+      if (!nodeResult) {
+        console.log(`Can't find nodes for range CFI: ${cfi}`);
+
+        return null;
+      }
+
+      return this.createRange(nodeResult.startElement, nodeResult.startOffset,
+                              nodeResult.endElement, nodeResult.endOffset);
+    }
+
+    if (EPUBcfi.Interpreter.hasTextTerminus(wrappedCfi)) {
+      // tslint:disable-next-line:no-any
+      let textTerminusResult: any;
+      try {
+        textTerminusResult = EPUBcfi.Interpreter.getTextTerminusInfo(
+          wrappedCfi, this.rootDocument,
+          this.elementChecker.getClassBlacklist(),
+          this.elementChecker.getElementBlacklist(),
+          this.elementChecker.getIdBlacklist());
+      } catch (ex) {
+        // EPUBcfi.Interpreter can throw a SyntaxError
+      }
+
+      if (!textTerminusResult) {
+        console.log(`Can't find node for text term CFI: ${cfi}`);
+
+        return null;
+      }
+
+      return this.createRange(textTerminusResult.textNode, textTerminusResult.textOffset,
+                              textTerminusResult.textNode, textTerminusResult.textOffset);
+
+    }
+
+    return null;
+  }
+
   private wrapCfi(partialCfi: string): string {
     return `epubcfi(/99!${partialCfi})`;
+  }
+
+  private createRange(startNode: Node, startOffset: number | undefined,
+                      endNode: Node, endOffset: number | undefined): Range {
+    const range = this.rootDocument.createRange();
+    range.setStart(startNode, startOffset ? startOffset : 0);
+
+    if (endNode.nodeType === Node.ELEMENT_NODE) {
+      range.setEnd(endNode, endOffset ? endOffset : endNode.childNodes.length);
+    } else if (endNode.nodeType === Node.TEXT_NODE) {
+      range.setEnd(endNode, endOffset ? endOffset : 0);
+    }
+
+    return range;
   }
 
 }

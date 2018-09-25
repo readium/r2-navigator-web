@@ -24,7 +24,7 @@ describe('CfiNavigationLogic', () => {
   });
 
   afterEach(() => {
-    // hostEnv.clear();
+    hostEnv.clear();
   });
 
   describe('CfiNavigationLogic', () => {
@@ -55,14 +55,26 @@ describe('CfiNavigationLogic', () => {
 
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
 
-      // console.log(navLogic.isRangeCfi('/4/2[chapter-i]/4/8/1:118'));
-
       const ele = navLogic.getElementByCfi('/4/2[chapter-i]/4/8/1:118');
       assert.isNotNull(ele);
 
       const text = (<Node>ele).textContent;
       assert.isNotNull(text);
       assert.isTrue((<string>text).startsWith('“Oh, God”, he thought'));
+    });
+
+    it('getPageIndexByCfi()', async () => {
+      const pageWidth = 400;
+      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
+      await hostEnv.loadSpineItem(siv4, 4);
+
+      const iframe = hostEnv.getIframe();
+      const doc = <Document>(iframe.contentDocument);
+
+      const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
+
+      const pageIndex = navLogic.getPageIndexByCfi('/4/2[chapter-i]/4/8/1:118', pageWidth);
+      assert.equal(pageIndex, 1);
     });
   });
 });

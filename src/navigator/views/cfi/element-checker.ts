@@ -182,6 +182,15 @@ export class ElementVisibilityChecker {
     return this.isVwm ? rects[0].top : rects[0].left;
   }
 
+  public getRangeStartOffset(range: Range): number | null {
+    const rects = this.getRangeRectangles(range);
+    if (rects.length === 0) {
+      return null;
+    }
+
+    return this.isVwm ? rects[0].top : rects[0].left;
+  }
+
   public findNearestElement(ele: Node): [Node | null, boolean] {
     let siblingTextNodesAndSelf;
     if (!ele.parentNode) {
