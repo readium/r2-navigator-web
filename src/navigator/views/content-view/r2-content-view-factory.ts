@@ -21,7 +21,10 @@ export class R2ContentViewFactory implements IContentViewFactory {
 
   public createContentView(isFixedLayout: boolean, isVertical: boolean): IContentView {
     if (isFixedLayout || isVertical) {
-      return new R2SinglePageContentView(this.iframeLoader, this.eleChecker);
+      const cv = new R2SinglePageContentView(this.iframeLoader, this.eleChecker);
+      cv.setLayout(isVertical, isFixedLayout);
+
+      return cv;
     }
 
     return new R2MultiPageContentView(this.iframeLoader, this.eleChecker);

@@ -159,4 +159,15 @@ export class R2ContentView implements IContentView {
     const doc = <Document>this.iframe.contentDocument;
     this.cfiNavLogic = new CfiNavigationLogic(doc, this.elementChecker);
   }
+
+  protected getHostSize(): [number, number] | null {
+    if (!this.host.style.width || !this.host.style.height) {
+      return null;
+    }
+
+    const width = parseFloat(this.host.style.width);
+    const height = parseFloat(this.host.style.height);
+
+    return [width, height];
+  }
 }

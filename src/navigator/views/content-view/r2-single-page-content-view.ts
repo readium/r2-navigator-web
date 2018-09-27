@@ -1,6 +1,4 @@
-import { PublicationLink } from '@evidentpoint/r2-shared-js';
-import { CancellationToken } from '../types';
-import { ViewSettings } from '../view-settings';
+import { Rect } from '../cfi/rect';
 import { R2ContentView } from './r2-content-view';
 
 import * as DomUtils from '../../../utils/dom-utils';
@@ -14,6 +12,15 @@ export class R2SinglePageContentView extends R2ContentView  {
   private ePubRoot: SVGElement | HTMLElement | null = null;
 
   private metaSize: Size = [0, 0];
+  private metaScale: number = 1;
+
+  private isVertical: boolean = false;
+  private isFixedLayout: boolean = true;
+
+  public setLayout(isVert: boolean, isFxl: boolean): void {
+    this.isVertical = isVert;
+    this.isFixedLayout = isFxl;
+  }
 
   public element(): HTMLElement {
     return this.iframeContainer;
@@ -43,39 +50,42 @@ export class R2SinglePageContentView extends R2ContentView  {
 
     this.setupIframe();
 
-    this.useReadiumCss = false;
-  }
-
-  public async loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
-                             viewSettings: ViewSettings,
-                             token?: CancellationToken): Promise<void> {
-    this.spineItem = spineItem;
-    this.spineItemIndex = spineItemIndex;
-
-    this.render();
-
-    this.hideIframe();
-
-    const onIframeContentLoaded = (success: boolean) => {
-      this.onIframeLoaded(success);
-    };
-
-    this.iframeLoader.loadIframe(this.iframe, spineItem.Href, onIframeContentLoaded,
-                                 {}, spineItem.TypeLink);
-
-    return this.iframeLoadedPromise();
+    this.useReadiumCss = !this.isFixedLayout;
   }
 
   public getPageIndexOffsetFromCfi(cfi: string): number {
-    throw new Error('Method not implemented.');
+    return 0;
   }
 
   public getPageIndexOffsetFromElementId(elementId: string): number {
-    throw new Error('Method not implemented.');
+    return 0;
   }
 
   public getCfi(offsetMain: number, offset2nd: number): string {
-    throw new Error('Method not implemented.');
+    let right: number;
+    let bottom: number;
+    if (this.isVertical) {
+      right = offset2nd;
+      bottom = offsetMain;
+    } else {
+      right = offsetMain;
+      bottom = offset2nd;
+    }
+
+    if (this.isFixedLayout) {
+      right += this.metaWidth() * this.metaScale;
+      bottom += this.metaHeight() * this.metaScale;
+    } else {
+      const size = this.getHostSize();
+      if (size) {
+        right += size[0];
+        bottom += size[1];
+      }
+    }
+
+    const cfi = this.cfiNavLogic.getFirstVisibleCfi(new Rect(offsetMain, offset2nd, right, bottom));
+
+    return cfi ? cfi : '';
   }
 
   public scale(scale: number): void {
@@ -239,6 +249,7 @@ export class R2SinglePageContentView extends R2ContentView  {
   }
 
   private transform(scale: number, left: number, top: number): void {
+    this.metaScale = scale;
     const elWidth = Math.ceil(this.metaSize[0] * scale);
     const elHeight = Math.floor(this.metaSize[1] * scale);
 

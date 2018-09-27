@@ -114,15 +114,4 @@ export class R2MultiPageContentView extends R2ContentView {
 
     this.spineItemPgCount = Math.round((fullWidth + columnGap) / this.hostWidth);
   }
-
-  private getHostSize(): [number, number] | null {
-    if (!this.host.style.width || !this.host.style.height) {
-      return null;
-    }
-
-    const width = parseFloat(this.host.style.width);
-    const height = parseFloat(this.host.style.height);
-
-    return [width, height];
-  }
 }
