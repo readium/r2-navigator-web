@@ -4,21 +4,24 @@
 import { assert } from 'chai';
 import { Location, Navigator, SpreadMode } from '../../src/navigator';
 
+import { HostEnv } from '../helpers/host-env';
 import { openRendition } from '../helpers/reader-helper';
 
 describe('Navigator', () => {
-  let viewportDiv: HTMLElement;
+  let hostEnv: HostEnv;
   let navigator: Navigator;
 
   let bookInitLocation: Location | undefined | null;
 
-  const initBook = async (url: string): Promise<void> => {
-    viewportDiv = document.createElement('div');
-    viewportDiv.setAttribute('id', 'viewport');
+  const initBook = async (url: string, isR1: boolean): Promise<void> => {
+    hostEnv = new HostEnv();
+    if (isR1) {
+      await hostEnv.openPublicationR1(url);
+    } else {
+      await hostEnv.openPublicationR2(url);
+    }
 
-    document.body.appendChild(viewportDiv);
-
-    const rendition = await openRendition(url);
+    const rendition = hostEnv.getRendition();
     rendition.viewport.setViewportSize(600, 800);
     rendition.setPageLayout({
       spreadMode: SpreadMode.Freeform,
@@ -44,12 +47,12 @@ describe('Navigator', () => {
   });
 
   afterEach(() => {
-    document.body.removeChild(viewportDiv);
+    hostEnv.clear();
   });
 
   describe('#rendition', () => {
     it('render()', async () => {
-      await initBook('/fixtures/publications/metamorphosis/manifest.json');
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', true);
 
       const loc = await navigator.getCurrentLocation();
 
@@ -61,7 +64,7 @@ describe('Navigator', () => {
 
   describe('#navigator', () => {
     beforeEach(async () => {
-      await initBook('/fixtures/publications/metamorphosis/manifest.json');
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', true);
     });
 
     it('nextScreen()', async () => {
@@ -123,7 +126,7 @@ describe('Navigator', () => {
 
   describe('#navigator-fixed-layout', () => {
     beforeEach(async () => {
-      await initBook('/fixtures/publications/igp-twss-fxl/manifest.json');
+      await initBook('/fixtures/publications/igp-twss-fxl/manifest.json', true);
     });
 
     it('nextScreen()', async () => {

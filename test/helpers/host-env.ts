@@ -1,4 +1,4 @@
-import { LayoutView } from '../../src/navigator';
+import { LayoutView, Rendition, SettingName } from '../../src/navigator';
 import { IFrameLoader } from '../../src/navigator/iframe-loader';
 import {
   ElementBlacklistedChecker,
@@ -23,6 +23,8 @@ export class HostEnv {
   private eleChecker: ElementBlacklistedChecker;
 
   private layoutView?: LayoutView;
+
+  private rendition?: Rendition;
 
   public constructor() {
     this.initViewport();
@@ -92,12 +94,24 @@ export class HostEnv {
     return this.layoutView;
   }
 
+  public getRendition(): Rendition {
+    if (!this.rendition) {
+      this.rendition = new Rendition(this.publication, this.viewportDiv, this.cvFactory);
+    }
+
+    return this.rendition;
+  }
+
   public getIframe(): HTMLIFrameElement {
     return <HTMLIFrameElement>(this.viewportDiv.querySelector('iframe'));
   }
 
   public clear(): void {
     document.body.removeChild(this.viewportDiv);
+  }
+
+  public setColumnGap(gap: number): void {
+    this.viewSettings.updateSetting([{ name: SettingName.ColumnGap, value: gap }]);
   }
 
   private initViewport(): void {
