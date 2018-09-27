@@ -28,6 +28,18 @@ export class R2MultiPageContentView extends R2ContentView {
     this.paginate();
   }
 
+  public getPageIndexOffsetFromCfi(cfi: string): number {
+    const pageIndex = this.cfiNavLogic.getPageIndexByCfi(cfi, this.hostWidth);
+
+    return pageIndex !== null ? pageIndex : -1;
+  }
+
+  public getPageIndexOffsetFromElementId(elementId: string): number {
+    const pageIndex = this.cfiNavLogic.getPageIndexFromElementId(elementId, this.hostWidth);
+
+    return pageIndex !== null ? pageIndex : -1;
+  }
+
   public getCfi(offsetMain: number, offset2nd: number): string {
     const right = offsetMain + this.hostWidth;
     const bottom = offset2nd + this.hostHeight;

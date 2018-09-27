@@ -62,6 +62,15 @@ export class CfiNavigationLogic {
     return this.getElementByPartialCfi(cfi);
   }
 
+  public getPageIndexFromElementId(eleId: string, pageDimension: number): number | null {
+    const element = this.getElementById(eleId);
+    if (!element) {
+      return null;
+    }
+
+    return this.getPageIndexFromElement(element, pageDimension);
+  }
+
   public getPageIndexFromElement(ele: Node, pageDimension: number): number | null {
     let pageIndex = this.findPageIndexByRectangles(ele, pageDimension);
     if (pageIndex === null) {
@@ -86,6 +95,10 @@ export class CfiNavigationLogic {
     const cfi = this.wrapCfi(partialCfi);
 
     return EPUBcfi.Interpreter.isRangeCfi(cfi) || EPUBcfi.Interpreter.hasTextTerminus(cfi);
+  }
+
+  public getElementById(eleId: string): HTMLElement | null {
+    return this.rootDocument.getElementById(eleId);
   }
 
   private findVisibleLeafNodeCfi(visNode: IVisibleElementInfo, viewport: Rect): string | null {

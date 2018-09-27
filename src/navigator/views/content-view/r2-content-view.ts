@@ -31,8 +31,9 @@ export class R2ContentView implements IContentView {
   protected elementChecker: ElementBlacklistedChecker;
   protected cfiNavLogic: CfiNavigationLogic;
 
-  public constructor(loader: IFrameLoader) {
+  public constructor(loader: IFrameLoader, eleChecker: ElementBlacklistedChecker) {
     this.iframeLoader = loader;
+    this.elementChecker = eleChecker;
   }
 
   public render(): void {

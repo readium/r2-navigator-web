@@ -299,6 +299,9 @@ export class LayoutView extends View {
     }
 
     const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
+    if (pageIndexOffset < 0) {
+      return undefined;
+    }
 
     return siv.offset + pageIndexOffset * this.pageWidth;
   }
@@ -312,6 +315,9 @@ export class LayoutView extends View {
     }
 
     const pageIndexOffset = siv.view.getPageIndexOffsetFromElementId(elementId);
+    if (pageIndexOffset < 0) {
+      return undefined;
+    }
 
     return siv.offset + pageIndexOffset * this.pageWidth;
   }

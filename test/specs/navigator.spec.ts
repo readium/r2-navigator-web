@@ -62,7 +62,7 @@ describe('Navigator', () => {
     });
   });
 
-  describe('#navigator', () => {
+  describe('navigator-r1', () => {
     beforeEach(async () => {
       await initBook('/fixtures/publications/metamorphosis/manifest.json', true);
     });
@@ -155,6 +155,23 @@ describe('Navigator', () => {
 
       const loc = await navigator.getCurrentLocation();
       console.log(loc);
+    });
+  });
+
+  describe('navigator-r2', () => {
+    beforeEach(async () => {
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', false);
+    });
+
+    it('gotoLocation()', async () => {
+      const newLoc = new Location('/4/2[copyright-page]/2/2/1:32', 'OEBPS/copyright.html');
+      await navigator.gotoLocation(newLoc);
+
+      const loc = await navigator.getCurrentLocation();
+
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
+      assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
   });
 });
