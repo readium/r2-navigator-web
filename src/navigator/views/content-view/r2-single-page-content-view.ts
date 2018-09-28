@@ -118,6 +118,10 @@ export class R2SinglePageContentView extends R2ContentView  {
     this.setHeight(contHeight);
 
     super.onIframeLoaded(success);
+
+    if (!this.isFixedLayout) {
+      this.showIFrame();
+    }
   }
 
   private contentDocHeight(): number {
