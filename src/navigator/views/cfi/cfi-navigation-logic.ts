@@ -40,11 +40,11 @@ export class CfiNavigationLogic {
     return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport);
   }
 
-  public getPageIndexByCfi(cfi: string, pageDimension: number): number | null {
+  public getOffsetByCfi(cfi: string): [number, number] | null {
     if (this.isRangeCfi(cfi)) {
       const range = this.getNodeRangeInfoFromCfi(cfi);
       if (range) {
-        return this.getPageIndexFromRange(range, pageDimension);
+        return this.getOffsetFromRange(range);
       }
 
       return null;
@@ -52,7 +52,7 @@ export class CfiNavigationLogic {
 
     const ele = this.getElementByCfi(cfi);
     if (ele) {
-      return this.getPageIndexFromElement(ele, pageDimension);
+      return this.getOffsetFromElement(ele);
     }
 
     return null;
@@ -62,33 +62,32 @@ export class CfiNavigationLogic {
     return this.getElementByPartialCfi(cfi);
   }
 
-  public getPageIndexFromElementId(eleId: string, pageDimension: number): number | null {
+  public getOffsetFromElement(ele: Node): [number, number] | null {
+    let offset = this.getOffsetByRectangles(ele);
+    if (offset === null) {
+      const visChecker = new ElementVisibilityChecker(this.rootDocument);
+      const [nearEle, _] = visChecker.findNearestElement(ele);
+      if (nearEle) {
+        offset = this.getOffsetByRectangles(nearEle);
+      }
+    }
+
+    return offset;
+  }
+
+  public getOffsetFromElementId(eleId: string): [number, number] | null {
     const element = this.getElementById(eleId);
     if (!element) {
       return null;
     }
 
-    return this.getPageIndexFromElement(element, pageDimension);
+    return this.getOffsetFromElement(element);
   }
 
-  public getPageIndexFromElement(ele: Node, pageDimension: number): number | null {
-    let pageIndex = this.findPageIndexByRectangles(ele, pageDimension);
-    if (pageIndex === null) {
-      const visChecker = new ElementVisibilityChecker(this.rootDocument);
-      const [nearEle, _] = visChecker.findNearestElement(ele);
-      if (nearEle) {
-        pageIndex = this.findPageIndexByRectangles(nearEle, pageDimension);
-      }
-    }
-
-    return pageIndex;
-  }
-
-  public getPageIndexFromRange(range: Range, pageDimension: number): number | null {
+  public getOffsetFromRange(range: Range): [number, number] | null {
     const visCheck = new ElementVisibilityChecker(this.rootDocument);
-    const offset = visCheck.getRangeStartOffset(range);
 
-    return offset !== null ? Math.floor(offset / pageDimension) : null;
+    return visCheck.getRangeStartOffset(range);
   }
 
   public isRangeCfi(partialCfi: string): boolean {
@@ -157,14 +156,10 @@ export class CfiNavigationLogic {
         this.elementChecker.getIdBlacklist());
   }
 
-  private findPageIndexByRectangles(ele: Node, pageDimension: number): number | null {
+  private getOffsetByRectangles(ele: Node): [number, number] | null {
     const visChecker = new ElementVisibilityChecker(this.rootDocument);
-    const offset = visChecker.getElementStartOffset(ele);
-    if (offset === null) {
-      return null;
-    }
 
-    return Math.floor(offset / pageDimension);
+    return visChecker.getElementStartOffset(ele);
   }
 
   private getElementByPartialCfi(cfi: string): Node | null {

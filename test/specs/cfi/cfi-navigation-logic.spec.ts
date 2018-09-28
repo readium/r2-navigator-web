@@ -63,7 +63,7 @@ describe('CfiNavigationLogic', () => {
       assert.isTrue((<string>text).startsWith('“Oh, God”, he thought'));
     });
 
-    it('getPageIndexByCfi()', async () => {
+    it('getOffsetByCfi()', async () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
@@ -73,8 +73,11 @@ describe('CfiNavigationLogic', () => {
 
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
 
-      const pageIndex = navLogic.getPageIndexByCfi('/4/2[chapter-i]/4/8/1:118', pageWidth);
-      assert.equal(pageIndex, 1);
+      const offset = navLogic.getOffsetByCfi('/4/2[chapter-i]/4/8/1:118');
+      assert.isNotNull(offset);
+
+      const xOffset = (<[number, number]>offset)[0];
+      assert.equal(xOffset, 400);
     });
   });
 });

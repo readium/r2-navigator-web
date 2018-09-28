@@ -56,12 +56,28 @@ export class SpineItemView extends View {
     return this.contentView;
   }
 
+  public getOffsetFromCfi(cfi: string): number {
+    if (cfi === '') {
+      return 0;
+    }
+
+    return this.contentView.getOffsetFromCfi(cfi);
+  }
+
   public getPageIndexOffsetFromCfi(cfi: string): number {
     if (cfi === '') {
       return 0;
     }
 
     return this.contentView.getPageIndexOffsetFromCfi(cfi);
+  }
+
+  public getOffsetFromElementId(elementId: string): number {
+    if (elementId === '') {
+      return 0;
+    }
+
+    return this.contentView.getOffsetFromElementId(elementId);
   }
 
   public getPageIndexOffsetFromElementId(elementId: string): number {

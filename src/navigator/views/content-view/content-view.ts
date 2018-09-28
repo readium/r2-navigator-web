@@ -25,6 +25,9 @@ export interface IContentView {
 
   spineItemPageCount(): number;
 
+  getOffsetFromCfi(cfi: string): number;
+  getOffsetFromElementId(cfi: string): number;
+
   getPageIndexOffsetFromCfi(cfi: string): number;
   getPageIndexOffsetFromElementId(elementId: string): number;
   getCfi(offsetMain: number, offset2nd: number): string;

@@ -108,6 +108,14 @@ export class R2ContentView implements IContentView {
     return this.spineItemPgCount;
   }
 
+  public getOffsetFromCfi(cfi: string): number {
+    throw new Error('Method not implemented.');
+  }
+
+  public getOffsetFromElementId(cfi: string): number {
+    throw new Error('Method not implemented.');
+  }
+
   public getPageIndexOffsetFromCfi(cfi: string): number {
     throw new Error('Method not implemented.');
   }

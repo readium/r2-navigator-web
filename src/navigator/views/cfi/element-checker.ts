@@ -66,7 +66,6 @@ export class ElementVisibilityChecker {
   private elementChecker?: ElementBlacklistedChecker;
 
   private isRtl: boolean = false;
-  private isVwm: boolean = false;
 
   public constructor(doc: Document, viewport?: Rect, eleChecker?: ElementBlacklistedChecker) {
     this.rootDoc = doc;
@@ -173,22 +172,22 @@ export class ElementVisibilityChecker {
     return resultRange;
   }
 
-  public getElementStartOffset(ele: Node): number | null {
+  public getElementStartOffset(ele: Node): [number, number] | null {
     const rects = this.getNodeRectangles(ele);
     if (rects.length === 0) {
       return null;
     }
 
-    return this.isVwm ? rects[0].top : rects[0].left;
+    return [rects[0].left, rects[0].top];
   }
 
-  public getRangeStartOffset(range: Range): number | null {
+  public getRangeStartOffset(range: Range): [number, number] | null {
     const rects = this.getRangeRectangles(range);
     if (rects.length === 0) {
       return null;
     }
 
-    return this.isVwm ? rects[0].top : rects[0].left;
+    return [rects[0].left, rects[0].top];
   }
 
   public findNearestElement(ele: Node): [Node | null, boolean] {

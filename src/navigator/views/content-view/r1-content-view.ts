@@ -76,6 +76,18 @@ export class R1ContentView implements IContentView {
     return this.spineItemPgCount;
   }
 
+  public getOffsetFromCfi(cfi: string): number {
+    console.warn('R1 view does not support getOffsetFromCfi()');
+
+    return 0;
+  }
+
+  public getOffsetFromElementId(cfi: string): number {
+    console.warn('R1 view does not support getOffsetFromElementId()');
+
+    return 0;
+  }
+
   public getPageIndexOffsetFromCfi(cfi: string): number {
     return this.contentViewImpl.getPageIndexOffsetFromCfi(cfi);
   }
