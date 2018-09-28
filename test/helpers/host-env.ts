@@ -63,10 +63,11 @@ export class HostEnv {
     this.eleChecker = new ElementBlacklistedChecker([], [], []);
   }
 
-  public createSpineItemView(pageWidth: number, pageHeight: number): SpineItemView {
+  public createSpineItemView(pageWidth: number, pageHeight: number,
+                             isVertical: boolean, isFixedLayout: boolean): SpineItemView {
     const spineItemView = new SpineItemView(this.publication.Spine,
-                                            false,
-                                            false,
+                                            isVertical,
+                                            isFixedLayout,
                                             this.cvFactory);
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', 'spine-item-view');

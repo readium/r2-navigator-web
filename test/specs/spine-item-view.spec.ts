@@ -1,5 +1,6 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
+import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { HostEnv } from '../helpers/host-env';
 
 describe('SpineItemView', () => {
@@ -28,13 +29,13 @@ describe('SpineItemView', () => {
 
     it('loadSpineItem()', async () => {
       const pageWidth = 400;
-      const siv = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv, 0);
       const pageSize = siv.getTotalSize(pageWidth);
 
       assert.equal(pageSize, 400);
 
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
       const page4Size = siv4.getTotalSize(pageWidth);
 
@@ -44,7 +45,7 @@ describe('SpineItemView', () => {
 
     it('getCfi()', async () => {
       const pageWidth = 400;
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
 
       const cfi1 = siv4.getCfi(0, 0);
@@ -57,38 +58,63 @@ describe('SpineItemView', () => {
   });
 
   describe('SpineItemView-R2', () => {
+    const pageWidth = 400;
+    let siv4: SpineItemView;
+
     beforeEach(async () => {
       await hostEnv.openPublicationR2('/fixtures/publications/metamorphosis/manifest.json');
       hostEnv.setColumnGap(20);
+      siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
+      await hostEnv.loadSpineItem(siv4, 4);
     });
 
     it('loadSpineItem()', async () => {
-      const pageWidth = 400;
-      const siv = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv, 0);
       const pageSize = siv.getTotalSize(pageWidth);
-
       assert.equal(pageSize, 400);
 
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
-      await hostEnv.loadSpineItem(siv4, 4);
       const page4Size = siv4.getTotalSize(pageWidth);
-
       assert.equal(page4Size, 7600);
-
     });
 
     it('getCfi()', async () => {
-      const pageWidth = 400;
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
-      await hostEnv.loadSpineItem(siv4, 4);
-
       const cfi1 = siv4.getCfi(0, 0);
       console.log(cfi1);
 
       const cfi2 = siv4.getCfi(600, 0);
       console.log(`R2 ${cfi2}`);
 
+    });
+  });
+
+  describe('SpineItemView-R2-Vertical', () => {
+    const pageWidth = 400;
+    let siv4: SpineItemView;
+
+    beforeEach(async () => {
+      await hostEnv.openPublicationR2('/fixtures/publications/metamorphosis/manifest.json');
+      hostEnv.setColumnGap(20);
+      siv4 = hostEnv.createSpineItemView(pageWidth, 800, true, false);
+      await hostEnv.loadSpineItem(siv4, 4);
+    });
+
+    it('loadSpineItem()', async () => {
+      const siv = hostEnv.createSpineItemView(pageWidth, 800, true, false);
+      await hostEnv.loadSpineItem(siv, 0);
+      const pageSize = siv.getTotalSize(pageWidth);
+      assert.equal(pageSize, 340);
+
+      const page4Size = siv4.getTotalSize(pageWidth);
+      assert.equal(page4Size, 15504);
+    });
+
+    it('getCfi()', async () => {
+      const cfi1 = siv4.getCfi(0, 0);
+      console.log(cfi1);
+
+      const cfi2 = siv4.getCfi(600, 0);
+      console.log(`R2 ${cfi2}`);
     });
   });
 });

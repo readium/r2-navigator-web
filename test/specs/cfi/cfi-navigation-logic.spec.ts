@@ -30,7 +30,7 @@ describe('CfiNavigationLogic', () => {
   describe('CfiNavigationLogic', () => {
     it('getFirstVisibleCfi()', async () => {
       const pageWidth = 400;
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
 
       const iframe = hostEnv.getIframe();
@@ -47,7 +47,7 @@ describe('CfiNavigationLogic', () => {
 
     it('getElementByCfi()', async () => {
       const pageWidth = 400;
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
 
       const iframe = hostEnv.getIframe();
@@ -65,7 +65,7 @@ describe('CfiNavigationLogic', () => {
 
     it('getPageIndexByCfi()', async () => {
       const pageWidth = 400;
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800);
+      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
 
       const iframe = hostEnv.getIframe();
