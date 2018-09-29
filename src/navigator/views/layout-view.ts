@@ -456,7 +456,7 @@ export class LayoutView extends View {
     let newEnd: number = this.loadedContentRange[0];
     let hasAnyRemoved: boolean = false;
     for (const vs of this.spineItemViewStatus) {
-      const viewEnd = vs.offset + vs.view.getTotalSize(this.pageWidth);
+      const viewEnd = vs.offset + vs.viewSize;
       if (viewEnd < start || vs.offset > end) {
         vs.view.unloadSpineItem();
         if (this.layoutRoot.contains(vs.viewContainer)) {

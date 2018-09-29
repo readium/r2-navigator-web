@@ -385,6 +385,9 @@ export class Viewport {
     if (this.scrollRequestToken === t) {
       this.scrollRequestToken = undefined;
     }
+    if (!t.isCancelled) {
+      await this.bookView.removeOutOfRangeSpineItems(start, end);
+    }
   }
 
   private async updatePrefetch(token?: CancellationToken): Promise<void> {
