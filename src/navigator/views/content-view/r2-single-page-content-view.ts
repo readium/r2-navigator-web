@@ -53,6 +53,24 @@ export class R2SinglePageContentView extends R2ContentView  {
     this.useReadiumCss = !this.isFixedLayout;
   }
 
+  public getOffsetFromCfi(cfi: string): number {
+    const offset = this.cfiNavLogic.getOffsetByCfi(cfi);
+    if (offset === null) {
+      return -1;
+    }
+
+    return this.isVertical ? offset[1] : offset[0];
+  }
+
+  public getOffsetFromElementId(cfi: string): number {
+    const offset = this.cfiNavLogic.getOffsetFromElementId(cfi);
+    if (offset === null) {
+      return -1;
+    }
+
+    return this.isVertical ? offset[1] : offset[0];
+  }
+
   public getPageIndexOffsetFromCfi(cfi: string): number {
     return 0;
   }

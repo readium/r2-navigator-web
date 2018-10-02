@@ -13,7 +13,7 @@ describe('Navigator', () => {
 
   let bookInitLocation: Location | undefined | null;
 
-  const initBook = async (url: string, isR1: boolean): Promise<void> => {
+  const initBook = async (url: string, isR1: boolean, isVert: boolean): Promise<void> => {
     hostEnv = new HostEnv();
     if (isR1) {
       await hostEnv.openPublicationR1(url);
@@ -22,12 +22,18 @@ describe('Navigator', () => {
     }
 
     const rendition = hostEnv.getRendition();
-    rendition.viewport.setViewportSize(600, 800);
+    if (isVert) {
+      rendition.viewport.setViewportSize(800, 600);
+    } else {
+      rendition.viewport.setViewportSize(600, 800);
+    }
+
     rendition.setPageLayout({
       spreadMode: SpreadMode.Freeform,
       pageWidth: 400,
       pageHeight: 800,
     });
+    rendition.setViewAsVertical(isVert);
     rendition.viewport.enableScroll(false);
 
     await rendition.render();
@@ -47,12 +53,12 @@ describe('Navigator', () => {
   });
 
   afterEach(() => {
-    hostEnv.clear();
+    // hostEnv.clear();
   });
 
-  describe('#rendition', () => {
+  describe('rendition', () => {
     it('render()', async () => {
-      await initBook('/fixtures/publications/metamorphosis/manifest.json', true);
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', true, false);
 
       const loc = await navigator.getCurrentLocation();
 
@@ -64,7 +70,7 @@ describe('Navigator', () => {
 
   describe('navigator-r1', () => {
     beforeEach(async () => {
-      await initBook('/fixtures/publications/metamorphosis/manifest.json', true);
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', true, false);
     });
 
     it('nextScreen()', async () => {
@@ -126,7 +132,7 @@ describe('Navigator', () => {
 
   describe('#navigator-fixed-layout', () => {
     beforeEach(async () => {
-      await initBook('/fixtures/publications/igp-twss-fxl/manifest.json', true);
+      await initBook('/fixtures/publications/igp-twss-fxl/manifest.json', true, false);
     });
 
     it('nextScreen()', async () => {
@@ -160,7 +166,7 @@ describe('Navigator', () => {
 
   describe('navigator-r2', () => {
     beforeEach(async () => {
-      await initBook('/fixtures/publications/metamorphosis/manifest.json', false);
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', false, false);
     });
 
     it('gotoLocation()', async () => {
@@ -172,6 +178,23 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
+    });
+  });
+
+  describe('navigator-r2-vertical', () => {
+    beforeEach(async () => {
+      await initBook('/fixtures/publications/metamorphosis/manifest.json', false, true);
+    });
+
+    it('gotoLocation()', async () => {
+      const newLoc = new Location('/4/2[chapter-i]/4/2/1:276', 'OEBPS/chapter-001-chapter-i.html');
+      await navigator.gotoLocation(newLoc);
+
+      const loc = await navigator.getCurrentLocation();
+
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2[chapter-i]/4/2/1:219');
+      assert.equal(loc!.getHref(), 'OEBPS/chapter-001-chapter-i.html');
     });
   });
 });

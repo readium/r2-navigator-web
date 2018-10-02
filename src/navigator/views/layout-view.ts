@@ -298,12 +298,19 @@ export class LayoutView extends View {
       return undefined;
     }
 
-    const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
-    if (pageIndexOffset < 0) {
+    let inSpineItemOffset: number = 0;
+    if (this.isVertical) {
+      inSpineItemOffset = siv.view.getOffsetFromCfi(loc.getLocation());
+    } else {
+      const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
+      inSpineItemOffset = pageIndexOffset < 0 ? -1 : pageIndexOffset * this.pageWidth;
+    }
+
+    if (inSpineItemOffset < 0) {
       return undefined;
     }
 
-    return siv.offset + pageIndexOffset * this.pageWidth;
+    return siv.offset + inSpineItemOffset;
   }
 
   public async getOffsetFromAnchor(href: string,
@@ -314,12 +321,19 @@ export class LayoutView extends View {
       return undefined;
     }
 
-    const pageIndexOffset = siv.view.getPageIndexOffsetFromElementId(elementId);
-    if (pageIndexOffset < 0) {
+    let inSpineItemOffset: number = 0;
+    if (this.isVertical) {
+      inSpineItemOffset = siv.view.getOffsetFromElementId(elementId);
+    } else {
+      const pageIndexOffset = siv.view.getPageIndexOffsetFromElementId(elementId);
+      inSpineItemOffset = pageIndexOffset < 0 ? -1 : pageIndexOffset * this.pageWidth;
+    }
+
+    if (inSpineItemOffset < 0) {
       return undefined;
     }
 
-    return siv.offset + pageIndexOffset * this.pageWidth;
+    return siv.offset + inSpineItemOffset;
   }
 
   public async ensureLoaded(token?: CancellationToken): Promise<void> {

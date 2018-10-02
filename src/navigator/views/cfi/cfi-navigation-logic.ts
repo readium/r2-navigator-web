@@ -231,8 +231,14 @@ export class CfiNavigationLogic {
         return null;
       }
 
-      return this.createRange(textTerminusResult.textNode, textTerminusResult.textOffset,
-                              textTerminusResult.textNode, textTerminusResult.textOffset);
+      const container = textTerminusResult.textNode;
+      const start = textTerminusResult.textOffset;
+      // LD(2018.10.02): it seems like Chrome(v69) has a bug that collapsed
+      // range with witespace char won't report proper getClientRects().
+      // so a no-collapsed range is created instead
+      const end = textTerminusResult.textOffset + 1;
+
+      return this.createRange(container, start, container, end);
 
     }
 

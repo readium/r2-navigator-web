@@ -102,6 +102,9 @@ export class SpineItemView extends View {
     this.spineItemPageCount = this.contentView.spineItemPageCount();
     this.contentStatus = ContentLoadingStatus.Loaded;
     this.contentHeight = this.contentView.calculatedHeight();
+    if (this.isVertical) {
+      this.host.style.height = `${this.contentHeight}px`;
+    }
   }
 
   public unloadSpineItem(): void {
