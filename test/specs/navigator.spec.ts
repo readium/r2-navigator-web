@@ -53,7 +53,7 @@ describe('Navigator', () => {
   });
 
   afterEach(() => {
-    // hostEnv.clear();
+    hostEnv.clear();
   });
 
   describe('rendition', () => {
