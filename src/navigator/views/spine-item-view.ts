@@ -99,12 +99,8 @@ export class SpineItemView extends View {
                                          viewSettings,
                                          token);
 
-    this.spineItemPageCount = this.contentView.spineItemPageCount();
     this.contentStatus = ContentLoadingStatus.Loaded;
-    this.contentHeight = this.contentView.calculatedHeight();
-    if (this.isVertical) {
-      this.host.style.height = `${this.contentHeight}px`;
-    }
+    this.onViewChanged();
   }
 
   public unloadSpineItem(): void {
@@ -138,9 +134,9 @@ export class SpineItemView extends View {
   public resize(pageWidth: number, pageHeight: number): void {
     if (this.isFixedLayout) {
       this.resizeFixedLayoutPage(this.scaleOption, pageWidth, pageHeight);
-    } else if (!this.isVertical) {
+    } else {
       this.contentView.onResize();
-      this.spineItemPageCount = this.contentView.spineItemPageCount();
+      this.onViewChanged();
     }
   }
 
@@ -170,7 +166,7 @@ export class SpineItemView extends View {
 
   public setViewSettings(viewSetting: ViewSettings): void {
     this.contentView.setViewSettings(viewSetting);
-    this.spineItemPageCount = this.contentView.spineItemPageCount();
+    this.onViewChanged();
   }
 
   public render(): void {
@@ -358,6 +354,14 @@ export class SpineItemView extends View {
   //     );
   //   });
   // }
+
+  private onViewChanged(): void {
+    this.spineItemPageCount = this.contentView.spineItemPageCount();
+    if (this.isVertical) {
+      this.contentHeight = this.contentView.calculatedHeight();
+      this.host.style.height = `${this.contentHeight}px`;
+    }
+  }
 
   private updateScale(): void {
     if (!this.isFixedLayout) {

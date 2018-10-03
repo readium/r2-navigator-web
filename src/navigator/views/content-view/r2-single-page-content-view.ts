@@ -1,4 +1,5 @@
 import { Rect } from '../cfi/rect';
+import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
 import * as DomUtils from '../../../utils/dom-utils';
@@ -52,6 +53,11 @@ export class R2SinglePageContentView extends R2ContentView  {
 
     this.useReadiumCss = !this.isFixedLayout;
     this.useReadiumCssOverride = true;
+  }
+
+  public setViewSettings(viewSetting: ViewSettings): void {
+    super.setViewSettings(viewSetting);
+    this.onResize();
   }
 
   public getOffsetFromCfi(cfi: string): number {
@@ -118,7 +124,8 @@ export class R2SinglePageContentView extends R2ContentView  {
   }
 
   public onResize(): void {
-    throw new Error('Method not implemented.');
+    const contHeight = this.contentDocHeight();
+    this.setHeight(contHeight);
   }
 
   protected onIframeLoaded(success: boolean): void {
