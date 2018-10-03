@@ -105,9 +105,16 @@ export class IFrameLoader {
     const defaultCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-default.css`);
     const afterCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-after.css`);
 
-    headEle.appendChild(beforeCss);
-    headEle.appendChild(defaultCss);
-    headEle.appendChild(afterCss);
+    // Need to insert before any node except <base>
+    let refNode: Node | null = null;
+    if (headEle.firstChild) {
+      // firstChild should be <base>
+      refNode = headEle.firstChild.nextSibling;
+    }
+
+    headEle.insertBefore(beforeCss, refNode);
+    headEle.insertBefore(defaultCss, refNode);
+    headEle.insertBefore(afterCss, refNode);
   }
 
   private creatCssLink(href: string): HTMLLinkElement {
