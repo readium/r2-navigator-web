@@ -103,7 +103,7 @@ describe('SpineItemView', () => {
       const siv = hostEnv.createSpineItemView(pageWidth, 800, true, false);
       await hostEnv.loadSpineItem(siv, 0);
       const pageSize = siv.getTotalSize(pageWidth);
-      assert.equal(pageSize, 340);
+      assert.equal(pageSize, 347);
 
       const page4Size = siv4.getTotalSize(pageWidth);
       assert.equal(page4Size, 15504);

@@ -7,6 +7,7 @@ interface IR1AttachedDataType {
 
 interface ILoaderConfig {
   useReadiumCss?: boolean;
+  useReadiumCssOverride?: boolean;
 }
 
 export class IFrameLoader {
@@ -80,7 +81,8 @@ export class IFrameLoader {
 
     this.injectBaseHref(doc, headElement, href);
     if (config.useReadiumCss === true) {
-      this.injectReadiumCss(doc, headElement);
+      const useOverride = config.useReadiumCssOverride === true;
+      this.injectReadiumCss(headElement, useOverride);
     }
 
     if (contentType.includes('xml')) {
@@ -97,7 +99,7 @@ export class IFrameLoader {
     headEle.insertBefore(baseElement, headEle.firstChild);
   }
 
-  private injectReadiumCss(doc: Document, headEle: HTMLHeadElement): void {
+  private injectReadiumCss(headEle: HTMLHeadElement, useOverride: boolean): void {
     if (!this.readiumCssBasePath) {
       return;
     }
@@ -115,6 +117,11 @@ export class IFrameLoader {
     headEle.insertBefore(beforeCss, refNode);
     headEle.insertBefore(defaultCss, refNode);
     headEle.insertBefore(afterCss, refNode);
+
+    if (useOverride) {
+      const overrideCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-override.css`);
+      headEle.insertBefore(overrideCss, refNode);
+    }
   }
 
   private creatCssLink(href: string): HTMLLinkElement {

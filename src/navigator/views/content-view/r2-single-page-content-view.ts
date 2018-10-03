@@ -51,6 +51,7 @@ export class R2SinglePageContentView extends R2ContentView  {
     this.setupIframe();
 
     this.useReadiumCss = !this.isFixedLayout;
+    this.useReadiumCssOverride = true;
   }
 
   public getOffsetFromCfi(cfi: string): number {

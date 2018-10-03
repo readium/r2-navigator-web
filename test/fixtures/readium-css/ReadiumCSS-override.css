@@ -1,0 +1,4 @@
+img, svg, audio, video {
+    /* set max-height in vertical view will cause wrong image size */
+    max-height: unset !important;
+}

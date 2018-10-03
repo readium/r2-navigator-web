@@ -26,6 +26,7 @@ export class R2ContentView implements IContentView {
   protected ePubBody: HTMLBodyElement | null = null;
 
   protected useReadiumCss: boolean = true;
+  protected useReadiumCssOverride: boolean = false;
   protected vs: ViewSettings;
 
   protected elementChecker: ElementBlacklistedChecker;
@@ -55,10 +56,15 @@ export class R2ContentView implements IContentView {
       this.onIframeLoaded(success);
     };
 
+    const loaderConfig = {
+      useReadiumCss: this.useReadiumCss,
+      useReadiumCssOverride: this.useReadiumCssOverride,
+    };
+
     this.iframeLoader.loadIframe(this.iframe,
                                  spineItem.Href,
                                  onIframeContentLoaded,
-                                 { useReadiumCss: this.useReadiumCss },
+                                 loaderConfig,
                                  spineItem.TypeLink);
 
     return this.iframeLoadedPromise();
