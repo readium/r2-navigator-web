@@ -85,7 +85,7 @@ export class R2MultiPageContentView extends R2ContentView {
       }
     }
 
-    this.paginate();
+    this.setViewSettings(this.vs);
 
     this.showIFrame();
     super.onIframeLoaded(success);

@@ -142,8 +142,7 @@ export class R2SinglePageContentView extends R2ContentView  {
 
     this.updateMetaSize();
 
-    const contHeight = this.contentDocHeight();
-    this.setHeight(contHeight);
+    this.setViewSettings(this.vs);
 
     super.onIframeLoaded(success);
 
