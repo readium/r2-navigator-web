@@ -70,6 +70,7 @@
   },
   "dependencies": {
     "@evidentpoint/r2-shared-js": "^1.0.0-alpha.2",
+    "r2-glue-js": "^0.0.0",
     "@evidentpoint/readium-shared-js": "^1.0.0-alpha",
     "@evidentpoint/readium-cfi-js": "^1.0.0-alpha.4",
     "isomorphic-url-shim": "^1.0.2",
