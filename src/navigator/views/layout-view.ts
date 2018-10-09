@@ -1,3 +1,4 @@
+import { ReadingProgression } from 'r2-webpub-model-js/lib/models/metadata/readingprogression';
 import { Publication } from '../../streamer';
 import { Location } from '../location';
 import { IContentViewFactory } from './content-view/content-view-factory';
@@ -49,13 +50,13 @@ export class LayoutView extends View {
 
   private hasUnknownSizeSpineItemLoading: boolean = false;
 
-  private isFixedLayout: boolean = false;
+  private readonly isFixedLayout: boolean = false;
   private zoomOption: ZoomOptions = ZoomOptions.FitByPage;
   private zoomScale: number = 1;
 
   private spineItemViewFactory: SpineItemViewFactory;
 
-  private isRtl: boolean = false;
+  private readonly isRtl: boolean = false;
 
   private numOfPagesPerSpread: number = 0;
 
@@ -69,8 +70,8 @@ export class LayoutView extends View {
       this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
     }
 
-    if (this.publication.Metadata.Direction) {
-      this.isRtl = this.publication.Metadata.Direction === 'rtl';
+    if (this.publication.Metadata.ReadingProgression) {
+      this.isRtl = this.publication.Metadata.ReadingProgression === ReadingProgression.RTL;
     }
 
     this.spineItemViewFactory = new SpineItemViewFactory(pub,

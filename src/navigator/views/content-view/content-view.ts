@@ -1,11 +1,11 @@
-import { PublicationLink } from '@evidentpoint/r2-shared-js';
+import { Link } from 'r2-webpub-model-js/lib/models/link';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
 
 export interface IContentView {
   render(): void;
 
-  loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+  loadSpineItem(spineItem: Link, spineItemIndex: number,
                 viewSettings: ViewSettings,
                 token?: CancellationToken): Promise<void>;
 

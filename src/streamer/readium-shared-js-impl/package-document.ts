@@ -1,5 +1,6 @@
-import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import { Interpreter } from '@evidentpoint/readium-cfi-js';
+import { Link } from 'r2-webpub-model-js/lib/models/link';
+import { ReadingProgression } from 'r2-webpub-model-js/lib/models/metadata/readingprogression';
 import { Publication } from '../publication';
 
 export class PackageDocument {
@@ -55,7 +56,7 @@ export class PackageDocument {
       return;
     }
 
-    const pageList = this.pub.PageList.map((link: PublicationLink) => {
+    const pageList = this.pub.PageList.map((link: Link) => {
       if (this.isIntraPubCfiLink(link.Href)) {
         const parsedHref = this.parseIntraPubCfiLink(link.Href);
 
@@ -162,12 +163,12 @@ export class PackageDocument {
   }
 
   private getPageProgressionDirection(): string {
-    const pageProgressionDirection: string = this.pub.Metadata.Direction;
-    if (pageProgressionDirection === 'rtl') {
+    const pageProgressionDirection = this.pub.Metadata.ReadingProgression;
+    if (pageProgressionDirection === ReadingProgression.RTL) {
       return 'rtl';
     }
 
-    if (pageProgressionDirection === 'default') {
+    if (pageProgressionDirection === ReadingProgression.Auto) {
       return 'default';
     }
 
@@ -175,10 +176,10 @@ export class PackageDocument {
   }
 
   private getSharedJsSpine(): object {
-    return this.pub.Spine.map((pubSpineItem: PublicationLink) => {
+    return this.pub.Spine.map((pubSpineItem: Link) => {
       return {
         href: pubSpineItem.Href,
-        media_type: pubSpineItem.TypeLink,
+        media_type: pubSpineItem.Type,
         // assuming that the order of spine items in webpub indicates that they are linear
         linear: 'yes',
 

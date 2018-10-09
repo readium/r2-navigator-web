@@ -1,10 +1,10 @@
-import { PublicationLink } from '@evidentpoint/r2-shared-js';
 import {
   Globals as Readium,
   PaginationChangedEventArgs,
   StyleCollection,
   ViewerSettings,
 } from '@evidentpoint/readium-shared-js';
+import { Link } from 'r2-webpub-model-js/lib/models/link';
 
 import { IFrameLoader } from '../../iframe-loader';
 import { getReadiumEventsRelayInstance } from '../readium-events-relay';
@@ -40,7 +40,7 @@ export class R1ContentView implements IContentView {
   protected $iframe: any;
   protected rjsSpineItem: any;
 
-  protected spineItem: PublicationLink;
+  protected spineItem: Link;
   protected spineItemIndex: number;
   protected spineItemPgCount: number = 1;
 
@@ -139,7 +139,7 @@ export class R1ContentView implements IContentView {
     };
   }
 
-  public async loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+  public async loadSpineItem(spineItem: Link, spineItemIndex: number,
                              viewSettings: ViewSettings,
                              token?: CancellationToken): Promise<void> {
     this.spineItem = spineItem;

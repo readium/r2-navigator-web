@@ -1,4 +1,4 @@
-import { PublicationLink } from '@evidentpoint/r2-shared-js';
+import { Link } from 'r2-webpub-model-js/lib/models/link';
 import { IContentView } from './content-view/content-view';
 import { IContentViewFactory } from './content-view/content-view-factory';
 import { ViewSettings } from './view-settings';
@@ -17,11 +17,11 @@ export enum ContentLoadingStatus {
 export class SpineItemView extends View {
   protected host: HTMLElement;
 
-  protected spine: PublicationLink[];
+  protected spine: Link[];
 
   protected cvFactory: IContentViewFactory;
 
-  protected spineItem: PublicationLink;
+  protected spineItem: Link;
   protected spineItemIndex: number;
   protected spineItemPageCount: number = 0;
 
@@ -40,7 +40,7 @@ export class SpineItemView extends View {
   protected contentView: IContentView;
 
   public constructor(
-    spine: PublicationLink[],
+    spine: Link[],
     isVertical: boolean,
     isFixedLayout: boolean,
     cvFactory: IContentViewFactory,
@@ -88,7 +88,7 @@ export class SpineItemView extends View {
     return this.contentView.getPageIndexOffsetFromElementId(elementId);
   }
 
-  public async loadSpineItem(spineItem: PublicationLink,
+  public async loadSpineItem(spineItem: Link,
                              viewSettings: ViewSettings,
                              token?: CancellationToken): Promise<void> {
     this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);

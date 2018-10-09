@@ -1,4 +1,4 @@
-import { PublicationLink } from '@evidentpoint/r2-shared-js';
+import { Link } from 'r2-webpub-model-js/lib/models/link';
 import { IFrameLoader } from '../../iframe-loader';
 import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
 import { ElementBlacklistedChecker } from '../cfi/element-checker';
@@ -18,7 +18,7 @@ export class R2ContentView implements IContentView {
 
   protected iframeLoadedCallbacks: IframeLoadedCallback[] = [];
 
-  protected spineItem: PublicationLink;
+  protected spineItem: Link;
   protected spineItemIndex: number;
   protected spineItemPgCount: number = 1;
 
@@ -41,7 +41,7 @@ export class R2ContentView implements IContentView {
     throw new Error('Method not implemented.');
   }
 
-  public loadSpineItem(spineItem: PublicationLink, spineItemIndex: number,
+  public loadSpineItem(spineItem: Link, spineItemIndex: number,
                        viewSettings: ViewSettings,
                        token?: CancellationToken | undefined): Promise<void> {
     this.spineItem = spineItem;
@@ -65,7 +65,7 @@ export class R2ContentView implements IContentView {
                                  spineItem.Href,
                                  onIframeContentLoaded,
                                  loaderConfig,
-                                 spineItem.TypeLink);
+                                 spineItem.Type);
 
     return this.iframeLoadedPromise();
   }
