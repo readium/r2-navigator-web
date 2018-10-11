@@ -33,7 +33,7 @@ export function triggerLayout(iframe: HTMLIFrameElement): void {
   let ss: CSSStyleSheet | null = null;
   try {
     ss = doc.styleSheets && doc.styleSheets.length ? <CSSStyleSheet>(doc.styleSheets[0]) : null;
-    if (!ss) {
+    if (!ss && doc.head) {
       const style = doc.createElement('style');
       doc.head.appendChild(style);
       style.appendChild(doc.createTextNode(''));

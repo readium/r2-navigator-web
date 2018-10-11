@@ -71,10 +71,10 @@ export class IFrameLoader {
                  config: ILoaderConfig): string {
     const parser = new DOMParser();
     // @ts-ignore
-    const doc = parser.parseFromString(sourceText, contentType);
+    const doc = parser.parseFromString(sourceText, <SupportedType>(contentType));
 
     const headElement = doc.querySelector('head');
-    if (!headElement) {
+    if (!doc.documentElement || !headElement) {
       // No head element.. not a valid (X)HTML document?
       // Then just return the original source
       return sourceText;

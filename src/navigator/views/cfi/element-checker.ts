@@ -38,7 +38,7 @@ export class ElementBlacklistedChecker {
     const clsAttr = element.getAttribute('class');
     const classList = clsAttr ? clsAttr.split(' ') : [];
 
-    classList.forEach((cls) => {
+    classList.forEach(cls => {
       if (this.classBlacklist.indexOf(cls) >= 0) {
         return true;
       }
@@ -195,7 +195,7 @@ export class ElementVisibilityChecker {
     if (!ele.parentNode) {
       siblingTextNodesAndSelf = [ele];
     } else {
-      siblingTextNodesAndSelf = Array.from(ele.parentNode.childNodes).filter((n) => {
+      siblingTextNodesAndSelf = Array.from(ele.parentNode.childNodes).filter(n => {
         return n === ele || this.isValidTextNode(n);
       });
     }
