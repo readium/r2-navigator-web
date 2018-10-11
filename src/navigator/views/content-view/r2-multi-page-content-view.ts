@@ -104,6 +104,9 @@ export class R2MultiPageContentView extends R2ContentView {
     this.hostWidth = hostSize[0];
     this.hostHeight = hostSize[1];
 
+    // Need to set the iframe width to default value
+    // so resize can work properly
+    this.iframe.width = '100%';
     this.iframe.style.height = `${this.hostHeight}px`;
 
     this.ePubHtml.style.height = `${this.hostHeight}px`;
