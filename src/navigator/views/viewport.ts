@@ -209,10 +209,10 @@ export class Viewport {
   }
 
   public async nextScreen(token?: CancellationToken): Promise<void> {
-    let newPos = this.viewOffset + this.visibleViewportSize;
+    const newPos = this.viewOffset + this.visibleViewportSize;
     const loadedEndPos = this.bookView.getLoadedEndPosition();
-    if (newPos > loadedEndPos && !this.bookView.hasMoreAfterEnd()) {
-      newPos = loadedEndPos;
+    if (newPos >= loadedEndPos && !this.bookView.hasMoreAfterEnd()) {
+      return;
     }
 
     if (newPos !== this.viewOffset &&
@@ -356,7 +356,7 @@ export class Viewport {
   }
 
   private bindEvents(): void {
-    this.root.addEventListener('scroll', async (e) => {
+    this.root.addEventListener('scroll', async e => {
       if (!this.scrollEnabled || this.scrollFromInternal) {
         return;
       }
@@ -490,7 +490,7 @@ export class Viewport {
     }
 
     const pageRanges = this.bookView.visiblePages(start, end);
-    if (pageRanges.length === 0) {
+    if (pageRanges.length < numOfPagePerSpread) {
       return start;
     }
 
