@@ -1,3 +1,4 @@
+import string from 'rollup-plugin-string';
 import typescript2 from 'rollup-plugin-typescript2';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
@@ -6,6 +7,7 @@ const pkg = require('./package.json');
 
 export default {
   input: './src/index.ts',
+  preserveSymlinks: true,
   output: [
     {
       file: pkg.module,
@@ -31,6 +33,9 @@ export default {
     'jquery'
   ],
   plugins: [
+    string({
+			include: './node_modules/r2-glue-js/dist/ReadiumGlue-payload.js',
+		}),
     resolve(),
     commonjs(),
     typescript2(),

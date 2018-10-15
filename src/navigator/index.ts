@@ -1,4 +1,5 @@
 export { Navigator } from './navigator';
+export { RenditionContext } from './rendition-context';
 export { ReadingSystem } from './reading-system';
 export { Location } from './location';
 export { Rendition, SpreadMode } from './rendition';

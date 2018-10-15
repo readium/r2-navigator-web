@@ -1,4 +1,7 @@
 import { URL } from 'isomorphic-url-shim';
+// @ts-ignore
+// tslint:disable-next-line:no-submodule-imports
+import ReadiumGluePayloadJs from 'r2-glue-js/dist/ReadiumGlue-payload.js';
 
 interface IR1AttachedDataType {
   // tslint:disable-next-line:no-any
@@ -16,6 +19,7 @@ export class IFrameLoader {
   private isIE: boolean;
 
   private readiumCssBasePath?: string;
+  private loaderEvents: { [eventName: string]: Function[] } = {};
 
   constructor(publicationURI?: string) {
     this.publicationURI = publicationURI;
@@ -26,6 +30,14 @@ export class IFrameLoader {
 
   public setReadiumCssBasePath(path: string): void {
     this.readiumCssBasePath = path;
+  }
+
+  public addIFrameLoadedListener(callback: Function): void {
+    const eventName = 'iframeLoaded';
+    const events = this.loaderEvents[eventName] || [];
+    events.push(callback);
+
+    this.loaderEvents[eventName] = events;
   }
 
   public loadIframe(
@@ -86,6 +98,8 @@ export class IFrameLoader {
       this.injectReadiumCss(headElement, useOverride);
     }
 
+    this.injectReadiumGlue(doc, headElement);
+
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
     }
@@ -129,6 +143,13 @@ export class IFrameLoader {
     }
   }
 
+  private injectReadiumGlue(doc: Document, headEle: HTMLHeadElement): void {
+    // This lives within the iframe
+    const payload = this.createJSElement(ReadiumGluePayloadJs);
+
+    headEle.appendChild(payload);
+  }
+
   private creatCssLink(href: string): HTMLLinkElement {
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
@@ -136,6 +157,26 @@ export class IFrameLoader {
     cssLink.href = href;
 
     return cssLink;
+  }
+
+  private createJSElement(href: string): HTMLScriptElement {
+    const el = document.createElement('script');
+    el.setAttribute('type', 'text/javascript');
+
+    const blob = new Blob([href], { type : 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    el.setAttribute('src', url);
+
+    return el;
+  }
+
+  private iframeLoaded(iframe: HTMLIFrameElement): void {
+    const eventCbs = this.loaderEvents.iframeLoaded;
+    if (!eventCbs) return;
+
+    eventCbs.forEach(eventCb => {
+      eventCb(iframe);
+    });
   }
 
   private loadIframeWithDocument(
@@ -184,6 +225,7 @@ export class IFrameLoader {
     }
 
     iframe.onload = () => {
+      this.iframeLoaded(iframe);
       callback(true);
       if (!this.isIE) {
         window.URL.revokeObjectURL(documentDataUri);

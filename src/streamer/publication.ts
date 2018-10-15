@@ -83,9 +83,29 @@ export class Publication extends EPUBPublication {
     return new URL('./', href).toString();
   }
 
+  public getHrefRelativeToManifest(href: string): string {
+    const baseUri = this.getBaseURI();
+    if (!baseUri) return '';
+
+    const relativeHref = href.split(baseUri)[1];
+
+    return relativeHref || '';
+  }
+
   public findSpineItemIndexByHref(href: string): number {
     return this.readingOrder.findIndex((item: Link) => {
       return item.href === href;
     });
+  }
+
+  public isInternalHref(href: string): boolean {
+    const baseUri = this.getBaseURI();
+    if (!baseUri) {
+      console.warn('Could not get baseUri');
+
+      return false;
+    }
+
+    return href.includes(baseUri);
   }
 }
