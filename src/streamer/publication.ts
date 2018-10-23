@@ -39,7 +39,7 @@ export class Publication extends EPUBPublication {
   public searchLinkByRel(rel: string): Link | undefined {
     if (this.Resources) {
       const ll = this.Resources.find((link) => {
-        return link.HasRel(rel);
+        return link.Rel.has(rel);
       });
       if (ll) {
         return ll;
@@ -48,7 +48,7 @@ export class Publication extends EPUBPublication {
 
     if (this.ReadingOrder) {
       const ll = this.ReadingOrder.find((link) => {
-        return link.HasRel(rel);
+        return link.Rel.has(rel);
       });
       if (ll) {
         return ll;
@@ -57,7 +57,7 @@ export class Publication extends EPUBPublication {
 
     if (this.Links) {
       const ll = this.Links.find((link) => {
-        return link.HasRel(rel);
+        return link.Rel.has(rel);
       });
       if (ll) {
         return ll;
