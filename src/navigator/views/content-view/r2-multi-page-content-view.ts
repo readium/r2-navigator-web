@@ -136,9 +136,12 @@ export class R2MultiPageContentView extends R2ContentView {
     // This workaround is required for triggering layout changes in Safari
     triggerLayout(this.iframe);
 
-    // Use Element.getBoundingClientRect() instead of Element.scrollWidth
-    // since scrollWidth will round the value to an integer
-    const fullWidth = this.ePubHtml.getBoundingClientRect().width;
+    let fullWidth = this.ePubHtml.scrollWidth;
+    // scrollWidth will round the value to an integer
+    // so scrollWidth could be less than hostWidth
+    if (fullWidth < this.hostWidth) {
+      fullWidth = this.hostWidth;
+    }
     this.iframe.width = `${fullWidth}px`;
 
     this.spineItemPgCount = Math.round((fullWidth + columnGap) / this.hostWidth);
