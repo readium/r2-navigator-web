@@ -19,7 +19,7 @@ export class Navigator {
 
   public async nextScreen(): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async (token) => {
+      async token => {
         await this.rendition.viewport.nextScreen(token);
       },
     );
@@ -27,7 +27,7 @@ export class Navigator {
 
   public async previousScreen(): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async (token) => {
+      async token => {
         await this.rendition.viewport.prevScreen(token);
       },
     );
@@ -51,7 +51,7 @@ export class Navigator {
 
   public async gotoLocation(loc: Location): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async (token) => {
+      async token => {
         await this.rendition.viewport.renderAtLocation(loc, token);
       },
     );
@@ -59,7 +59,7 @@ export class Navigator {
 
   public async gotoAnchorLocation(href: string, eleId: string): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async (token) => {
+      async token => {
         await this.rendition.viewport.renderAtAnchorLocation(href, eleId, token);
       },
     );

@@ -1,7 +1,6 @@
 {
   "defaultSeverity": "error",
   "extends": [
-    "tslint-microsoft-contrib",
     "tslint-config-airbnb"
   ],
   "jsRules": {},
