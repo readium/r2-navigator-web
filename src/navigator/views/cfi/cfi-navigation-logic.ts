@@ -31,11 +31,11 @@ export class CfiNavigationLogic {
     return cfi;
   }
 
-  public getFirstVisibleCfi(viewport: Rect): string | null {
+  public getFirstVisibleCfi(viewport: Rect, fromEnd: boolean): string | null {
     const visChecker = new ElementVisibilityChecker(this.rootDocument,
                                                     viewport,
                                                     this.elementChecker);
-    const visibleEleInfo = visChecker.findFirstVisibleElement();
+    const visibleEleInfo = visChecker.findFirstVisibleElement(fromEnd);
 
     return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport);
   }

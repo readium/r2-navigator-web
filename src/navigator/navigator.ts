@@ -38,15 +38,11 @@ export class Navigator {
   }
 
   public async getCurrentLocationAsync(): Promise<Location | undefined | null> {
-    const pos = this.rendition.viewport.getStartPosition();
-
-    return this.locationFromPaginationAsync(pos);
+    return await this.getScreenBeginAsync();
   }
 
   public getCurrentLocation(): Location | undefined | null {
-    const pos = this.rendition.viewport.getStartPosition();
-
-    return this.locationFromPagination(pos);
+    return this.getScreenBegin();
   }
 
   public async gotoLocation(loc: Location): Promise<void> {
@@ -66,23 +62,39 @@ export class Navigator {
   }
 
   public async getScreenBeginAsync(): Promise<Location | undefined | null> {
-    return this.getCurrentLocationAsync();
+    const pos = this.rendition.viewport.getStartPosition();
+    if (!pos) {
+      return pos;
+    }
+
+    return this.locationFromPaginationAsync(pos, false);
   }
 
   public getScreenBegin(): Location | undefined | null {
-    return this.getCurrentLocation();
+    const pos = this.rendition.viewport.getStartPosition();
+    if (!pos) {
+      return pos;
+    }
+
+    return this.locationFromPagination(pos, false);
   }
 
   public async getScreenEndAsync(): Promise<Location | undefined | null> {
     const pos = this.rendition.viewport.getEndPosition();
+    if (!pos) {
+      return pos;
+    }
 
-    return this.locationFromPaginationAsync(pos);
+    return this.locationFromPaginationAsync(pos, true);
   }
 
   public getScreenEnd(): Location | undefined | null {
     const pos = this.rendition.viewport.getEndPosition();
+    if (!pos) {
+      return pos;
+    }
 
-    return this.locationFromPagination(pos);
+    return this.locationFromPagination(pos, true);
   }
 
   public isFirstScreen(): boolean {
@@ -141,23 +153,15 @@ export class Navigator {
   // }
 
   // tslint:disable-next-line:max-line-length
-  private async locationFromPaginationAsync(pos?: PaginationInfo): Promise<Location | undefined | null> {
-    if (!pos) {
-      return pos;
-    }
-
+  private async locationFromPaginationAsync(pos: PaginationInfo, backward: boolean): Promise<Location> {
     await pos.view.ensureContentLoaded();
 
-    return new Location(pos.view.getCfi(pos.offsetInView, 0),
+    return new Location(pos.view.getCfi(pos.offsetInView, 0, backward),
                         this.pub.spine[pos.spineItemIndex].href);
   }
 
-  private locationFromPagination(pos?: PaginationInfo): Location | undefined | null {
-    if (!pos) {
-      return pos;
-    }
-
-    return new Location(pos.view.getCfi(pos.offsetInView, 0),
+  private locationFromPagination(pos: PaginationInfo, backward: boolean): Location {
+    return new Location(pos.view.getCfi(pos.offsetInView, 0, backward),
                         this.pub.spine[pos.spineItemIndex].href);
   }
 }

@@ -40,7 +40,7 @@ describe('CfiNavigationLogic', () => {
       const right = left + pageWidth;
       const viewportRect = new Rect(left, 0, right, 800);
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
-      const firstVisCfi = navLogic.getFirstVisibleCfi(viewportRect);
+      const firstVisCfi = navLogic.getFirstVisibleCfi(viewportRect, false);
 
       assert.equal(firstVisCfi, '/4/2[chapter-i]/4/8/1:118');
     });

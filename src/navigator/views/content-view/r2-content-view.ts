@@ -130,7 +130,7 @@ export class R2ContentView implements IContentView {
     throw new Error('Method not implemented.');
   }
 
-  public getCfi(offsetMain: number, offset2nd: number): string {
+  public getCfi(offsetMain: number, offset2nd: number, backward: boolean): string {
     throw new Error('Method not implemented.');
   }
 

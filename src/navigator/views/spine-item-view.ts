@@ -217,8 +217,8 @@ export class SpineItemView extends View {
     return pageWidth;
   }
 
-  public getCfi(offsetMain: number, offset2nd: number): string {
-    return this.contentView.getCfi(offsetMain, offset2nd);
+  public getCfi(offsetMain: number, offset2nd: number, backward: boolean): string {
+    return this.contentView.getCfi(offsetMain, offset2nd, backward);
   }
 
   // public getPaginationInfo(): object {

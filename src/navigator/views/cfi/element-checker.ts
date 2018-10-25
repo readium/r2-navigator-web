@@ -58,6 +58,24 @@ export class ElementBlacklistedChecker {
   }
 }
 
+class NodeIterator {
+  private walker: TreeWalker;
+  private isForward: boolean;
+
+  public constructor(walker: TreeWalker, isForward: boolean) {
+    this.walker = walker;
+    this.isForward = isForward;
+
+    if (!this.isForward) {
+      while (this.walker.lastChild()) {}
+    }
+  }
+
+  public next(): Node | null {
+    return this.isForward ? this.walker.nextNode() : this.walker.previousNode();
+  }
+}
+
 export class ElementVisibilityChecker {
   private rootDoc: Document;
 
@@ -73,7 +91,7 @@ export class ElementVisibilityChecker {
     this.elementChecker = eleChecker;
   }
 
-  public findFirstVisibleElement(): IVisibleElementInfo {
+  public findFirstVisibleElement(fromEnd: boolean): IVisibleElementInfo {
     const bodyEle = this.rootDoc.body;
 
     let firstVisibleElement: HTMLElement | null = null;
@@ -102,7 +120,12 @@ export class ElementVisibilityChecker {
                                                  { acceptNode: filter },
                                                  false);
 
-    while (treeWalker.nextNode()) {
+    const nodeIter = new NodeIterator(treeWalker, !fromEnd);
+    if (!fromEnd && nodeIter.next() === null) {
+      return { textNode, percentVisible, element: firstVisibleElement };
+    }
+
+    do  {
       const node = treeWalker.currentNode;
 
       if (node.nodeType === Node.TEXT_NODE) {
@@ -145,7 +168,7 @@ export class ElementVisibilityChecker {
         textNode = null;
         break;
       }
-    }
+    } while (nodeIter.next());
 
     return { textNode, percentVisible, element: firstVisibleElement };
   }

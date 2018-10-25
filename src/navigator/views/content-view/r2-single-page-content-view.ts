@@ -86,31 +86,37 @@ export class R2SinglePageContentView extends R2ContentView  {
     return 0;
   }
 
-  public getCfi(offsetMain: number, offset2nd: number): string {
+  public getCfi(offsetMain: number, offset2nd: number, backward: boolean): string {
     let left: number;
     let top: number;
+    let right: number;
+    let bottom: number;
     if (this.isVertical) {
+      const size = this.getHostSize();
       left = offset2nd;
       top = offsetMain;
-    } else {
-      left = offsetMain;
-      top = offset2nd;
-    }
+      if (backward && size) {
+        top -= size[1];
+      }
 
-    let right = left;
-    let bottom = top;
-    if (this.isFixedLayout) {
-      right += this.metaWidth() * this.metaScale;
-      bottom += this.metaHeight() * this.metaScale;
-    } else {
-      const size = this.getHostSize();
+      right = left;
+      bottom = top;
       if (size) {
         right += size[0];
         bottom += size[1];
       }
+    } else {
+      left = offsetMain;
+      top = offset2nd;
+      if (backward) {
+        left -= this.metaWidth() * this.metaScale;
+      }
+
+      right = left + this.metaWidth() * this.metaScale;
+      bottom = top + this.metaHeight() * this.metaScale;
     }
 
-    const cfi = this.cfiNavLogic.getFirstVisibleCfi(new Rect(left, top, right, bottom));
+    const cfi = this.cfiNavLogic.getFirstVisibleCfi(new Rect(left, top, right, bottom), backward);
 
     return cfi ? cfi : '';
   }

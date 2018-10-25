@@ -64,10 +64,14 @@ export class R2MultiPageContentView extends R2ContentView {
     return Math.floor(offset[0] / this.hostWidth);
   }
 
-  public getCfi(offsetMain: number, offset2nd: number): string {
-    const right = offsetMain + this.hostWidth;
+  public getCfi(offsetMain: number, offset2nd: number, backward: boolean): string {
+    const left = backward ? offsetMain - this.hostWidth : offsetMain;
+    const right = left + this.hostWidth;
     const bottom = offset2nd + this.hostHeight;
-    const cfi = this.cfiNavLogic.getFirstVisibleCfi(new Rect(offsetMain, offset2nd, right, bottom));
+    const cfi = this.cfiNavLogic.getFirstVisibleCfi(
+                  new Rect(left, offset2nd, right, bottom),
+                  backward,
+                );
 
     return cfi ? cfi : '';
   }

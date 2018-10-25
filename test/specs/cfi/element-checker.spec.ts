@@ -42,7 +42,7 @@ describe('ElementChecker', () => {
       const visChecker = new ElementVisibilityChecker(doc,
                                                       viewportRect,
                                                       hostEnv.getElementChecker());
-      const visEle = visChecker.findFirstVisibleElement();
+      const visEle = visChecker.findFirstVisibleElement(false);
       // console.log(visEle.textNode);
       assert.isNotNull(visEle.textNode);
 

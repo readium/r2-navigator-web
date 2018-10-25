@@ -48,10 +48,10 @@ describe('SpineItemView', () => {
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
 
-      const cfi1 = siv4.getCfi(0, 0);
+      const cfi1 = siv4.getCfi(0, 0, false);
       console.log(cfi1);
 
-      const cfi2 = siv4.getCfi(600, 0);
+      const cfi2 = siv4.getCfi(600, 0, false);
       console.log(`R1 ${cfi2}`);
 
     });
@@ -79,10 +79,10 @@ describe('SpineItemView', () => {
     });
 
     it('getCfi()', async () => {
-      const cfi1 = siv4.getCfi(0, 0);
+      const cfi1 = siv4.getCfi(0, 0, false);
       console.log(cfi1);
 
-      const cfi2 = siv4.getCfi(600, 0);
+      const cfi2 = siv4.getCfi(600, 0, false);
       console.log(`R2 ${cfi2}`);
 
     });
@@ -110,10 +110,10 @@ describe('SpineItemView', () => {
     });
 
     it('getCfi()', async () => {
-      const cfi1 = siv4.getCfi(0, 0);
+      const cfi1 = siv4.getCfi(0, 0, false);
       console.log(cfi1);
 
-      const cfi2 = siv4.getCfi(600, 0);
+      const cfi2 = siv4.getCfi(600, 0, false);
       console.log(`R2 ${cfi2}`);
     });
   });
