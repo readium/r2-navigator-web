@@ -173,9 +173,9 @@ export class Rendition {
 
   public render(): Promise<void> {
     this.bookView = new LayoutView(this.pub, this.vs, this.contentViewFactory);
+    this.bookView.setVerticalLayout(this.viewAsVertical);
     this.bookView.setPageSize(this.pageWidth, this.pageHeight);
     this.bookView.setNumberOfPagesPerSpread(this.numOfPagesPerSpread);
-    this.bookView.setVerticalLayout(this.viewAsVertical);
 
     this.viewport.setView(this.bookView);
 
