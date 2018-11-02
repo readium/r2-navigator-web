@@ -5,8 +5,8 @@ import { Link } from 'r2-webpub-model-js/lib/models/link';
 export class Publication extends EPUBPublication {
 
   // Alias for now, refactor later.
-  public get Spine(): Link[] {
-    return this.ReadingOrder;
+  public get spine(): Link[] {
+    return this.readingOrder;
   }
 
   private readonly sourceURI?: string;
@@ -37,27 +37,27 @@ export class Publication extends EPUBPublication {
   }
 
   public searchLinkByRel(rel: string): Link | undefined {
-    if (this.Resources) {
-      const ll = this.Resources.find((link) => {
-        return link.Rel.has(rel);
+    if (this.resources) {
+      const ll = this.resources.find((link) => {
+        return link.rel.has(rel);
       });
       if (ll) {
         return ll;
       }
     }
 
-    if (this.ReadingOrder) {
-      const ll = this.ReadingOrder.find((link) => {
-        return link.Rel.has(rel);
+    if (this.readingOrder) {
+      const ll = this.readingOrder.find((link) => {
+        return link.rel.has(rel);
       });
       if (ll) {
         return ll;
       }
     }
 
-    if (this.Links) {
-      const ll = this.Links.find((link) => {
-        return link.Rel.has(rel);
+    if (this.links) {
+      const ll = this.links.find((link) => {
+        return link.rel.has(rel);
       });
       if (ll) {
         return ll;
@@ -77,15 +77,15 @@ export class Publication extends EPUBPublication {
       if (!selfLink) {
         throw new Error('No self link in publication');
       }
-      href = selfLink.Href;
+      href = selfLink.href;
     }
 
     return new URL('./', href).toString();
   }
 
   public findSpineItemIndexByHref(href: string): number {
-    return this.ReadingOrder.findIndex((item: Link) => {
-      return item.Href === href;
+    return this.readingOrder.findIndex((item: Link) => {
+      return item.href === href;
     });
   }
 }

@@ -111,11 +111,11 @@ export class R1ContentView implements IContentView {
   }
 
   public getElements(selector: string): any {
-    return this.contentViewImpl.getElements(this.spineItem.Href, selector);
+    return this.contentViewImpl.getElements(this.spineItem.href, selector);
   }
 
   public getElementById(id: string): any {
-    return this.contentViewImpl.getElementById(this.spineItem.Href, id);
+    return this.contentViewImpl.getElementById(this.spineItem.href, id);
   }
 
   public isElementVisible($ele: any, offsetMain: number, offset2nd: number): boolean {

@@ -1,6 +1,5 @@
 import { Interpreter } from '@evidentpoint/readium-cfi-js';
 import { Link } from 'r2-webpub-model-js/lib/models/link';
-import { ReadingProgression } from 'r2-webpub-model-js/lib/models/metadata/readingprogression';
 import { Publication } from '../publication';
 
 export class PackageDocument {
@@ -40,7 +39,7 @@ export class PackageDocument {
 
   // tslint:disable-next-line:no-any
   public async generatePageListJSON(callback: any): Promise<void> {
-    if (!this.pub.PageList) {
+    if (!this.pub.pageList) {
       callback(undefined);
 
       return;
@@ -56,19 +55,19 @@ export class PackageDocument {
       return;
     }
 
-    const pageList = this.pub.PageList.map((link: Link) => {
-      if (this.isIntraPubCfiLink(link.Href)) {
-        const parsedHref = this.parseIntraPubCfiLink(link.Href);
+    const pageList = this.pub.pageList.map((link: Link) => {
+      if (this.isIntraPubCfiLink(link.href)) {
+        const parsedHref = this.parseIntraPubCfiLink(link.href);
 
         return {
-          label: link.Title,
+          label: link.title,
           cfi: parsedHref,
         };
       }
 
       return {
-        label: link.Title,
-        href: link.Href,
+        label: link.title,
+        href: link.href,
       };
     });
 
@@ -80,7 +79,7 @@ export class PackageDocument {
   }
 
   private getRenditionLayout(): string {
-    if (this.pub.Metadata.Rendition && this.pub.Metadata.Rendition.Layout === 'fixed') {
+    if (this.pub.metadata.rendition && this.pub.metadata.rendition.layout === 'fixed') {
       return 'pre-paginated';
     }
 
@@ -163,29 +162,26 @@ export class PackageDocument {
   }
 
   private getPageProgressionDirection(): string {
-    const pageProgressionDirection = this.pub.Metadata.ReadingProgression;
-    if (pageProgressionDirection === ReadingProgression.RTL) {
-      return 'rtl';
-    }
+    const pageProgressionDirection = this.pub.metadata.readingProgression;
 
-    if (pageProgressionDirection === ReadingProgression.Auto) {
+    if (pageProgressionDirection === 'auto') {
       return 'default';
     }
 
-    return 'ltr';
+    return pageProgressionDirection;
   }
 
   private getSharedJsSpine(): object {
-    return this.pub.Spine.map((pubSpineItem: Link) => {
+    return this.pub.spine.map((pubSpineItem: Link) => {
       return {
-        href: pubSpineItem.Href,
-        media_type: pubSpineItem.Type,
+        href: pubSpineItem.href,
+        media_type: pubSpineItem.type,
         // assuming that the order of spine items in webpub indicates that they are linear
         linear: 'yes',
 
         // R2: these data is lost
         rendition_viewport: undefined,
-        idref: pubSpineItem.Href,
+        idref: pubSpineItem.href,
         manifest_id: '',
         media_overlay_id: '',
         properties: '',

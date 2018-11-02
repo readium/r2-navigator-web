@@ -1,4 +1,3 @@
-import { ReadingProgression } from 'r2-webpub-model-js/lib/models/metadata/readingprogression';
 import { Publication } from '../../streamer';
 import { Location } from '../location';
 import { IContentViewFactory } from './content-view/content-view-factory';
@@ -66,12 +65,12 @@ export class LayoutView extends View {
     this.vs = vs;
     this.initSpineItemViews();
 
-    if (this.publication.Metadata.Rendition) {
-      this.isFixedLayout = this.publication.Metadata.Rendition.Layout === 'fixed';
+    if (this.publication.metadata.rendition) {
+      this.isFixedLayout = this.publication.metadata.rendition.layout === 'fixed';
     }
 
-    if (this.publication.Metadata.ReadingProgression) {
-      this.isRtl = this.publication.Metadata.ReadingProgression === ReadingProgression.RTL;
+    if (this.publication.metadata.readingProgression) {
+      this.isRtl = this.publication.metadata.readingProgression === 'rtl';
     }
 
     this.spineItemViewFactory = new SpineItemViewFactory(pub,
@@ -79,9 +78,9 @@ export class LayoutView extends View {
                                                          cvFactory);
 
     // tslint:disable-next-line:prefer-array-literal
-    this.spineItemViewSizes = new Array<number>(pub.Spine.length).fill(-1);
+    this.spineItemViewSizes = new Array<number>(pub.spine.length).fill(-1);
     // tslint:disable-next-line:prefer-array-literal
-    this.spineItemViewPageCounts = new Array<number>(pub.Spine.length).fill(-1);
+    this.spineItemViewPageCounts = new Array<number>(pub.spine.length).fill(-1);
   }
 
   public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
@@ -244,7 +243,7 @@ export class LayoutView extends View {
   }
 
   public hasMoreAfterEnd(): boolean {
-    return this.nextIndexAfterEnd() < this.publication.Spine.length;
+    return this.nextIndexAfterEnd() < this.publication.spine.length;
   }
 
   public hasMoreBeforeStart(): boolean {
@@ -621,7 +620,7 @@ export class LayoutView extends View {
       newSpineItemIndex = this.endViewStatus().spineItemIndex + 1;
     }
 
-    if (newSpineItemIndex >= this.publication.Spine.length) {
+    if (newSpineItemIndex >= this.publication.spine.length) {
       return;
     }
 
@@ -701,12 +700,12 @@ export class LayoutView extends View {
     if (this.spineItemViewSizes[index] > 0) {
       viewLength = this.spineItemViewSizes[index];
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
-      spineItemView.loadSpineItem(this.publication.Spine[index], this.vs, token).then(() => {
+      spineItemView.loadSpineItem(this.publication.spine[index], this.vs, token).then(() => {
         this.onSpineItemLoaded(spineItemView);
       });
     } else {
       this.hasUnknownSizeSpineItemLoading = true;
-      await spineItemView.loadSpineItem(this.publication.Spine[index], this.vs, token);
+      await spineItemView.loadSpineItem(this.publication.spine[index], this.vs, token);
       this.hasUnknownSizeSpineItemLoading = false;
 
       if (token && token.isCancelled) {

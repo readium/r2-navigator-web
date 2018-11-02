@@ -24,7 +24,7 @@ export class SpineItemViewFactory {
   }
 
   public createSpineItemView(pageWidth: number, pageHeight: number): [SpineItemView, HTMLElement] {
-    const spineItemView = new SpineItemView(this.publication.Spine,
+    const spineItemView = new SpineItemView(this.publication.spine,
                                             this.isVertical,
                                             this.isFixedLayout,
                                             this.contentViewFactory);

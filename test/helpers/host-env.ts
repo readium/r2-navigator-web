@@ -65,7 +65,7 @@ export class HostEnv {
 
   public createSpineItemView(pageWidth: number, pageHeight: number,
                              isVertical: boolean, isFixedLayout: boolean): SpineItemView {
-    const spineItemView = new SpineItemView(this.publication.Spine,
+    const spineItemView = new SpineItemView(this.publication.spine,
                                             isVertical,
                                             isFixedLayout,
                                             this.cvFactory);
@@ -83,7 +83,7 @@ export class HostEnv {
   }
 
   public async loadSpineItem(siView: SpineItemView, siIndex: number): Promise<void> {
-    await siView.loadSpineItem(this.publication.Spine[siIndex], this.viewSettings);
+    await siView.loadSpineItem(this.publication.spine[siIndex], this.viewSettings);
   }
 
   public getLayoutView(): LayoutView {

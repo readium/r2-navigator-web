@@ -100,7 +100,7 @@ export class Navigator {
       return false;
     }
 
-    return pos.spineItemIndex >= this.pub.Spine.length &&
+    return pos.spineItemIndex >= this.pub.spine.length &&
            pos.pageIndex + 1 === pos.spineItemPageCount;
   }
 
@@ -149,7 +149,7 @@ export class Navigator {
     await pos.view.ensureContentLoaded();
 
     return new Location(pos.view.getCfi(pos.offsetInView, 0),
-                        this.pub.Spine[pos.spineItemIndex].Href);
+                        this.pub.spine[pos.spineItemIndex].href);
   }
 
   private locationFromPagination(pos?: PaginationInfo): Location | undefined | null {
@@ -158,6 +158,6 @@ export class Navigator {
     }
 
     return new Location(pos.view.getCfi(pos.offsetInView, 0),
-                        this.pub.Spine[pos.spineItemIndex].Href);
+                        this.pub.spine[pos.spineItemIndex].href);
   }
 }

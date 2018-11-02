@@ -62,10 +62,10 @@ export class R2ContentView implements IContentView {
     };
 
     this.iframeLoader.loadIframe(this.iframe,
-                                 spineItem.Href,
+                                 spineItem.href,
                                  onIframeContentLoaded,
                                  loaderConfig,
-                                 spineItem.Type);
+                                 spineItem.type);
 
     return this.iframeLoadedPromise();
   }
