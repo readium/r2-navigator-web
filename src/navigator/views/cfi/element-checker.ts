@@ -248,7 +248,6 @@ export class ElementVisibilityChecker {
       // tslint:disable-next-line:no-bitwise
       NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
       { acceptNode: (): number => { return NodeFilter.FILTER_ACCEPT; } },
-      false,
     );
 
     let node = nodeIterator.nextNode();

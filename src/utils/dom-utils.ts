@@ -26,7 +26,7 @@ export function isIframeAlive(iframe: HTMLIFrameElement): boolean {
 
 export function triggerLayout(iframe: HTMLIFrameElement): void {
   const doc = iframe.contentDocument;
-  if (!doc) {
+  if (!doc || !doc.head) {
     return;
   }
 

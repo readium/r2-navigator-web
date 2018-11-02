@@ -70,6 +70,7 @@ export class IFrameLoader {
                  href: string,
                  config: ILoaderConfig): string {
     const parser = new DOMParser();
+    // @ts-ignore
     const doc = parser.parseFromString(sourceText, contentType);
 
     const headElement = doc.querySelector('head');
@@ -87,6 +88,10 @@ export class IFrameLoader {
 
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
+    }
+
+    if (!doc.documentElement) {
+      return '';
     }
 
     return doc.documentElement.outerHTML;

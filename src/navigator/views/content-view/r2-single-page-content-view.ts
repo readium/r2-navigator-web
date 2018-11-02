@@ -155,7 +155,7 @@ export class R2SinglePageContentView extends R2ContentView  {
     const win = this.iframe.contentWindow;
     const doc = this.iframe.contentDocument;
 
-    if (win && doc) {
+    if (win && doc && doc.documentElement) {
       return Math.round(DomUtils.height(doc.documentElement, win));
     }
 
