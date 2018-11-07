@@ -10,7 +10,7 @@ describe('StreamerClient', () => {
         '/fixtures/publications/metamorphosis/manifest.json',
       );
       // tslint:disable-next-line:no-http-string
-      assert.equal(pub.Context[0], 'http://readium.org/webpub/default.jsonld');
+      assert.equal(pub.context[0], 'http://readium.org/webpub/default.jsonld');
     });
   });
 });

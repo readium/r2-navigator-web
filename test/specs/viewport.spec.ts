@@ -28,9 +28,7 @@ describe('Viewport', () => {
     viewport = new Viewport(viewportDiv);
 
     // tslint:disable-next-line:max-line-length
-    const publication = await Publication.fromURL(
-      '/fixtures/publications/metamorphosis/manifest.json',
-    );
+    const publication = await Publication.fromURL(`${window.location.origin}/fixtures/publications/metamorphosis/manifest.json`);
 
     const vs = new ViewSettings();
     layoutView = new LayoutView(publication, vs, new R1ContentViewFactory(publication));

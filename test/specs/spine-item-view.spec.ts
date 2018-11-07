@@ -106,7 +106,7 @@ describe('SpineItemView', () => {
       assert.equal(pageSize, 347);
 
       const page4Size = siv4.getTotalSize(pageWidth);
-      assert.equal(page4Size, 15504);
+      assert.equal(page4Size, 15503);
     });
 
     it('getCfi()', async () => {

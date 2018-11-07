@@ -44,7 +44,7 @@ export class HostEnv {
 
   public async openPublicationR1(pubUrl: string): Promise<void> {
     this.pubUrl = pubUrl;
-    this.publication = await Publication.fromURL(this.pubUrl);
+    this.publication = await Publication.fromURL(`${window.location.origin}${this.pubUrl}`);
 
     this.cvFactory = new R1ContentViewFactory(this.publication);
     this.viewSettings = new ViewSettings();
@@ -53,7 +53,7 @@ export class HostEnv {
 
   public async openPublicationR2(pubUrl: string): Promise<void> {
     this.pubUrl = pubUrl;
-    this.publication = await Publication.fromURL(this.pubUrl);
+    this.publication = await Publication.fromURL(`${window.location.origin}${this.pubUrl}`);
 
     const loader = new IFrameLoader(this.publication.getBaseURI());
     loader.setReadiumCssBasePath('/fixtures/readium-css');
