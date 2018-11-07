@@ -16,7 +16,7 @@
     "modified": "2018-04-23T18:47:41.737Z",
     "published": "2013-01-01T00:00:00.000Z",
     "description": " In this collection the poems are arranged in chronological order. The reader can follow Sassoon's emotional journey from a naive young officer with a fervent sense of mission, to a man  who could only see madness in the brutality, hypocrisy and waste of war. Sassoon's intelligence and writing skills create stunning and often horrifying word pictures in just a few lines. \n",
-    "direction": "ltr",
+    "readingProgression": "ltr",
     "rendition": {
       "layout": "fixed",
       "orientation": "auto",
@@ -32,13 +32,13 @@
   },
   "links": [
     {
-      "href": "http://localhost:9876/fixtures/publications/igp-twss-fxl/manifest.json",
+      "href": "/fixtures/publications/igp-twss-fxl/manifest.json",
       "type": "application/webpub+json",
       "templated": false,
       "rel": "self"
     }
   ],
-  "spine": [
+  "readingOrder": [
     {
       "href": "OPS/s001-Cover-01.xhtml",
       "type": "application/xhtml+xml"

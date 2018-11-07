@@ -18,13 +18,13 @@
   },
   "links": [
     {
-      "href": "http://localhost:9876/fixtures/publications/metamorphosis/manifest.json",
+      "href": "/fixtures/publications/metamorphosis/manifest.json",
       "type": "application/webpub+json",
       "templated": false,
       "rel": "self"
     }
   ],
-  "spine": [
+  "readingOrder": [
     {
       "href": "OEBPS/title-page.html",
       "type": "application/xhtml+xml"

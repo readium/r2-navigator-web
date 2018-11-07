@@ -31,13 +31,13 @@
   },
   "links": [
     {
-      "href": "http://localhost:9876/fixtures/publications/war-of-the-worlds/manifest.json",
+      "href": "/fixtures/publications/war-of-the-worlds/manifest.json",
       "type": "application/webpub+json",
       "templated": false,
       "rel": "self"
     }
   ],
-  "spine": [
+  "readingOrder": [
     {
       "href": "OPS/cover.xml",
       "type": "application/xhtml+xml"
