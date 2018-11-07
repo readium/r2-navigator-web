@@ -131,6 +131,10 @@ export class SpineItemView extends View {
     return Promise.reject('Not loaded');
   }
 
+  public isContentLoaded(): boolean {
+    return this.contentStatus === ContentLoadingStatus.Loaded;
+  }
+
   public resize(pageWidth: number, pageHeight: number): void {
     if (this.isFixedLayout) {
       this.resizeFixedLayoutPage(this.scaleOption, pageWidth, pageHeight);
@@ -255,11 +259,9 @@ export class SpineItemView extends View {
   //   return navLogic.isElementVisible($ele, visOffset);
   // }
 
-  // public getNearestCfiFromElement(element: any): any {
-  //   const navLogic = this.contentViewImpl.getNavigator();
-
-  //   return navLogic.getNearestCfiFromElement(element);
-  // }
+  public getCfiFromElementId(elementId: string): string {
+    return this.contentView.getCfiFromElementId(elementId);
+  }
 
   // public getIframe(): any {
   //   return this.$iframe;

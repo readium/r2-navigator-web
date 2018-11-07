@@ -174,9 +174,7 @@ export class IFrameLoader {
     const eventCbs = this.loaderEvents.iframeLoaded;
     if (!eventCbs) return;
 
-    eventCbs.forEach(eventCb => {
-      eventCb(iframe);
-    });
+    eventCbs.forEach(eventCb => eventCb(iframe));
   }
 
   private loadIframeWithDocument(

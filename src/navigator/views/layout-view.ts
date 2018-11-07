@@ -336,6 +336,15 @@ export class LayoutView extends View {
     return siv.offset + inSpineItemOffset;
   }
 
+  public getCfiFromAnchor(href: string, elementId: string): string | undefined {
+    const siv = this.getLoadedSpineItemViewStatusFromHref(href);
+    if (!siv) {
+      return undefined;
+    }
+
+    return siv.view.getCfiFromElementId(elementId);
+  }
+
   public async ensureLoaded(token?: CancellationToken): Promise<void> {
     for (const siv of this.spineItemViewStatus) {
       await siv.view.ensureContentLoaded(token);
@@ -772,6 +781,22 @@ export class LayoutView extends View {
       if (siIndex === siv.spineItemIndex) {
         await siv.view.ensureContentLoaded();
         retSiv = siv;
+      }
+    }
+
+    return retSiv;
+  }
+
+  private getLoadedSpineItemViewStatusFromHref(href: string): SpineItemViewStatus | undefined {
+    let retSiv: SpineItemViewStatus | undefined;
+    const siIndex = this.findSpineItemIndexByHref(href);
+    for (const siv of this.spineItemViewStatus) {
+      if (siIndex === siv.spineItemIndex) {
+        if (siv.view.isContentLoaded()) {
+          retSiv = siv;
+        } else {
+          break;
+        }
       }
     }
 

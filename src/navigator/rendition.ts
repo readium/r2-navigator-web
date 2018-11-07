@@ -161,6 +161,14 @@ export class Rendition {
     return this.pub;
   }
 
+  public getCfiFromAnchor(href: string, elementId: string): string | undefined {
+    if (!this.bookView) {
+      return undefined;
+    }
+
+    return this.bookView.getCfiFromAnchor(href, elementId);
+  }
+
   // // tslint:disable-next-line:no-any
   // public getReadiumPackageDocument(): any {
   //   return this.bookView.getRsjPackageDocument();

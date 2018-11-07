@@ -31,6 +31,7 @@ export interface IContentView {
   getPageIndexOffsetFromCfi(cfi: string): number;
   getPageIndexOffsetFromElementId(elementId: string): number;
   getCfi(offsetMain: number, offset2nd: number, backward: boolean): string;
+  getCfiFromElementId(elementId: string): string;
 
   onResize(): void;
 }

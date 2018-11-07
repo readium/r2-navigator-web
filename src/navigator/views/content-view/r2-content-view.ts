@@ -134,6 +134,11 @@ export class R2ContentView implements IContentView {
     throw new Error('Method not implemented.');
   }
 
+  public getCfiFromElementId(elementId: string): string {
+    const cfi = this.cfiNavLogic.getCfiFromElementId(elementId);
+    return cfi === null ? '' : cfi;
+  }
+
   public onResize(): void {
     return;
   }

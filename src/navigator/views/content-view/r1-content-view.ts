@@ -124,6 +124,10 @@ export class R1ContentView implements IContentView {
     return navLogic.isElementVisible($ele, { top: offset2nd, left: -offsetMain });
   }
 
+  public getCfiFromElementId(elementId: string): string {
+    throw new Error('Method not implemented.');
+  }
+
   public getNearestCfiFromElement(element: any): any {
     const navLogic = this.contentViewImpl.getNavigator();
 

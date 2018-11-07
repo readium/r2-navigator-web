@@ -16,6 +16,15 @@ export class CfiNavigationLogic {
     this.elementChecker = eleChecker;
   }
 
+  public getCfiFromElementId(elementId: string): string | null {
+    const element = this.getElementById(elementId);
+    if (!element) {
+      return null;
+    }
+
+    return this.getCfiFromElement(element);
+  }
+
   public getCfiFromElement(element: Element): string {
     let cfi = EPUBcfi.Generator.generateElementCFIComponent(
                 element,
