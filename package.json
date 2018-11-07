@@ -70,13 +70,13 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "r2-webpub-model-js": "^1.0.0-alpha.0",
-    "@evidentpoint/readium-shared-js": "^1.0.0-alpha",
     "@evidentpoint/readium-cfi-js": "^1.0.0-alpha.4",
+    "@evidentpoint/readium-shared-js": "^1.0.0-alpha",
+    "eventemitter3": "^3.1.0",
     "isomorphic-url-shim": "^1.0.2",
+    "jquery": "^3.3.1",
     "r2-glue-js": "^0.0.0",
-    "eventemitter3": "^2.0.3",
-    "jquery": "^3.3.1"
+    "r2-webpub-model-js": "^1.0.0-alpha.0"
   },
   "publishConfig": {
     "access": "public"
