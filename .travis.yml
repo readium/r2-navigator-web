@@ -1,0 +1,16 @@
+dist: trusty
+addons:
+  chrome: stable
+  firefox: latest
+sudo: false
+branches:
+  only:
+  - master
+language: node_js
+node_js: lts/*
+env:
+- MOZ_HEADLESS=1
+install:
+- npm install
+script:
+- npm run test
