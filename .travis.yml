@@ -1,8 +1,7 @@
-dist: trusty
+dist: xenial
 addons:
   chrome: stable
   firefox: latest
-sudo: false
 branches:
   only:
   - master
