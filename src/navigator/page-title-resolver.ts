@@ -1,4 +1,4 @@
-import * as EPUBcfi from '@evidentpoint/readium-cfi-js';
+import * as EPUBcfi from 'readium-cfi-js';
 
 import { Publication } from '../streamer/publication';
 import { Location } from './location';

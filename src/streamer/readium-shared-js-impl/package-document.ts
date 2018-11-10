@@ -1,4 +1,4 @@
-import { Interpreter } from '@evidentpoint/readium-cfi-js';
+import { Interpreter } from 'readium-cfi-js';
 import { Link } from 'r2-webpub-model-js/lib/models/link';
 import { Publication } from '../publication';
 

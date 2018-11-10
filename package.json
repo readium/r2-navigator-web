@@ -70,7 +70,7 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "@evidentpoint/readium-cfi-js": "^1.0.0-alpha.4",
+    "readium-cfi-js": "^1.0.0-alpha.1",
     "@evidentpoint/readium-shared-js": "^1.0.0-alpha",
     "eventemitter3": "^3.1.0",
     "isomorphic-url-shim": "^1.0.2",
