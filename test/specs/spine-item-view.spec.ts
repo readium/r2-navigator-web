@@ -22,41 +22,6 @@ describe('SpineItemView', () => {
     hostEnv.clear();
   });
 
-  describe('SpineItemView-R1', () => {
-    beforeEach(async () => {
-      await hostEnv.openPublicationR1('/fixtures/publications/metamorphosis/manifest.json');
-    });
-
-    it('loadSpineItem()', async () => {
-      const pageWidth = 400;
-      const siv = hostEnv.createSpineItemView(pageWidth, 800, false, false);
-      await hostEnv.loadSpineItem(siv, 0);
-      const pageSize = siv.getTotalSize(pageWidth);
-
-      assert.equal(pageSize, 400);
-
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
-      await hostEnv.loadSpineItem(siv4, 4);
-      const page4Size = siv4.getTotalSize(pageWidth);
-
-      assert.equal(page4Size, 7600);
-
-    });
-
-    it('getCfi()', async () => {
-      const pageWidth = 400;
-      const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
-      await hostEnv.loadSpineItem(siv4, 4);
-
-      const cfi1 = siv4.getCfi(0, 0, false);
-      console.log(cfi1);
-
-      const cfi2 = siv4.getCfi(600, 0, false);
-      console.log(`R1 ${cfi2}`);
-
-    });
-  });
-
   describe('SpineItemView-R2', () => {
     const pageWidth = 400;
     let siv4: SpineItemView;
@@ -106,7 +71,7 @@ describe('SpineItemView', () => {
       assert.equal(pageSize, 347);
 
       const page4Size = siv4.getTotalSize(pageWidth);
-      assert.equal(page4Size, 15503);
+      assert.approximately(page4Size, 15504, 1);
     });
 
     it('getCfi()', async () => {

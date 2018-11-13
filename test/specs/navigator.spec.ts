@@ -15,11 +15,8 @@ describe('Navigator', () => {
 
   const initBook = async (url: string, isR1: boolean, isVert: boolean): Promise<void> => {
     hostEnv = new HostEnv();
-    if (isR1) {
-      await hostEnv.openPublicationR1(url);
-    } else {
-      await hostEnv.openPublicationR2(url);
-    }
+
+    await hostEnv.openPublicationR2(url);
 
     const rendition = hostEnv.getRendition();
     if (isVert) {
@@ -141,7 +138,7 @@ describe('Navigator', () => {
 
       const loc = await navigator.getCurrentLocation();
       assert(loc);
-      assert.equal(loc!.getLocation(), '/4/2/2[Copyright1]/2[copyright1]/2[p2]/2/1:1');
+      assert.equal(loc!.getLocation(), '/4/2/2[Copyright1]/2[copyright1]/2[p2]/2/1:0');
       assert.equal(loc!.getHref(), 'OPS/s004-Copyright-01.xhtml');
     });
 
