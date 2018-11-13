@@ -18,7 +18,7 @@ describe('LayoutView', () => {
 
   beforeEach(async () => {
     hostEnv = new HostEnv();
-    await hostEnv.openPublicationR1('/fixtures/publications/metamorphosis/manifest.json');
+    await hostEnv.openPublicationR2('/fixtures/publications/metamorphosis/manifest.json');
     layoutView = hostEnv.getLayoutView();
     layoutView.setPageSize(200, 400);
   });
