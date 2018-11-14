@@ -12,7 +12,6 @@ export {
   stringToSettingName,
   ZoomOptions,
 } from './views/types';
-export { getReadiumEventsRelayInstance } from './views/readium-events-relay';
 export { NavigationRequestManager } from './request-manager';
 export { IContentViewFactory } from './views/content-view/content-view-factory';
 export { R2ContentViewFactory } from './views/content-view/r2-content-view-factory';
