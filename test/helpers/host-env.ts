@@ -5,8 +5,6 @@ import {
 } from '../../src/navigator/views/cfi/element-checker';
 import { IContentViewFactory } from '../../src/navigator/views/content-view/content-view-factory';
 // tslint:disable-next-line:max-line-length
-import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
-// tslint:disable-next-line:max-line-length
 import { R2ContentViewFactory } from '../../src/navigator/views/content-view/r2-content-view-factory';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { ViewSettings } from '../../src/navigator/views/view-settings';
@@ -40,15 +38,6 @@ export class HostEnv {
 
   public getViewSettings(): ViewSettings {
     return this.viewSettings;
-  }
-
-  public async openPublicationR1(pubUrl: string): Promise<void> {
-    this.pubUrl = pubUrl;
-    this.publication = await Publication.fromURL(`${window.location.origin}${this.pubUrl}`);
-
-    this.cvFactory = new R1ContentViewFactory(this.publication);
-    this.viewSettings = new ViewSettings();
-    this.eleChecker = new ElementBlacklistedChecker([], [], []);
   }
 
   public async openPublicationR2(pubUrl: string): Promise<void> {

@@ -1,8 +1,8 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { LayoutView, Viewport } from '../../src/navigator';
+import { IFrameLoader, LayoutView, Viewport } from '../../src/navigator';
 // tslint:disable-next-line:max-line-length
-import { R1ContentViewFactory } from '../../src/navigator/views/content-view/r1-content-view-factory';
+import { R2ContentViewFactory } from '../../src/navigator/views/content-view/r2-content-view-factory';
 import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
 
@@ -30,8 +30,11 @@ describe('Viewport', () => {
     // tslint:disable-next-line:max-line-length
     const publication = await Publication.fromURL(`${window.location.origin}/fixtures/publications/metamorphosis/manifest.json`);
 
+    const loader = new IFrameLoader(publication.getBaseURI());
+    loader.setReadiumCssBasePath('/fixtures/readium-css');
+
     const vs = new ViewSettings();
-    layoutView = new LayoutView(publication, vs, new R1ContentViewFactory(publication));
+    layoutView = new LayoutView(publication, vs, new R2ContentViewFactory(loader));
     layoutView.setPageSize(400, 400);
 
     viewport.setView(layoutView);

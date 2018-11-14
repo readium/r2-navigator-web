@@ -1,6 +1,7 @@
 import { Publication } from '../streamer';
 import { Rendition } from './rendition';
-import { R1ContentViewFactory } from './views/content-view/r1-content-view-factory';
+import { R2ContentViewFactory } from './views/content-view/r2-content-view-factory';
+import { IFrameLoader } from './iframe-loader';
 
 export class ReadingSystem {
   private viewport: HTMLElement;
@@ -10,6 +11,7 @@ export class ReadingSystem {
   }
 
   public openRendition(pub: Publication): Rendition {
-    return new Rendition(pub, this.viewport, new R1ContentViewFactory(pub));
+    const loader = new IFrameLoader(pub.getBaseURI());
+    return new Rendition(pub, this.viewport, new R2ContentViewFactory(loader));
   }
 }
