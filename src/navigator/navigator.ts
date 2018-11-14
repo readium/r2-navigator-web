@@ -19,7 +19,7 @@ export class Navigator {
 
   public async nextScreen(): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async token => {
+      async (token) => {
         await this.rendition.viewport.nextScreen(token);
       },
     );
@@ -27,7 +27,7 @@ export class Navigator {
 
   public async previousScreen(): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async token => {
+      async (token) => {
         await this.rendition.viewport.prevScreen(token);
       },
     );
@@ -45,9 +45,17 @@ export class Navigator {
     return this.getScreenBegin();
   }
 
+  public async gotoBegin(): Promise<void> {
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.renderAtSpineItem(0, token);
+      },
+    );
+  }
+
   public async gotoLocation(loc: Location): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async token => {
+      async (token) => {
         await this.rendition.viewport.renderAtLocation(loc, token);
       },
     );
@@ -55,7 +63,7 @@ export class Navigator {
 
   public async gotoAnchorLocation(href: string, eleId: string): Promise<void> {
     await this.requestManager.executeNavigationAction(
-      async token => {
+      async (token) => {
         await this.rendition.viewport.renderAtAnchorLocation(href, eleId, token);
       },
     );
@@ -135,13 +143,12 @@ export class Navigator {
   }
 
   public getScreenCountSpine(): number {
-    // const pos = this.rendition.viewport.getStartPosition();
-    // if (!pos) {
-    //   return -1;
-    // }
+    const pos = this.rendition.viewport.getStartPosition();
+    if (!pos) {
+      return -1;
+    }
 
-    // return pos.spineItemPageCount;
-    return -1;
+    return pos.spineItemPageCount;
   }
 
   // public async gotoScreenSpine(screenIndex: number): Promise<void> {

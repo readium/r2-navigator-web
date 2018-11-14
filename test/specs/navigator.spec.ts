@@ -65,7 +65,7 @@ describe('Navigator', () => {
     });
   });
 
-  describe('navigator-r1', () => {
+  describe('navigator', () => {
     beforeEach(async () => {
       await initBook('/fixtures/publications/metamorphosis/manifest.json', true, false);
     });
@@ -98,7 +98,7 @@ describe('Navigator', () => {
       assert.equal(navigator.isFirstScreenSpine(), true);
       assert.equal(navigator.isFinalScreenSpine(), true);
 
-      // assert.equal(navigator.getScreenCountSpine(), 1);
+      assert.equal(navigator.getScreenCountSpine(), 1);
     });
 
     it('gotoLocation()', async () => {
@@ -161,24 +161,7 @@ describe('Navigator', () => {
     });
   });
 
-  describe('navigator-r2', () => {
-    beforeEach(async () => {
-      await initBook('/fixtures/publications/metamorphosis/manifest.json', false, false);
-    });
-
-    it('gotoLocation()', async () => {
-      const newLoc = new Location('/4/2[copyright-page]/2/2/1:32', 'OEBPS/copyright.html');
-      await navigator.gotoLocation(newLoc);
-
-      const loc = await navigator.getCurrentLocation();
-
-      assert(loc);
-      assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
-      assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
-    });
-  });
-
-  describe('navigator-r2-vertical', () => {
+  describe('navigator-vertical', () => {
     beforeEach(async () => {
       await initBook('/fixtures/publications/metamorphosis/manifest.json', false, true);
     });

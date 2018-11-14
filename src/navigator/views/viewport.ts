@@ -356,7 +356,7 @@ export class Viewport {
   }
 
   private bindEvents(): void {
-    this.root.addEventListener('scroll', async e => {
+    this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {
         return;
       }
