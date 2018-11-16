@@ -2,7 +2,7 @@ import { Rect } from '../cfi/rect';
 import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
-import * as DomUtils from '../../../utils/dom-utils';
+import * as DomUtils from './dom-utils';
 
 type Size = [number, number];
 

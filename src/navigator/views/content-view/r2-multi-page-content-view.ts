@@ -1,4 +1,4 @@
-import { triggerLayout } from '../../../utils/dom-utils';
+import { triggerLayout } from './dom-utils';
 import { Rect } from '../cfi/rect';
 import { SettingName } from '../types';
 import { ViewSettings } from '../view-settings';

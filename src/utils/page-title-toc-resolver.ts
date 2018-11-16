@@ -1,8 +1,8 @@
 import * as EPUBcfi from 'readium-cfi-js';
 
 import { Publication } from '../streamer/publication';
-import { Location } from './location';
-import { Rendition } from './rendition';
+import { Location } from '../navigator/location';
+import { Rendition } from '../navigator/rendition';
 import { EPUBLink } from 'r2-webpub-model-js/lib/extensions/epub/link';
 import { Link } from 'r2-webpub-model-js/lib/models/link';
 

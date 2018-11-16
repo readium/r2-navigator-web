@@ -1,5 +1,5 @@
 import { HostEnv } from '../helpers/host-env';
-import { PageTitleTocResolver } from '../../src/navigator/page-title-toc-resolver';
+import { PageTitleTocResolver } from '../../src/utils/page-title-toc-resolver';
 import { Navigator, SpreadMode } from '../../src/navigator';
 
 // tslint:disable-next-line:no-implicit-dependencies
