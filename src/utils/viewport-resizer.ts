@@ -1,7 +1,5 @@
-import {
-  RenditionContext,
-  Location,
-} from '@evidentpoint/r2-navigator-web';
+import { RenditionContext } from '../navigator/rendition-context';
+import { Location } from '../navigator/location';
 
 type OnSizeUpdateCallback = () => void;
 
