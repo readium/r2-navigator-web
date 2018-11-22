@@ -33,6 +33,22 @@ export class Navigator {
     );
   }
 
+  public async nextSpineItem(): Promise<void> {
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.nextSpineItem(token);
+      },
+    );
+  }
+
+  public async previousSpineItem(): Promise<void> {
+    await this.requestManager.executeNavigationAction(
+      async (token) => {
+        await this.rendition.viewport.prevSpineItem(token);
+      },
+    );
+  }
+
   public async ensureLoaded(): Promise<void> {
     await this.rendition.viewport.ensureLoaded();
   }

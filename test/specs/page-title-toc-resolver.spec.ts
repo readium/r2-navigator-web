@@ -1,6 +1,6 @@
 import { HostEnv } from '../helpers/host-env';
 import { PageTitleTocResolver } from '../../src/utils/page-title-toc-resolver';
-import { Navigator, SpreadMode } from '../../src/navigator';
+import { Navigator, ScrollMode, SpreadMode } from '../../src/navigator';
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
@@ -31,7 +31,7 @@ describe('PageTitleTocResolver', () => {
         pageHeight: 800,
       });
       rendition.setViewAsVertical(false);
-      rendition.viewport.enableScroll(false);
+      rendition.viewport.setScrollMode(ScrollMode.None);
 
       await rendition.render();
       const navigator = new Navigator(rendition);
@@ -57,7 +57,7 @@ describe('PageTitleTocResolver', () => {
         pageHeight: 800,
       });
       rendition.setViewAsVertical(false);
-      rendition.viewport.enableScroll(false);
+      rendition.viewport.setScrollMode(ScrollMode.None);
 
       await rendition.render();
       const navigator = new Navigator(rendition);

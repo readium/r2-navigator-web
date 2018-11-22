@@ -3,7 +3,7 @@ export { RenditionContext } from './rendition-context';
 export { ReadingSystem } from './reading-system';
 export { Location } from './location';
 export { Rendition, SpreadMode } from './rendition';
-export { Viewport } from './views/viewport';
+export { ScrollMode, Viewport } from './views/viewport';
 export { LayoutView } from './views/layout-view';
 export {
   CancellationToken,

@@ -6,6 +6,12 @@ import { CancellationToken } from './types';
 
 type VisiblePagesReadyCallbackType = (cv: IContentView) => void;
 
+export enum ScrollMode {
+  None,
+  Publication,
+  SpineItem,
+}
+
 export class Viewport {
   private bookView: LayoutView;
 
@@ -24,7 +30,7 @@ export class Viewport {
 
   private scrollRequestToken?: CancellationToken;
 
-  private scrollEnabled: boolean = false;
+  private scrollMode: ScrollMode = ScrollMode.None;
 
   private scrollFromInternal: boolean = false;
 
@@ -37,6 +43,8 @@ export class Viewport {
 
     this.nextScreen = this.nextScreen.bind(this);
     this.prevScreen = this.prevScreen.bind(this);
+    this.nextSpineItem = this.nextSpineItem.bind(this);
+    this.prevSpineItem = this.prevSpineItem.bind(this);
 
     this.bindEvents();
   }
@@ -54,7 +62,7 @@ export class Viewport {
     this.bookView.attachToHost(this.root);
   }
 
-  public enableScroll(e: boolean): void {
+  public setScrollMode(mode: ScrollMode): void {
     this.root.style.overflowX = 'hidden';
     this.root.style.overflowY = 'hidden';
     // tslint:disable-next-line:no-any
@@ -65,8 +73,8 @@ export class Viewport {
       return;
     }
 
-    this.scrollEnabled = e;
-    if (this.scrollEnabled) {
+    this.scrollMode = mode;
+    if (this.scrollMode === ScrollMode.Publication || this.scrollMode === ScrollMode.SpineItem) {
       if (this.bookView.isVerticalLayout()) {
         this.root.style.overflowY = 'scroll';
       } else {
@@ -131,7 +139,7 @@ export class Viewport {
   }
 
   public async renderAtSpineItem(spineItemIndex: number, token?: CancellationToken): Promise<void> {
-    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
+    await this.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
     if (token && token.isCancelled) {
       return;
     }
@@ -141,7 +149,6 @@ export class Viewport {
     }
 
     this.viewOffset = await this.ensureViewportFilledAtPosition(pos, token);
-    this.updatePositions();
 
     this.adjustScrollPosition();
     this.render();
@@ -152,7 +159,7 @@ export class Viewport {
 
     await this.onPagesReady(token);
 
-    await  this.updatePrefetch(token);
+    await this.updatePrefetch(token);
   }
 
   public async renderAtLocation(loc: Location, token?: CancellationToken): Promise<void> {
@@ -161,7 +168,7 @@ export class Viewport {
       return;
     }
 
-    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
+    await this.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
     if (token && token.isCancelled) {
       return;
     }
@@ -172,7 +179,6 @@ export class Viewport {
     }
 
     this.viewOffset = await this.ensureViewportFilledAtPosition(offset, token);
-    this.updatePositions();
 
     this.adjustScrollPosition();
     this.render();
@@ -193,7 +199,7 @@ export class Viewport {
       return;
     }
 
-    await this.bookView.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
+    await this.ensureContentLoadedAtSpineItemRange(spineItemIndex, spineItemIndex, token);
     if (token && token.isCancelled) {
       return;
     }
@@ -204,7 +210,6 @@ export class Viewport {
     }
 
     this.viewOffset = await this.ensureViewportFilledAtPosition(offset);
-    this.updatePositions();
 
     this.adjustScrollPosition();
     this.render();
@@ -243,6 +248,22 @@ export class Viewport {
         (newPos >= loadedStartPos || this.bookView.hasMoreBeforeStart())) {
       await this.renderAtOffset(newPos, token);
     }
+  }
+
+  public async nextSpineItem(token?: CancellationToken): Promise<void> {
+    if (this.startPos === undefined) {
+      return;
+    }
+
+    await this.renderAtSpineItem(this.startPos.spineItemIndex + 1, token);
+  }
+
+  public async prevSpineItem(token?: CancellationToken): Promise<void> {
+    if (this.startPos === undefined) {
+      return;
+    }
+
+    await this.renderAtSpineItem(this.startPos.spineItemIndex - 1, token);
   }
 
   public async ensureLoaded(token?: CancellationToken): Promise<void> {
@@ -390,19 +411,21 @@ export class Viewport {
 
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
-      if (!this.scrollEnabled || this.scrollFromInternal) {
+      if (this.scrollMode === ScrollMode.None || this.scrollFromInternal) {
         return;
       }
 
       this.viewOffset = this.scrollOffset();
       // console.log(`offset: ${this.viewOffset}`);
 
-      const start = this.viewOffset - this.prefetchSize;
-      const end = this.viewOffset + this.viewportSize + this.prefetchSize;
-      if ((end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) ||
-         (start <= this.bookView.getLoadedStartPostion() && this.bookView.hasMoreBeforeStart())) {
-        await this.ensureConentLoadedAtRange(start, end);
-        this.adjustScrollPosition();
+      if (this.scrollMode === ScrollMode.Publication) {
+        const start = this.viewOffset - this.prefetchSize;
+        const end = this.viewOffset + this.viewportSize + this.prefetchSize;
+        if ((end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) ||
+          (start <= this.bookView.getLoadedStartPostion() && this.bookView.hasMoreBeforeStart())) {
+          await this.ensureConentLoadedAtRange(start, end);
+          this.adjustScrollPosition();
+        }
       }
       this.render();
     });
@@ -430,6 +453,10 @@ export class Viewport {
 
     await this.bookView.ensureConentLoadedAtRange(start, end, token);
     this.updatePositions();
+
+    if (this.scrollMode === ScrollMode.SpineItem) {
+      this.showOnlyCurrentSpineItemRange();
+    }
   }
 
   private updatePositions(): void {
@@ -452,7 +479,7 @@ export class Viewport {
   }
 
   private adjustScrollPosition(): void {
-    if (!this.scrollEnabled) {
+    if (this.scrollMode !== ScrollMode.Publication) {
       return;
     }
 
@@ -467,9 +494,7 @@ export class Viewport {
   }
 
   private render(): void {
-    if (this.scrollEnabled) {
-      this.updateScrollFromViewOffset();
-    } else {
+    if (this.scrollMode === ScrollMode.None) {
       const containerElement = this.bookView.containerElement();
       let transformString: string;
       if (this.bookView.isVerticalLayout()) {
@@ -484,6 +509,8 @@ export class Viewport {
       }
 
       containerElement.style.transform = transformString;
+    } else {
+      this.updateScrollFromViewOffset();
     }
     this.onRender();
 
@@ -512,11 +539,38 @@ export class Viewport {
     }
 
     let newPos = pos;
-    if (!this.scrollEnabled) {
+    if (this.scrollMode === ScrollMode.None) {
       newPos = this.clipToVisibleRange(pos, pos + this.getScaledViewportSize());
     }
 
+    this.updatePositions();
+
+    if (this.scrollMode === ScrollMode.SpineItem) {
+      this.showOnlyCurrentSpineItemRange();
+    }
+
     return newPos;
+  }
+
+  private async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number,
+                                                    token?: CancellationToken): Promise<void> {
+    await this.bookView.ensureContentLoadedAtSpineItemRange(startIndex, endIndex, token);
+    if (token && token.isCancelled) {
+      return;
+    }
+
+    if (this.scrollMode === ScrollMode.SpineItem) {
+      this.bookView.showOnlySpineItemRange(startIndex);
+      this.viewOffset = 0;
+    }
+  }
+
+  private showOnlyCurrentSpineItemRange(): void {
+    if (!this.startPos) {
+      return;
+    }
+
+    this.bookView.showOnlySpineItemRange(this.startPos.spineItemIndex);
   }
 
   private clipToVisibleRange(start: number, end: number): number {

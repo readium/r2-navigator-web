@@ -2,7 +2,7 @@
 
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import { Location, Navigator, SpreadMode } from '../../src/navigator';
+import { Location, Navigator, ScrollMode, SpreadMode } from '../../src/navigator';
 
 import { HostEnv } from '../helpers/host-env';
 import { openRendition } from '../helpers/reader-helper';
@@ -31,7 +31,7 @@ describe('Navigator', () => {
       pageHeight: 800,
     });
     rendition.setViewAsVertical(isVert);
-    rendition.viewport.enableScroll(false);
+    rendition.viewport.setScrollMode(ScrollMode.None);
 
     await rendition.render();
 

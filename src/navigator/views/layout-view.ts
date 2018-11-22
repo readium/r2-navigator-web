@@ -392,6 +392,10 @@ export class LayoutView extends View {
 
   public async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number,
                                                    token?: CancellationToken): Promise<void> {
+    if (endIndex < 0 || startIndex >= this.publication.spine.length) {
+      return;
+    }
+
     let isEmpty = this.spineItemViewStatus.length === 0;
     if (!isEmpty) {
       if (this.startViewStatus().spineItemIndex > endIndex ||
@@ -435,17 +439,28 @@ export class LayoutView extends View {
       return 0;
     }
 
-    for (const vs of this.spineItemViewStatus) {
-      vs.offset -= adj;
-      this.postionSpineItemView(vs);
-    }
-
-    this.loadedContentRange[0] -= adj;
-    this.loadedContentRange[1] -= adj;
-    this.paginatedRange[0] -= adj;
-    this.paginatedRange[1] -= adj;
+    this.adjustRange(adj);
 
     return adj;
+  }
+
+  public showOnlySpineItemRange(spineItemIndex: number): void {
+    let viewStatus: SpineItemViewStatus | undefined;
+    for (const siv of this.spineItemViewStatus) {
+      if (siv.spineItemIndex === spineItemIndex) {
+        viewStatus = siv;
+      }
+    }
+    if (!viewStatus) {
+      return;
+    }
+
+    const offset = viewStatus.offset;
+    this.adjustRange(offset);
+
+    const size = viewStatus.view.getTotalSize(0);
+    this.layoutRoot.style.height = `${size}px`;
+    this.layoutRoot.style.overflow = 'hidden';
   }
 
   public visiblePages(start: number, end: number): [number, number][] {
@@ -801,6 +816,18 @@ export class LayoutView extends View {
     }
 
     return retSiv;
+  }
+
+  private adjustRange(adj: number): void {
+    for (const vs of this.spineItemViewStatus) {
+      vs.offset -= adj;
+      this.postionSpineItemView(vs);
+    }
+
+    this.loadedContentRange[0] -= adj;
+    this.loadedContentRange[1] -= adj;
+    this.paginatedRange[0] -= adj;
+    this.paginatedRange[1] -= adj;
   }
 
 }
