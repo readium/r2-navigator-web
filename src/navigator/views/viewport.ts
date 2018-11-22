@@ -30,6 +30,8 @@ export class Viewport {
 
   private visiblePagesReadyCallbacks: VisiblePagesReadyCallbackType[] = [];
 
+  private viewportEvents: { [eventName: string]: Function[] } = {};
+
   constructor(root: HTMLElement) {
     this.root = root;
 
@@ -37,6 +39,14 @@ export class Viewport {
     this.prevScreen = this.prevScreen.bind(this);
 
     this.bindEvents();
+  }
+
+  public addPositionUpdatedListener(callback: Function): void {
+    this.addEventListener('onPositionUpdated', callback);
+  }
+
+  public addRenderListener(callback: Function): void {
+    this.addEventListener('onRender', callback);
   }
 
   public setView(v: LayoutView): void {
@@ -355,6 +365,29 @@ export class Viewport {
     this.bookView.endViewUpdate();
   }
 
+  private addEventListener(eventName: string, callback: Function): void {
+    const events = this.viewportEvents[eventName] || [];
+    events.push(callback);
+
+    this.viewportEvents[eventName] = events;
+  }
+
+  private onPositionUpdated(
+    startPos: PaginationInfo | undefined,
+    endPos: PaginationInfo | undefined): void {
+    const eventCbs = this.viewportEvents.onPositionUpdated;
+    if (!eventCbs) return;
+
+    eventCbs.forEach(eventCb => eventCb(startPos, endPos));
+  }
+
+  private onRender(): void {
+    const eventCbs = this.viewportEvents.onRender;
+    if (!eventCbs) return;
+
+    eventCbs.forEach(eventCb => eventCb());
+  }
+
   private bindEvents(): void {
     this.root.addEventListener('scroll', async (e) => {
       if (!this.scrollEnabled || this.scrollFromInternal) {
@@ -414,6 +447,8 @@ export class Viewport {
     } else {
       this.endPos = undefined;
     }
+
+    this.onPositionUpdated(this.startPos, this.endPos);
   }
 
   private adjustScrollPosition(): void {
@@ -450,6 +485,7 @@ export class Viewport {
 
       containerElement.style.transform = transformString;
     }
+    this.onRender();
 
     this.updatePositions();
   }
