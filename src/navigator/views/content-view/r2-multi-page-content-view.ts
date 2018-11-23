@@ -136,6 +136,7 @@ export class R2MultiPageContentView extends R2ContentView {
     this.ePubHtml.style.columnGap = `${columnGap}px`;
     this.ePubHtml.style.columnCount = 'auto';
     this.ePubHtml.style.columnFill = 'auto';
+    this.ePubHtml.style.overflow = 'hidden';
 
     // This workaround is required for triggering layout changes in Safari
     triggerLayout(this.iframe);
