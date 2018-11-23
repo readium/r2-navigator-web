@@ -25,6 +25,7 @@ const READIUM_CSS_VAR_MAP: Map<string, IReadiumCSSSettingValueConverter> = new M
   [SettingName.ReadingMode, { name:'--USER__appearance', converter: stringConverter }],
   [SettingName.TextColor, { name: '--USER__textColor', converter: stringConverter }],
   [SettingName.BackgroundColor, { name: '--USER__backgroundColor', converter: stringConverter }],
+  [SettingName.FontOverride, { name: '--USER__fontOverride', converter: stringConverter }],
 ]);
 
 export class ViewSettings {

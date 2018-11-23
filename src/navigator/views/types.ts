@@ -17,6 +17,7 @@ export enum SettingName {
   TextColor = 'text-color', // string
   BackgroundColor = 'background-color', // string
   TextAlign = 'text-align', // string
+  FontOverride = 'font-override', // string
 }
 
 export interface ISettingEntry {
