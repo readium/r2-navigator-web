@@ -68,6 +68,8 @@ describe('SpineItemView', () => {
       const siv = hostEnv.createSpineItemView(pageWidth, 800, true, false);
       await hostEnv.loadSpineItem(siv, 0);
       const pageSize = siv.getTotalSize(pageWidth);
+      //TODO: Fails sporadically with `AssertionError: expected 285 to equal 347`
+      // Suspected timing issue due to an image asset loading
       assert.equal(pageSize, 347);
 
       const page4Size = siv4.getTotalSize(pageWidth);
