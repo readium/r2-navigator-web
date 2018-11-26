@@ -4,3 +4,4 @@ build_temp
 build_test_temp
 dist
 .rpt2_cache
+yarn-error.log
