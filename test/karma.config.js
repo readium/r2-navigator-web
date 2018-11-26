@@ -15,7 +15,7 @@ module.exports = function (config) {
         flags: ['--window-size=1024,768']
       }
     },
-    reporters: ['progress'],
+    reporters: ['spec'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
