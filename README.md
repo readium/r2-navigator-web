@@ -4,7 +4,7 @@ A web-based Readium Navigator implementation, written in TypeScript.
 ## Usage
 (WIP, placeholder)
 ```js
-import ReadiumNavigator from 'r2-navigator-web';
+import ReadiumNavigator from '@readium/navigator-web';
 ```
 
 ## Development

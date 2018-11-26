@@ -1,6 +1,6 @@
 {
-  "name": "r2-navigator-web",
+  "name": "readium-navigator-web",
   "main": "./dist/index.d.ts",
-  "out": "r2-navigator-web.d.ts",
+  "out": "readium-navigator-web.d.ts",
   "outputAsModuleFolder": true
 }

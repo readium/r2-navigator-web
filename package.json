@@ -1,10 +1,10 @@
 {
-  "name": "@evidentpoint/r2-navigator-web",
-  "version": "0.0.4",
+  "name": "@readium/navigator-web",
+  "version": "1.0.0-alpha.0",
   "description": "A Readium Navigator module for the web, written in TypeScript",
-  "main": "./dist/r2-navigator-web.umd.js",
-  "module": "./dist/r2-navigator-web.esm.js",
-  "types": "./dist/r2-navigator-web.d.ts",
+  "main": "./dist/readium-navigator-web.umd.js",
+  "module": "./dist/readium-navigator-web.esm.js",
+  "types": "./dist/readium-navigator-web.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:src && npm run build:types",
@@ -23,9 +23,9 @@
     "Readium"
   ],
   "author": {
-    "name": "Evident Point",
-    "organization": "Evident Point",
-    "url": "http://github.com/evidentpoint/"
+    "name": "Readium Foundation",
+    "organization": "Readium Foundation",
+    "url": "http://github.com/readium/"
   },
   "license": "BSD-3-Clause",
   "licenses": [
@@ -37,6 +37,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/chai": "^4.1.2",
     "@types/mocha": "^5.0.0",
@@ -70,12 +73,9 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
+    "@readium/shared-models": "^1.0.0-alpha.2",
     "readium-cfi-js": "^1.0.0-alpha.1",
     "isomorphic-url-shim": "^1.0.2",
-    "r2-glue-js": "^0.0.0-alpha.0",
-    "r2-webpub-model-js": "^1.0.0-alpha.0"
-  },
-  "publishConfig": {
-    "access": "public"
+    "r2-glue-js": "^0.0.0-alpha.0"
   }
 }
