@@ -5,7 +5,7 @@
   ],
   "jsRules": {},
   "rules": {
-    "no-submodule-imports": [true, "r2-webpub-model-js"],
+    "no-submodule-imports": [true, "@readium/shared-models"],
     "no-console": false,
     "missing-jsdoc": false,
     "no-relative-imports": false,

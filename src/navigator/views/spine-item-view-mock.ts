@@ -1,4 +1,4 @@
-import { Link } from 'r2-webpub-model-js/lib/models/link';
+import { Link } from '@readium/shared-models/lib/models/publication/link';
 import { SpineItemView } from './spine-item-view';
 
 class ReflowableViewMock {

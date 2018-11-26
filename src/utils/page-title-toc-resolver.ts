@@ -3,8 +3,7 @@ import * as EPUBcfi from 'readium-cfi-js';
 import { Publication } from '../streamer/publication';
 import { Location } from '../navigator/location';
 import { Rendition } from '../navigator/rendition';
-import { EPUBLink } from 'r2-webpub-model-js/lib/extensions/epub/link';
-import { Link } from 'r2-webpub-model-js/lib/models/link';
+import { Link } from '@readium/shared-models/lib/models/publication/link';
 
 class LinkLocationInfo {
   link: Link;
@@ -99,7 +98,7 @@ export class PageTitleTocResolver {
       tocInfo.push(locInfo);
     }
 
-    const children = (<EPUBLink>(link)).children;
+    const children = link.children;
     if (!children) {
       return;
     }

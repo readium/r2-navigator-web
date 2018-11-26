@@ -1,4 +1,4 @@
-import { Link } from 'r2-webpub-model-js/lib/models/link';
+import { Link } from '@readium/shared-models/lib/models/publication/link';
 import { IFrameLoader } from '../../iframe-loader';
 import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
 import { ElementBlacklistedChecker } from '../cfi/element-checker';

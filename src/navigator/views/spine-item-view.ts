@@ -1,4 +1,4 @@
-import { Link } from 'r2-webpub-model-js/lib/models/link';
+import { Link } from '@readium/shared-models/lib/models/publication/link';
 import { IContentView } from './content-view/content-view';
 import { IContentViewFactory } from './content-view/content-view-factory';
 import { ViewSettings } from './view-settings';

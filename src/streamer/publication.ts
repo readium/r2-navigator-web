@@ -1,9 +1,9 @@
 import { URL } from 'isomorphic-url-shim';
-import { EPUBPublication } from 'r2-webpub-model-js/lib/extensions/epub/publication';
-import { Link } from 'r2-webpub-model-js/lib/models/link';
+import { Publication as ReadiumWebPub } from '@readium/shared-models/lib/models/publication/publication';
+import { Link } from '@readium/shared-models/lib/models/publication/link';
+import { Relation } from '@readium/shared-models/lib/models/publication/interfaces/link-core';
 
-export class Publication extends EPUBPublication {
-
+export class Publication extends ReadiumWebPub {
   // Alias for now, refactor later.
   public get spine(): Link[] {
     return this.readingOrder;
@@ -16,12 +16,12 @@ export class Publication extends EPUBPublication {
     this.sourceURI = sourceURI;
   }
 
-  public static fromModel(publication: EPUBPublication, sourceURI?: string): Publication {
+  public static fromModel(publication: ReadiumWebPub, sourceURI?: string): Publication {
     return Object.assign(new Publication(sourceURI), publication);
   }
 
   public static fromJSON(webPubManifestJSON: string, sourceURI?: string): Publication {
-    return Publication.fromModel(EPUBPublication.parse(webPubManifestJSON), sourceURI);
+    return Publication.fromModel(ReadiumWebPub.parse(webPubManifestJSON), sourceURI);
   }
 
   public static async fromURL(publicationURL: string): Promise<Publication> {
@@ -36,7 +36,7 @@ export class Publication extends EPUBPublication {
     // return Publication.fromModel(epubPublication, publicationURL);
   }
 
-  public searchLinkByRel(rel: string): Link | undefined {
+  public searchLinkByRel(rel: Relation): Link | undefined {
     if (this.resources) {
       const ll = this.resources.find((link) => {
         return link.rel.has(rel);
