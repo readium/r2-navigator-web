@@ -12,7 +12,6 @@ export enum SpreadMode {
   FitViewportDoubleSpread,
 }
 
-// tslint:disable-next-line:interface-name
 export interface PageLayoutSettings {
   spreadMode: SpreadMode;
   pageWidth?: number;
