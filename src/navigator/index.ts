@@ -4,6 +4,7 @@ export { ReadingSystem } from './reading-system';
 export { Location } from './location';
 export { Rendition, SpreadMode } from './rendition';
 export { ScrollMode, Viewport } from './views/viewport';
+export { ViewSettings } from './views/view-settings';
 export { LayoutView } from './views/layout-view';
 export {
   CancellationToken,
