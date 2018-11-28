@@ -40,6 +40,7 @@ describe('ElementChecker', () => {
       const right = left + pageWidth;
       const viewportRect = new Rect(left, 0, right, 800);
       const visChecker = new ElementVisibilityChecker(doc,
+                                                      [400, 800],
                                                       viewportRect,
                                                       hostEnv.getElementChecker());
       const visEle = visChecker.findFirstVisibleElement(false);
