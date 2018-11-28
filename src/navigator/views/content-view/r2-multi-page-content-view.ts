@@ -93,6 +93,7 @@ export class R2MultiPageContentView extends R2ContentView {
 
     this.showIFrame();
     super.onIframeLoaded(success);
+    this.cfiNavLogic.setColumnSize(this.hostWidth, this.hostHeight);
   }
 
   private paginate(): void {

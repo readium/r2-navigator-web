@@ -38,7 +38,7 @@ export class ElementBlacklistedChecker {
     const clsAttr = element.getAttribute('class');
     const classList = clsAttr ? clsAttr.split(' ') : [];
 
-    classList.forEach(cls => {
+    classList.forEach((cls) => {
       if (this.classBlacklist.indexOf(cls) >= 0) {
         return true;
       }
@@ -85,8 +85,12 @@ export class ElementVisibilityChecker {
 
   private isRtl: boolean = false;
 
-  public constructor(doc: Document, viewport?: Rect, eleChecker?: ElementBlacklistedChecker) {
+  private columnSize: [number, number] = [0, 0];
+
+  public constructor(doc: Document, columnSize: [number, number],
+                     viewport?: Rect, eleChecker?: ElementBlacklistedChecker) {
     this.rootDoc = doc;
+    this.columnSize = columnSize;
     this.viewport = viewport;
     this.elementChecker = eleChecker;
   }
@@ -218,7 +222,7 @@ export class ElementVisibilityChecker {
     if (!ele.parentNode) {
       siblingTextNodesAndSelf = [ele];
     } else {
-      siblingTextNodesAndSelf = Array.from(ele.parentNode.childNodes).filter(n => {
+      siblingTextNodesAndSelf = Array.from(ele.parentNode.childNodes).filter((n) => {
         return n === ele || this.isValidTextNode(n);
       });
     }
@@ -311,23 +315,50 @@ export class ElementVisibilityChecker {
       clientRects = <DOMRectList>(ele.getClientRects());
     }
 
-    const rects: Rect[] = [];
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < clientRects.length; i += 1) {
-      const r = Rect.fromDOMRect(clientRects[i]);
-      rects.push(r);
-    }
-
-    return rects;
+    return this.normalizeDomRectangles(clientRects);
   }
 
   private getRangeRectangles(range: Range): Rect[] {
-    const clientRects = <DOMRectList>range.getClientRects();
+    return this.normalizeDomRectangles(<DOMRectList>range.getClientRects());
+  }
+
+  private normalizeDomRectangles(rectList: DOMRectList): Rect[] {
     const rects: Rect[] = [];
     // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < clientRects.length; i += 1) {
-      const r = Rect.fromDOMRect(clientRects[i]);
-      rects.push(r);
+    for (let i = 0; i < rectList.length; i += 1) {
+      const r = Rect.fromDOMRect(rectList[i]);
+      // Handle rects returned by Webkit
+      if (this.viewport && this.columnSize[0] > 0 &&
+          (r.top < this.viewport.top || r.bottom > this.viewport.bottom)) {
+        const columnWidth = this.columnSize[0];
+        const columnHeight = this.columnSize[1];
+
+        while (r.top < 0) {
+          r.top += columnHeight;
+          r.bottom += columnHeight;
+          r.left -= columnWidth;
+          r.right -= columnWidth;
+        }
+
+        const pageLeft = Math.floor(r.left / columnWidth) * columnWidth;
+        const pageRight = Math.ceil(r.right / columnWidth) * columnWidth;
+        const pageRect = new Rect(pageLeft, 0, pageRight, columnHeight);
+        while (pageRect.top < r.bottom) {
+          if (pageRect.overlapVertical(r)) {
+            const newTop = Math.max(r.top, pageRect.top) - pageRect.top + this.viewport.top;
+            // tslint:disable-next-line:max-line-length
+            const newBottom = Math.min(r.bottom, pageRect.bottom) - pageRect.top + this.viewport.top;
+            rects.push(new Rect(pageRect.left, newTop, pageRect.right, newBottom));
+          }
+
+          pageRect.left = pageRect.right;
+          pageRect.right += columnWidth;
+          pageRect.top = pageRect.bottom;
+          pageRect.bottom += columnHeight;
+        }
+      } else {
+        rects.push(r);
+      }
     }
 
     return rects;

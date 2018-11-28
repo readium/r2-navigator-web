@@ -11,9 +11,15 @@ export class CfiNavigationLogic {
 
   private elementChecker: ElementBlacklistedChecker;
 
+  private columnSize: [number, number] = [0, 0];
+
   public constructor(doc: Document, eleChecker: ElementBlacklistedChecker) {
     this.rootDocument = doc;
     this.elementChecker = eleChecker;
+  }
+
+  public setColumnSize(width: number, height: number): void {
+    this.columnSize = [width, height];
   }
 
   public getCfiFromElementId(elementId: string): string | null {
@@ -42,6 +48,7 @@ export class CfiNavigationLogic {
 
   public getFirstVisibleCfi(viewport: Rect, fromEnd: boolean): string | null {
     const visChecker = new ElementVisibilityChecker(this.rootDocument,
+                                                    this.columnSize,
                                                     viewport,
                                                     this.elementChecker);
     const visibleEleInfo = visChecker.findFirstVisibleElement(fromEnd);
@@ -74,7 +81,7 @@ export class CfiNavigationLogic {
   public getOffsetFromElement(ele: Node): [number, number] | null {
     let offset = this.getOffsetByRectangles(ele);
     if (offset === null) {
-      const visChecker = new ElementVisibilityChecker(this.rootDocument);
+      const visChecker = new ElementVisibilityChecker(this.rootDocument, this.columnSize);
       const [nearEle, _] = visChecker.findNearestElement(ele);
       if (nearEle) {
         offset = this.getOffsetByRectangles(nearEle);
@@ -94,7 +101,7 @@ export class CfiNavigationLogic {
   }
 
   public getOffsetFromRange(range: Range): [number, number] | null {
-    const visCheck = new ElementVisibilityChecker(this.rootDocument);
+    const visCheck = new ElementVisibilityChecker(this.rootDocument, this.columnSize);
 
     return visCheck.getRangeStartOffset(range);
   }
@@ -116,6 +123,7 @@ export class CfiNavigationLogic {
     // if a valid text node is found, try to generate a CFI with range offsets
     if (textNode && this.isValidTextNode(textNode)) {
       const visChecker = new ElementVisibilityChecker(this.rootDocument,
+                                                      this.columnSize,
                                                       viewport,
                                                       this.elementChecker);
       const visibleRange = visChecker.getVisibleTextRange(textNode, true);
@@ -166,7 +174,7 @@ export class CfiNavigationLogic {
   }
 
   private getOffsetByRectangles(ele: Node): [number, number] | null {
-    const visChecker = new ElementVisibilityChecker(this.rootDocument);
+    const visChecker = new ElementVisibilityChecker(this.rootDocument, this.columnSize);
 
     return visChecker.getElementStartOffset(ele);
   }
