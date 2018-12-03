@@ -68,10 +68,10 @@ function extendedThrottle(startCb: EventCallback, tickCb: EventCallback, endCb: 
     if (!(last && now < last + aDelay)) {
       last = now;
       if (first) {
-        startCb.apply(ctx, event);
+        startCb(event);
         first = false;
       } else {
-        tickCb.apply(ctx, event);
+        tickCb(event);
       }
     }
 
@@ -80,7 +80,7 @@ function extendedThrottle(startCb: EventCallback, tickCb: EventCallback, endCb: 
       () => {
         last = now;
         first = true;
-        endCb.apply(ctx, event);
+        endCb(event);
       },
       aWaitThreshold);
   };
