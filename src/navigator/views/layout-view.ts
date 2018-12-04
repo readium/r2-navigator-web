@@ -83,6 +83,12 @@ export class LayoutView extends View {
     this.spineItemViewPageCounts = new Array<number>(pub.spine.length).fill(-1);
   }
 
+  public reset(): void {
+    this.clearLoadedContent();
+    this.spineItemViewSizes.fill(-1);
+    this.spineItemViewPageCounts.fill(-1);
+  }
+
   public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
     for (const siv of this.spineItemViewStatus) {
       if (siv.spineItemIndex === spineItemIndex) {

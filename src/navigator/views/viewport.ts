@@ -58,6 +58,11 @@ export class Viewport {
     this.bookView.attachToHost(this.root);
   }
 
+  public reset(): void {
+    this.startPos = undefined;
+    this.endPos = undefined;
+  }
+
   public setScrollMode(mode: ScrollMode): void {
     this.root.style.overflowX = 'hidden';
     this.root.style.overflowY = 'hidden';

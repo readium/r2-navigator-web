@@ -222,6 +222,9 @@ export class SpineItemView extends View {
   }
 
   public getCfi(offsetMain: number, offset2nd: number, backward: boolean): string {
+    if (this.contentStatus !== ContentLoadingStatus.Loaded) {
+      return '';
+    }
     return this.contentView.getCfi(offsetMain, offset2nd, backward);
   }
 

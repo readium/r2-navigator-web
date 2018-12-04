@@ -44,6 +44,13 @@ export class Rendition {
     this.initDefaultViewSettings();
   }
 
+  public reset(): void {
+    if (this.bookView) {
+      this.bookView.reset();
+    }
+    this.viewport.reset();
+  }
+
   public setPageLayout(layoutSetting: PageLayoutSettings): void {
     const spreadMode = layoutSetting.spreadMode;
     const viewportSize = this.viewport.getViewportSize();
@@ -150,6 +157,9 @@ export class Rendition {
 
   public setViewAsVertical(v: boolean): void {
     this.viewAsVertical = v;
+    if (this.bookView) {
+      this.bookView.setVerticalLayout(v);
+    }
   }
 
   public getPageWidth(): number {
