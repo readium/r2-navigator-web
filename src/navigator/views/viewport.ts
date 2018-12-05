@@ -91,6 +91,16 @@ export class Viewport {
     this.viewportSize = size;
     this.viewportSize2nd = size2nd;
     this.visibleViewportSize = this.viewportSize;
+
+    if (this.bookView) {
+      if (this.bookView.isVerticalLayout()) {
+        this.root.style.width = `${this.viewportSize2nd}px`;
+        this.root.style.height = `${this.viewportSize}px`;
+      } else {
+        this.root.style.width = `${this.visibleViewportSize}px`;
+        this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
+      }
+    }
   }
 
   public getViewportSize(): number {
