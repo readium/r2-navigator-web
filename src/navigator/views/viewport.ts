@@ -553,6 +553,7 @@ export class Viewport {
 
   private async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number,
                                                     token?: CancellationToken): Promise<void> {
+    this.reset();
     await this.bookView.ensureContentLoadedAtSpineItemRange(startIndex, endIndex, token);
     if (token && token.isCancelled) {
       return;
