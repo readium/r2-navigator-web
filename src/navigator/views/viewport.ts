@@ -437,6 +437,7 @@ export class Viewport {
           (start <= this.bookView.getLoadedStartPostion() && this.bookView.hasMoreBeforeStart())) {
           await this.ensureConentLoadedAtRange(start, end);
           this.adjustScrollPosition();
+          await this.onPagesReady(this.scrollRequestToken);
         }
       }
       this.render();
