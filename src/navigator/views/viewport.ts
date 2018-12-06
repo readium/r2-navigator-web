@@ -505,8 +505,8 @@ export class Viewport {
   }
 
   private render(): void {
+    const containerElement = this.bookView.containerElement();
     if (this.scrollMode === ScrollMode.None) {
-      const containerElement = this.bookView.containerElement();
       let transformString: string;
       if (this.bookView.isVerticalLayout()) {
         transformString = `translateY(${-this.viewOffset}px)`;
@@ -521,6 +521,7 @@ export class Viewport {
 
       containerElement.style.transform = transformString;
     } else {
+      containerElement.style.transform = 'translateX(0)';
       this.updateScrollFromViewOffset();
     }
 

@@ -85,6 +85,7 @@ export class LayoutView extends View {
 
   public reset(): void {
     this.clearLoadedContent();
+    this.paginatedRange = [0, 0];
     this.spineItemViewSizes.fill(-1);
     this.spineItemViewPageCounts.fill(-1);
   }
