@@ -164,7 +164,7 @@ export class IFrameLoader {
     el.setAttribute('type', 'text/javascript');
 
     const blob = new Blob([href], { type : 'application/javascript' });
-    const url = URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
     el.setAttribute('src', url);
 
     return el;
