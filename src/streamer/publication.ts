@@ -87,7 +87,10 @@ export class Publication extends ReadiumWebPub {
     const baseUri = this.getBaseURI();
     if (!baseUri) return '';
 
-    const relativeHref = href.split(baseUri)[1];
+    let relativeHref = href;
+    if (href.includes(baseUri)) {
+      relativeHref = href.split(baseUri)[1];
+    }
 
     return relativeHref || '';
   }
