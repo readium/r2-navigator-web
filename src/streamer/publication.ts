@@ -39,7 +39,7 @@ export class Publication extends ReadiumWebPub {
   public searchLinkByRel(rel: Relation): Link | undefined {
     if (this.resources) {
       const ll = this.resources.find((link) => {
-        return link.rel.has(rel);
+        return link.rel && link.rel.has(rel);
       });
       if (ll) {
         return ll;
@@ -48,7 +48,7 @@ export class Publication extends ReadiumWebPub {
 
     if (this.readingOrder) {
       const ll = this.readingOrder.find((link) => {
-        return link.rel.has(rel);
+        return link.rel && link.rel.has(rel);
       });
       if (ll) {
         return ll;
@@ -57,7 +57,7 @@ export class Publication extends ReadiumWebPub {
 
     if (this.links) {
       const ll = this.links.find((link) => {
-        return link.rel.has(rel);
+        return link.rel && link.rel.has(rel);
       });
       if (ll) {
         return ll;
