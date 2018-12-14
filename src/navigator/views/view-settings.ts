@@ -62,6 +62,15 @@ export class ViewSettings {
     return <T>(val);
   }
 
+  public getSettingWithDefaultValue<T>(name: SettingName, defaultVal: T): T {
+    const val = this.settings.get(name);
+    if (val === undefined) {
+      return defaultVal;
+    }
+
+    return <T>(val);
+  }
+
   // tslint:disable-next-line:no-any
   private setCss(view: HTMLElement, varName: string, varVal: any): void {
     const cssConverter = READIUM_CSS_VAR_MAP.get(varName);

@@ -10,6 +10,8 @@ export class CancellationToken {
 
 export enum SettingName {
   ColumnGap = 'column-gap', // number,
+  MaxColumnWidth = 'column-max', // number,
+  MinColumnWidth = 'column-min', // number,
   SpreadMode = 'spread-mode', // string
   FontFamily = 'font-family', // string
   FontSize = 'font-size', // number
@@ -29,6 +31,8 @@ export interface ISettingEntry {
 const SETTING_NAME_MAP: Map<string, SettingName> = new Map([
   [SettingName.BackgroundColor, SettingName.BackgroundColor],
   [SettingName.ColumnGap, SettingName.ColumnGap],
+  [SettingName.MaxColumnWidth, SettingName.MaxColumnWidth],
+  [SettingName.MinColumnWidth, SettingName.MinColumnWidth],
   [SettingName.FontFamily, SettingName.FontFamily],
   [SettingName.FontSize, SettingName.FontSize],
   [SettingName.ReadingMode, SettingName.ReadingMode],

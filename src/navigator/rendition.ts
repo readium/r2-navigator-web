@@ -57,6 +57,13 @@ export class Rendition {
     let pageWidth = this.viewAsVertical ? this.viewport.getViewportSize2nd() : viewportSize;
     let pageHeight = this.viewAsVertical ? viewportSize : this.viewport.getViewportSize2nd();
 
+    const maxColWidth = this.vs.getSettingWithDefaultValue<number>(SettingName.MaxColumnWidth, 700);
+    const minColWidth = this.vs.getSettingWithDefaultValue<number>(SettingName.MinColumnWidth, 400);
+    const colGap = this.vs.getSettingWithDefaultValue<number>(SettingName.ColumnGap, 0);
+
+    const maxPageWidth = maxColWidth + colGap;
+    const minPageWidth = minColWidth + colGap;
+
     let numOfPagesPerSpread: number = 1;
     if (spreadMode === SpreadMode.Freeform) {
       numOfPagesPerSpread = 0;
@@ -67,11 +74,11 @@ export class Rendition {
         console.warn('Missing page width or height for freeform layout');
       }
     } else if (spreadMode === SpreadMode.FitViewportAuto) {
-      if (viewportSize > 1200) {
+      if (viewportSize > minPageWidth * 2) {
         if (this.viewAsVertical) {
           pageHeight = viewportSize / 2;
         } else {
-          pageWidth = viewportSize / 2;
+          pageWidth = Math.min(viewportSize / 2, maxPageWidth);
         }
         numOfPagesPerSpread = 2;
       }
@@ -79,9 +86,11 @@ export class Rendition {
       if (this.viewAsVertical) {
         pageHeight = viewportSize / 2;
       } else {
-        pageWidth = viewportSize / 2;
+        pageWidth = Math.min(viewportSize / 2, maxPageWidth);
       }
       numOfPagesPerSpread = 2;
+    } else if (spreadMode === SpreadMode.FitViewportSingleSpread) {
+      pageWidth = Math.min(viewportSize, maxPageWidth);
     }
 
     this.spreadMode = spreadMode;
