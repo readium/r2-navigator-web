@@ -278,6 +278,7 @@ export class ElementVisibilityChecker {
     );
 
     let node = nodeIterator.nextNode();
+    let prevNode = null;
     while (node) {
       const isLeafNode = node.nodeType === Node.ELEMENT_NODE &&
                                            (<Element>(node)).childElementCount === 0 &&
@@ -289,6 +290,13 @@ export class ElementVisibilityChecker {
           leafNodeElements.push(node);
         }
         node = nodeIterator.nextNode();
+      } else {
+        // If the previous node is the same as the last node, assume we've entered an infinite loop
+        // and break out of it.
+        if (prevNode === node) {
+          break;
+        }
+        prevNode = node;
       }
     }
 
@@ -413,7 +421,7 @@ export class ElementVisibilityChecker {
   }
 
   private isValidTextNode(node: Node): boolean {
-    if (node.nodeType === Node.TEXT_NODE) {
+    if (node && node.nodeType === Node.TEXT_NODE) {
       return this.isValidTextNodeContent(node.nodeValue);
     }
 
