@@ -136,8 +136,8 @@ export class Navigator {
       return false;
     }
 
-    return pos.spineItemIndex >= this.pub.spine.length &&
-           pos.pageIndex + 1 === pos.spineItemPageCount;
+    return pos.spineItemIndex + 1 >= this.pub.spine.length &&
+           pos.pageIndex + 1 >= pos.spineItemPageCount;
   }
 
   public isFirstScreenSpine(): boolean {
