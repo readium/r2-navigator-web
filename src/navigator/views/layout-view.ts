@@ -746,6 +746,10 @@ export class LayoutView extends View {
         this.onSpineItemLoaded(spineItemView);
       }
 
+      spineItemView.onSelfResize(() => {
+        this.rePaginate();
+      });
+
       viewLength = spineItemView.getTotalSize(this.pageWidth);
       this.spineItemViewSizes[index] = viewLength;
       this.spineItemViewPageCounts[index] = spineItemView.getTotalPageCount();

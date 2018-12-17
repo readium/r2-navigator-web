@@ -1,5 +1,5 @@
 import { Link } from '@readium/shared-models/lib/models/publication/link';
-import { IContentView } from './content-view/content-view';
+import { IContentView, SelfResizeCallbackType } from './content-view/content-view';
 import { IContentViewFactory } from './content-view/content-view-factory';
 import { ViewSettings } from './view-settings';
 
@@ -93,6 +93,9 @@ export class SpineItemView extends View {
                              token?: CancellationToken): Promise<void> {
     this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);
     this.contentView.attachToHost(this.host);
+    this.contentView.onSelfResize((spIndex: number) => {
+      this.spineItemPageCount = this.contentView.spineItemPageCount();
+    });
     this.contentStatus = ContentLoadingStatus.Loading;
     await this.contentView.loadSpineItem(spineItem,
                                          this.spine.indexOf(spineItem),
@@ -264,6 +267,10 @@ export class SpineItemView extends View {
 
   public getCfiFromElementId(elementId: string): string {
     return this.contentView.getCfiFromElementId(elementId);
+  }
+
+  public onSelfResize(callback: SelfResizeCallbackType): void {
+    this.contentView.onSelfResize(callback);
   }
 
   // public getIframe(): any {
