@@ -4,7 +4,7 @@ import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
 import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
-import { IContentView } from './content-view';
+import { IContentView, SelfResizeCallbackType } from './content-view';
 
 type IframeLoadedCallback = (success: boolean) => void;
 
@@ -140,6 +140,10 @@ export class R2ContentView implements IContentView {
   }
 
   public onResize(): void {
+    return;
+  }
+
+  public onSelfResize(callback: SelfResizeCallbackType): void {
     return;
   }
 
