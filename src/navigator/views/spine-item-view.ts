@@ -94,7 +94,7 @@ export class SpineItemView extends View {
     this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);
     this.contentView.attachToHost(this.host);
     this.contentView.onSelfResize((spIndex: number) => {
-      this.spineItemPageCount = this.contentView.spineItemPageCount();
+      this.onViewChanged();
     });
     this.contentStatus = ContentLoadingStatus.Loading;
     await this.contentView.loadSpineItem(spineItem,
@@ -231,19 +231,6 @@ export class SpineItemView extends View {
     return this.contentView.getCfi(offsetMain, offset2nd, backward);
   }
 
-  // public getPaginationInfo(): object {
-  //   return {
-  //     paginationInfo: this.contentViewImpl.getPaginationInfo(),
-  //     initiator: this,
-  //     spineItem: this.contentViewImpl.getLoadedSpineItems()[0],
-  //     elementId: undefined,
-  //   };
-  // }
-
-  // public getRangeCfiFromDomRange(range: Range): any {
-  //   return this.contentViewImpl.getRangeCfiFromDomRange(range);
-  // }
-
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
   //   return this.contentViewImpl.getVisibleElements(selector, includeSpineItems);
   // }
@@ -272,63 +259,6 @@ export class SpineItemView extends View {
   public onSelfResize(callback: SelfResizeCallbackType): void {
     this.contentView.onSelfResize(callback);
   }
-
-  // public getIframe(): any {
-  //   return this.$iframe;
-  // }
-
-  // public getRjsSpineItem(): any {
-  //   return this.rjsSpineItem;
-  // }
-
-  // tslint:disable-next-line:no-any
-  // private loadSpineItemReflowableView(params: any, reader: any,
-  //                                     token?: CancellationToken): Promise<void> {
-  //   this.contentViewImpl = new ReflowableView(params, reader);
-
-  //   this.handleDocumentContentLoaded();
-
-  //   getReadiumEventsRelayInstance().registerEvents(this.contentViewImpl);
-
-  //   this.contentViewImpl.render();
-
-  //   this.contentViewImpl.setViewSettings(this.rsjViewSettings, true);
-
-  //   this.contentViewImpl.openPage({ spineItem: this.rsjSpine.items[this.spineItemIndex] });
-
-  //   return this.paginationChangedPromise(token);
-  // }
-
-  // private paginationChangedHanlder(
-  //   paras: PaginationChangedEventArgs,
-  //   handler: (paras: PaginationChangedEventArgs) => void,
-  //   resolve: () => void,
-  //   token?: CancellationToken,
-  // ): void {
-  //   const pageInfo = paras.paginationInfo.openPages[0];
-  //   if (pageInfo.spineItemIndex === this.spineItemIndex) {
-  //     this.contentViewImpl.removeListener(
-  //       Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
-  //       handler,
-  //     );
-  //     this.spineItemPageCount = pageInfo.spineItemPageCount;
-  //     this.contentStatus = ContentLoadingStatus.Loaded;
-  //     console.log(`spine item ${this.spineItemIndex} loaded: ${this.spineItemPageCount} pages`);
-  //     resolve();
-  //   }
-  // }
-
-  // private paginationChangedPromise(token?: CancellationToken): Promise<void> {
-  //   return new Promise<void>((resolve: () => void) => {
-  //     const handler = (paras: PaginationChangedEventArgs) => {
-  //       this.paginationChangedHanlder(paras, handler, resolve, token);
-  //     };
-  //     this.contentViewImpl.on(
-  //       Readium.InternalEvents.CURRENT_VIEW_PAGINATION_CHANGED,
-  //       handler,
-  //     );
-  //   });
-  // }
 
   // private handleDocumentContentLoaded(): void {
   //   this.contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOADED,
