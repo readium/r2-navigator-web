@@ -723,6 +723,8 @@ export class LayoutView extends View {
     [spineItemView, spineItemViewContainer] =
       this.spineItemViewFactory.createSpineItemView(this.pageWidth, this.pageHeight);
 
+    spineItemView.hide();
+
     spineItemViewContainer.setAttribute('id', `spine-item-view-${index}`);
 
     this.layoutRoot.appendChild(spineItemViewContainer);
@@ -790,6 +792,7 @@ export class LayoutView extends View {
     }
 
     viewStatus.viewContainer.style.transform = transformString;
+    viewStatus.view.show();
   }
 
   private addNewViewStatus(vs: SpineItemViewStatus): void {

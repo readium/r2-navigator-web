@@ -260,6 +260,14 @@ export class SpineItemView extends View {
     this.contentView.onSelfResize(callback);
   }
 
+  public show(): void {
+    this.host.style.opacity = '1.0';
+  }
+
+  public hide(): void {
+    this.host.style.opacity = '0.0';
+  }
+
   // private handleDocumentContentLoaded(): void {
   //   this.contentViewImpl.on(Readium.Events.CONTENT_DOCUMENT_LOADED,
   //                           ($iframe: any, spineItem: any) => {
