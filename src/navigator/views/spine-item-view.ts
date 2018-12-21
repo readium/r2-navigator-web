@@ -88,6 +88,10 @@ export class SpineItemView extends View {
     return this.contentView.getPageIndexOffsetFromElementId(elementId);
   }
 
+  public getSpineItemLink(spineItemIndex: number): Link | undefined {
+    return this.spine[spineItemIndex];
+  }
+
   public async loadSpineItem(spineItem: Link,
                              viewSettings: ViewSettings,
                              token?: CancellationToken): Promise<void> {

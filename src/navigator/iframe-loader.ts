@@ -34,10 +34,12 @@ export class IFrameLoader {
 
   public addIFrameLoadedListener(callback: Function): void {
     const eventName = 'iframeLoaded';
-    const events = this.loaderEvents[eventName] || [];
-    events.push(callback);
+    this.addListener(eventName, callback);
+  }
 
-    this.loaderEvents[eventName] = events;
+  public addIFrameUnloadedListener(callback: Function): void {
+    const eventName = 'iframeUnloaded';
+    this.addListener(eventName, callback);
   }
 
   public loadIframe(
@@ -69,6 +71,13 @@ export class IFrameLoader {
     this.fetchContentDocument(contentUri).then((contentData: string) => {
       this.loadIframeWithDocument(iframe, contentUri, contentData, contentType, config, callback);
     });
+  }
+
+  private addListener(eventName: string, callback: Function): void {
+    const events = this.loaderEvents[eventName] || [];
+    events.push(callback);
+
+    this.loaderEvents[eventName] = events;
   }
 
   private async fetchContentDocument(src: string): Promise<string> {
@@ -177,6 +186,13 @@ export class IFrameLoader {
     eventCbs.forEach(eventCb => eventCb(iframe));
   }
 
+  private iframeUnloaded(iframe: HTMLIFrameElement): void {
+    const eventCbs = this.loaderEvents.iframeUnloaded;
+    if (!eventCbs) return;
+
+    eventCbs.forEach(eventCb => eventCb(iframe));
+  }
+
   private loadIframeWithDocument(
     iframe: HTMLIFrameElement,
     contentDocumentURI: string,
@@ -222,18 +238,28 @@ export class IFrameLoader {
       }
     }
 
-    iframe.onload = () => {
-      this.iframeLoaded(iframe);
-      callback(true);
-      if (!this.isIE) {
-        window.URL.revokeObjectURL(documentDataUri);
-      }
-    };
-
     if (!this.isIE) {
       iframe.setAttribute('src', documentDataUri);
     } else if (iframe.contentWindow) {
       iframe.contentWindow.document.close();
     }
+
+    const iframeWindow = iframe.contentWindow;
+    if (!iframeWindow) {
+      console.error('Could not find iframe content window - unable to add load / unload listeners');
+      return;
+    }
+
+    iframe.addEventListener('load', () => {
+      this.iframeLoaded(iframe);
+      callback(true);
+      if (!this.isIE) {
+        window.URL.revokeObjectURL(documentDataUri);
+      }
+    });
+
+    iframeWindow.addEventListener('unload', () => {
+      this.iframeUnloaded(iframe);
+    });
   }
 }

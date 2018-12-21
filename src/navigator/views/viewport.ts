@@ -120,6 +120,10 @@ export class Viewport {
     return this.viewportSize2nd;
   }
 
+  public getBoundingClientRect(): ClientRect | DOMRect {
+    return this.root.getBoundingClientRect();
+  }
+
   public setPrefetchSize(size: number): void {
     this.prefetchSize = size;
   }
