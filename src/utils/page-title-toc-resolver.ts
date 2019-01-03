@@ -16,6 +16,7 @@ class LinkLocationInfo {
 export interface PageBreakData {
   link: Link;
   rect: ClientRect | DOMRect;
+  iframeRect: ClientRect | DOMRect;
   offset: {
     x: number,
     y: number,
@@ -175,6 +176,7 @@ export class PageTitleTocResolver {
 
       if (isWithinViewport) {
         pageBreaks.push({
+          iframeRect,
           link: pageList[i],
           rect: elRect,
           offset: {
@@ -201,6 +203,7 @@ export class PageTitleTocResolver {
 
       if (isWithinViewport) {
         pageBreaks.push({
+          iframeRect,
           link: pageList[i],
           rect: elRect,
           offset: {
