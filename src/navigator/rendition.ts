@@ -143,6 +143,10 @@ export class Rendition {
     return this.vs;
   }
 
+  public isVerticalLayout(): boolean {
+    return this.bookView.isVerticalLayout();
+  }
+
   public setZoom(option: ZoomOptions, scale: number): void {
     if (this.bookView) {
       this.bookView.setZoom(option, scale);

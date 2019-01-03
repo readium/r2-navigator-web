@@ -13,9 +13,13 @@ class LinkLocationInfo {
   cfi?: string;
 }
 
-interface PageBreakData {
+export interface PageBreakData {
   link: Link;
   rect: ClientRect | DOMRect;
+  offset: {
+    x: number,
+    y: number,
+  };
 }
 
 export class PageTitleTocResolver {
@@ -156,6 +160,7 @@ export class PageTitleTocResolver {
     }
 
     const pageBreaks: PageBreakData[] = [];
+    const iframeRect = iframeEl.getBoundingClientRect();
 
     // Look at elements that fall at and beyond the start index
     for (let i = startIndex; i < pageList.length; i += 1) {
@@ -172,6 +177,10 @@ export class PageTitleTocResolver {
         pageBreaks.push({
           link: pageList[i],
           rect: elRect,
+          offset: {
+            x: iframeRect.left,
+            y: iframeRect.top,
+          },
         });
       } else {
         // If this element isn't visible, there shouldn't be any more beyond it
@@ -194,6 +203,10 @@ export class PageTitleTocResolver {
         pageBreaks.push({
           link: pageList[i],
           rect: elRect,
+          offset: {
+            x: iframeRect.left,
+            y: iframeRect.top,
+          },
         });
       } else {
         break;
