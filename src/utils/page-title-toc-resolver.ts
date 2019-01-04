@@ -171,14 +171,13 @@ export class PageTitleTocResolver {
       if (!el) {
         continue;
       }
-      const elRect = el.getBoundingClientRect();
-      const { isWithinViewport } = this.isElementVisibleInViewport(el, iframeEl);
+      const { isWithinViewport, elementRect } = this.isElementVisibleInViewport(el, iframeEl);
 
       if (isWithinViewport) {
         pageBreaks.push({
           iframeRect,
           link: pageList[i],
-          rect: elRect,
+          rect: elementRect,
           offset: {
             x: iframeRect.left,
             y: iframeRect.top,
@@ -198,14 +197,13 @@ export class PageTitleTocResolver {
       if (!el) {
         continue;
       }
-      const elRect = el.getBoundingClientRect();
-      const { isWithinViewport } = this.isElementVisibleInViewport(el, iframeEl);
+      const { isWithinViewport, elementRect } = this.isElementVisibleInViewport(el, iframeEl);
 
       if (isWithinViewport) {
         pageBreaks.push({
           iframeRect,
           link: pageList[i],
-          rect: elRect,
+          rect: elementRect,
           offset: {
             x: iframeRect.left,
             y: iframeRect.top,
@@ -222,7 +220,8 @@ export class PageTitleTocResolver {
   private isElementVisibleInViewport(
     element: HTMLElement,
     iframe: HTMLElement,
-  ): {isWithinViewport: boolean, isBeforeViewport: boolean, isAfterViewport: boolean} {
+  ): {isWithinViewport: boolean, isBeforeViewport: boolean, isAfterViewport: boolean
+    , elementRect: ClientRect | DOMRect} {
     const elStyle = window.getComputedStyle(element);
     // Ensure the element is visible before calculations are made
     let displayChanged = false;
@@ -256,13 +255,13 @@ export class PageTitleTocResolver {
 
     // Set the element back to it's original state
     if (displayChanged) {
-      element.style.setProperty('display', elStyle.display);
+      element.style.removeProperty('display');
     }
     if (visiblityChanged) {
-      element.style.setProperty('visibility', elStyle.visibility);
+      element.style.removeProperty('visibility');
     }
 
-    return { isWithinViewport, isBeforeViewport, isAfterViewport };
+    return { isWithinViewport, isBeforeViewport, isAfterViewport, elementRect };
   }
 
   private findMatchLink(loc: Location, infoMap: Map<string, LinkLocationInfo[]>): Link | null {
