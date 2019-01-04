@@ -27,6 +27,7 @@ export class Viewport {
   private endPos?: PaginationInfo;
 
   private root: HTMLElement;
+  private clipContatiner: HTMLElement;
 
   private scrollRequestToken?: CancellationToken;
 
@@ -46,6 +47,7 @@ export class Viewport {
     this.nextSpineItem = this.nextSpineItem.bind(this);
     this.prevSpineItem = this.prevSpineItem.bind(this);
 
+    this.init();
     this.bindEvents();
   }
 
@@ -55,7 +57,7 @@ export class Viewport {
 
   public setView(v: LayoutView): void {
     this.bookView = v;
-    this.bookView.attachToHost(this.root);
+    this.bookView.attachToHost(this.clipContatiner);
   }
 
   public reset(): void {
@@ -100,6 +102,9 @@ export class Viewport {
         this.root.style.width = `${this.visibleViewportSize}px`;
         this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
       }
+
+      this.clipContatiner.style.width = this.root.style.width;
+      this.clipContatiner.style.height = this.root.style.height;
     }
   }
 
@@ -333,73 +338,6 @@ export class Viewport {
     this.visiblePagesReadyCallbacks.push(callback);
   }
 
-  // tslint:disable-next-line:no-any
-  // public getRangeCfiFromDomRange(spineItemIndex: number, range: Range): any {
-  //   const view = this.bookView.getSpineItemView(spineItemIndex);
-  //   if (!view) {
-  //     return undefined;
-  //   }
-
-  //   return view.getRangeCfiFromDomRange(range);
-  // }
-
-  // tslint:disable-next-line:no-any
-  // public getVisibleElements(siIndex: number, selector: string): any {
-  //   const view = this.bookView.getSpineItemView(siIndex);
-  //   if (!view) {
-  //     return undefined;
-  //   }
-
-  //   return view.getVisibleElements(selector, true);
-  // }
-
-  // tslint:disable-next-line:no-any
-  // public getElements(siIndex: number, selector: string): any {
-  //   const view = this.bookView.getSpineItemView(siIndex);
-  //   if (!view) {
-  //     return undefined;
-  //   }
-
-  //   return view.getElements(selector);
-  // }
-
-  // tslint:disable-next-line:no-any
-  // public getElementById(siIndex: number, id: string): any {
-  //   const view = this.bookView.getSpineItemView(siIndex);
-  //   if (!view) {
-  //     return undefined;
-  //   }
-
-  //   return view.getElementById(id);
-  // }
-
-  // tslint:disable-next-line:no-any
-  // public isElementVisible(siIndex: number, $ele: any): boolean {
-  // tslint:disable-next-line:max-line-length
-  //   if (!this.bookView.isSpineItemVisible(siIndex, this.viewOffset, this.getScaledViewportSize())) {
-  //     return false;
-  //   }
-
-  //   const view = this.bookView.getSpineItemView(siIndex);
-  //   if (!view) {
-  //     return false;
-  //   }
-
-  //   const offset = this.bookView.getOffsetInSpineItemView(siIndex, this.viewOffset);
-
-  //   return view.isElementVisible($ele, offset, 0);
-  // }
-
-  // tslint:disable-next-line:no-any
-  // public getNearestCfiFromElement(siIndex: number, element: any): any {
-  //   const view = this.bookView.getSpineItemView(siIndex);
-  //   if (!view) {
-  //     return undefined;
-  //   }
-
-  //   return view.getNearestCfiFromElement(element);
-  // }
-
   public getViewScale(siIndex: number): number {
     const view = this.bookView.getSpineItemView(siIndex);
     if (!view) {
@@ -419,6 +357,15 @@ export class Viewport {
 
   private onLocationChanged(): void {
     this.locationChangedCallbacks.forEach(eventCb => eventCb());
+  }
+
+  private init(): void {
+    this.clipContatiner = document.createElement('div');
+    this.clipContatiner.id = 'viewport-clipper';
+    this.clipContatiner.style.position = 'absolute';
+    this.clipContatiner.style.overflowX = 'hidden';
+    this.clipContatiner.style.overflowY = 'hidden';
+    this.root.appendChild(this.clipContatiner);
   }
 
   private bindEvents(): void {
@@ -586,9 +533,20 @@ export class Viewport {
   }
 
   private clipToVisibleRange(start: number, end: number): number {
-    const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
+    let numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
     if (numOfPagePerSpread < 1) {
       return start;
+    }
+
+    if (numOfPagePerSpread === 2) {
+      const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(start);
+      this.clipContatiner.style.right = '';
+      if (doublepageSpreadLayout) {
+        if (doublepageSpreadLayout === 'right') {
+          this.clipContatiner.style.right = '0';
+        }
+        numOfPagePerSpread = 1;
+      }
     }
 
     const pageRanges = this.bookView.visiblePages(start, end);
@@ -613,8 +571,8 @@ export class Viewport {
       [firstPage, lastPage] = [lastPage, firstPage];
     }
     this.visibleViewportSize = lastPage[1] - firstPage[0];
-    this.root.style.width = `${this.visibleViewportSize}px`;
-    this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
+    this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
+    this.clipContatiner.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
 
     return firstPage[0];
   }

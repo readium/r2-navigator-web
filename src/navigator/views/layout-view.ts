@@ -6,6 +6,8 @@ import { SpineItemViewFactory } from './spine-item-view-factory';
 import { CancellationToken, ISettingEntry, ZoomOptions } from './types';
 import { View } from './view';
 import { ViewSettings } from './view-settings';
+// tslint:disable-next-line:max-line-length
+import { PageProperty } from '@readium/shared-models/lib/models/publication/interfaces/properties-core';
 
 export class PaginationInfo {
   public spineItemIndex: number;
@@ -494,6 +496,51 @@ export class LayoutView extends View {
     }
 
     return pageRanges;
+  }
+
+  public arrangeDoublepageSpreads(pos: number): PageProperty | undefined {
+    const startPageInfo = this.getPaginationInfoAtOffset(pos);
+    if (startPageInfo.length === 0) {
+      return undefined;
+    }
+
+    const spineItemIndex = startPageInfo[startPageInfo.length - 1].spineItemIndex;
+
+    const firstPage = this.publication.readingOrder[spineItemIndex];
+    let firstPageProp : PageProperty | undefined;
+    if (firstPage.properties) {
+      firstPageProp = firstPage.properties.page;
+    }
+
+    if (firstPageProp === 'center' || firstPageProp === 'right') {
+      return firstPageProp;
+    }
+
+    if (spineItemIndex + 1 >= this.publication.readingOrder.length) {
+      return firstPageProp;
+    }
+
+    const secondPage = this.publication.readingOrder[spineItemIndex + 1];
+    let secondPageProp : PageProperty | undefined;
+    if (secondPage.properties) {
+      secondPageProp = secondPage.properties.page;
+    }
+
+    if (secondPageProp === 'right') {
+      return undefined;
+    }
+
+    if (secondPageProp === 'left' || secondPageProp === 'center') {
+      if (!firstPageProp) {
+        if (spineItemIndex !== 0) {
+          return 'left';
+        }
+        return 'right';
+      }
+      return 'left';
+    }
+
+    return undefined;
   }
 
   public removeOutOfRangeSpineItems(start: number, end: number): void {
