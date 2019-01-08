@@ -23,6 +23,12 @@ export interface PageBreakData {
   };
 }
 
+export enum PageBreakVisibility {
+  Visible,
+  None,
+  Publisher,
+}
+
 export class PageTitleTocResolver {
   private pub: Publication;
   private rendition: Rendition;
@@ -60,6 +66,18 @@ export class PageTitleTocResolver {
   }
 
   public async getVisiblePageBreaks(): Promise<PageBreakData[]> {
+    return this.getPageBreaks((spineInfo: PaginationInfo) => {
+      return this.findVisiblePageBreaksForView(spineInfo);
+    });
+  }
+
+  public async setPageBreakVisibility(visible: PageBreakVisibility): Promise<void> {
+    this.getPageBreaks((spineInfo: PaginationInfo) => {
+      this.setAllPageBreaksVisibilityForView(spineInfo, visible);
+    });
+  }
+
+  private async getPageBreaks(findPageBreakFunc: Function): Promise<PageBreakData[]> {
     const screenBegin = this.rendition.viewport.getStartPosition();
     const screenEnd = this.rendition.viewport.getEndPosition();
 
@@ -78,13 +96,16 @@ export class PageTitleTocResolver {
       spineInfo.push(screenEnd);
     }
 
-    return this.findVisiblePageBreaksAllViews(spineInfo);
+    return this.findVisiblePageBreaksAllViews(spineInfo, findPageBreakFunc);
   }
 
-  private findVisiblePageBreaksAllViews(spineInfo: PaginationInfo[]): PageBreakData[] {
+  private findVisiblePageBreaksAllViews(
+    spineInfo: PaginationInfo[],
+    findPageBreakFunc: Function,
+  ): PageBreakData[] {
     let pageBreaks: PageBreakData[] = [];
-    spineInfo.forEach((view) => {
-      const pb = this.findVisiblePageBreaksForView(view);
+    spineInfo.forEach((spineInfo) => {
+      const pb = findPageBreakFunc(spineInfo);
       pageBreaks = pageBreaks.concat(pb);
     });
 
@@ -262,6 +283,47 @@ export class PageTitleTocResolver {
     }
 
     return { isWithinViewport, isBeforeViewport, isAfterViewport, elementRect };
+  }
+
+  private setAllPageBreaksVisibilityForView(
+    spineInfo: PaginationInfo,
+    visible: PageBreakVisibility,
+  ): void {
+    const contentView = spineInfo.view.getContentView();
+    const link = spineInfo.view.getSpineItemLink(spineInfo.spineItemIndex);
+    if (!link) {
+      console.error('No link returned');
+      return;
+    }
+
+    const links = this.pageListMapByHref.get(link.href);
+    if (links) {
+      links.forEach((link) => {
+        const href = link.href.split('#')[1];
+        const element = contentView.getElementById(href);
+        if (!element) {
+          return;
+        }
+
+        // TODO: Ideally, I think a class name should be added / removed instead of adding all the
+        // styles individually.
+        if (visible === PageBreakVisibility.Visible) {
+          element.style.setProperty('border', '1px solid rgb(190,190,190)');
+          element.style.setProperty('color', 'rgb(190, 190, 190)');
+          element.style.setProperty('padding', '0.1rem 0.3rem');
+          element.style.setProperty('margin', '0 0.2rem');
+          element.style.setProperty('display', 'inline');
+        } else if (visible === PageBreakVisibility.None) {
+          element.style.setProperty('display', 'none');
+        } else {
+          element.style.removeProperty('border');
+          element.style.removeProperty('color');
+          element.style.removeProperty('padding');
+          element.style.removeProperty('margin');
+          element.style.removeProperty('display');
+        }
+      });
+    }
   }
 
   private findMatchLink(loc: Location, infoMap: Map<string, LinkLocationInfo[]>): Link | null {
