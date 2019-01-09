@@ -1,3 +1,5 @@
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -12,7 +14,7 @@ module.exports = function (config) {
     customLaunchers: {
       ChromeHeadlessWithSizeDefined: {
         base: 'ChromeHeadless',
-        flags: ['--window-size=1024,768']
+        flags: ['--window-size=1024,768', , '--no-sandbox']
       }
     },
     reporters: ['spec'],
