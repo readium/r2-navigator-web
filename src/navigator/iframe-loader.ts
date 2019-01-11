@@ -238,12 +238,6 @@ export class IFrameLoader {
       }
     }
 
-    if (!this.isIE) {
-      iframe.setAttribute('src', documentDataUri);
-    } else if (iframe.contentWindow) {
-      iframe.contentWindow.document.close();
-    }
-
     const iframeWindow = iframe.contentWindow;
     if (!iframeWindow) {
       console.error('Could not find iframe content window - unable to add load / unload listeners');
@@ -261,5 +255,11 @@ export class IFrameLoader {
     iframeWindow.addEventListener('unload', () => {
       this.iframeUnloaded(iframe);
     });
+
+    if (!this.isIE) {
+      iframe.setAttribute('src', documentDataUri);
+    } else if (iframe.contentWindow) {
+      iframe.contentWindow.document.close();
+    }
   }
 }

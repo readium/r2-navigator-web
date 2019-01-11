@@ -29,6 +29,12 @@ export enum PageBreakVisibility {
   Publisher,
 }
 
+export enum PageBreakLocation {
+  isWithinViewport,
+  isBeforeViewport,
+  isAfterViewport,
+}
+
 export class PageTitleTocResolver {
   private pub: Publication;
   private rendition: Rendition;
@@ -65,9 +71,9 @@ export class PageTitleTocResolver {
     return this.findMatchLink(loc, this.tocMap);
   }
 
-  public async getVisiblePageBreaks(): Promise<PageBreakData[]> {
+  public async getVisiblePageBreaks(viewportRect: ClientRect | DOMRect): Promise<PageBreakData[]> {
     return this.getPageBreaks((spineInfo: PaginationInfo) => {
-      return this.findVisiblePageBreaksForView(spineInfo);
+      return this.findVisiblePageBreaksForView(spineInfo, viewportRect);
     });
   }
 
@@ -116,9 +122,13 @@ export class PageTitleTocResolver {
     return pageBreaks;
   }
 
-  private findVisiblePageBreaksForView(spineInfo: PaginationInfo): PageBreakData[] {
+  private findVisiblePageBreaksForView(
+    spineInfo: PaginationInfo,
+    viewportRect: ClientRect | DOMRect,
+  ): PageBreakData[] {
     const contentView = spineInfo.view.getContentView();
-    const link = spineInfo.view.getSpineItemLink(spineInfo.spineItemIndex);
+    const pub = this.rendition.getPublication();
+    const link = pub.readingOrder[spineInfo.spineItemIndex];
     if (!link) {
       console.error('No link returned');
       return [];
@@ -127,15 +137,19 @@ export class PageTitleTocResolver {
     const links = this.pageListMapByHref.get(link.href);
     let pageBreaks: PageBreakData[] = [];
     if (links) {
-      const link = this.findAnyVisiblePageBreakIndexInPageList(links, contentView);
-      pageBreaks = link ? this.findVisibleSiblingsInPageList(link, links, contentView) : [];
+      const link = this.findAnyVisiblePageBreakIndexInPageList(links, contentView, viewportRect);
+      // tslint:disable-next-line
+      pageBreaks = link ? this.findVisibleSiblingsInPageList(link, links, contentView, viewportRect) : [];
     }
 
     return pageBreaks;
   }
 
-  private findAnyVisiblePageBreakIndexInPageList(pageList: Link[], contentView: IContentView)
-  : Link | null | undefined {
+  private findAnyVisiblePageBreakIndexInPageList(
+    pageList: Link[],
+    contentView: IContentView,
+    viewportRect: ClientRect | DOMRect,
+  ): Link | null | undefined {
     if (pageList.length === 0) {
       return undefined;
     }
@@ -148,20 +162,20 @@ export class PageTitleTocResolver {
       return null;
     }
 
-    const { isWithinViewport, isBeforeViewport, isAfterViewport } =
-      this.isElementVisibleInViewport(element, iframeEl);
+    const { pageBreakLocation } =
+      this.isElementVisibleInViewport(element, iframeEl, viewportRect);
 
     // A visible pagebreak was found. Check siblings
-    if (isWithinViewport) {
+    if (pageBreakLocation === PageBreakLocation.isWithinViewport) {
       return pageList[middleIndex];
     }
-    if (isBeforeViewport) {
+    if (pageBreakLocation === PageBreakLocation.isBeforeViewport) {
       const subset = pageList.slice(middleIndex + 1, pageList.length);
-      return this.findAnyVisiblePageBreakIndexInPageList(subset, contentView);
+      return this.findAnyVisiblePageBreakIndexInPageList(subset, contentView, viewportRect);
     }
-    if (isAfterViewport) {
+    if (pageBreakLocation === PageBreakLocation.isAfterViewport) {
       const subset = pageList.slice(0, middleIndex);
-      return this.findAnyVisiblePageBreakIndexInPageList(subset, contentView);
+      return this.findAnyVisiblePageBreakIndexInPageList(subset, contentView, viewportRect);
     }
   }
 
@@ -171,78 +185,65 @@ export class PageTitleTocResolver {
     startLink: Link,
     pageList: Link[],
     contentView: IContentView,
+    viewportRect: ClientRect | DOMRect,
   ): PageBreakData[] {
-    const iframeEl = contentView.element().getElementsByTagName('iframe')[0];
     const startIndex = pageList.indexOf(startLink);
-    const href = pageList[startIndex].href.split('#')[1];
-    const element = contentView.getElementById(href);
-    if (!iframeEl || !element) {
-      console.error('iframe or element not found');
-      return [];
-    }
-
     const pageBreaks: PageBreakData[] = [];
-    const iframeRect = iframeEl.getBoundingClientRect();
 
     // Look at elements that fall at and beyond the start index
     for (let i = startIndex; i < pageList.length; i += 1) {
-      const pl = pageList[i];
-      const href = pl ? pageList[i].href.split('#')[1] : '';
-      const el = contentView.getElementById(href);
-      if (!el) {
-        continue;
-      }
-      const { isWithinViewport, elementRect } = this.isElementVisibleInViewport(el, iframeEl);
-
-      if (isWithinViewport) {
-        pageBreaks.push({
-          iframeRect,
-          link: pageList[i],
-          rect: elementRect,
-          offset: {
-            x: iframeRect.left,
-            y: iframeRect.top,
-          },
-        });
-      } else {
-        // If this element isn't visible, there shouldn't be any more beyond it
-        break;
-      }
+      this.addToPageBreaks(pageBreaks, pageList, i, contentView, viewportRect);
     }
 
     // Look at elements that fall before the start index
     for (let i = startIndex - 1; i >= 0; i -= 1) {
-      const pl = pageList[i];
-      const href = pl ? pageList[i].href.split('#')[1] : '';
-      const el = contentView.getElementById(href);
-      if (!el) {
-        continue;
-      }
-      const { isWithinViewport, elementRect } = this.isElementVisibleInViewport(el, iframeEl);
-
-      if (isWithinViewport) {
-        pageBreaks.push({
-          iframeRect,
-          link: pageList[i],
-          rect: elementRect,
-          offset: {
-            x: iframeRect.left,
-            y: iframeRect.top,
-          },
-        });
-      } else {
-        break;
-      }
+      this.addToPageBreaks(pageBreaks, pageList, i, contentView, viewportRect);
     }
 
     return pageBreaks;
   }
 
+  private addToPageBreaks(
+    pageBreaks: PageBreakData[],
+    pageList: Link[],
+    index: number,
+    contentView: IContentView,
+    viewportRect: ClientRect | DOMRect,
+  ): void {
+    const iframeEl = contentView.element().getElementsByTagName('iframe')[0];
+    const pl = pageList[index];
+    const href = pl ? pageList[index].href.split('#')[1] : '';
+    const el = contentView.getElementById(href);
+    if (!iframeEl || !el) {
+      console.error('iframe or element not found');
+      return;
+    }
+    const iframeRect = iframeEl.getBoundingClientRect();
+
+    const { pageBreakLocation, elementRect } =
+      this.isElementVisibleInViewport(el, iframeEl, viewportRect);
+
+    if (pageBreakLocation === PageBreakLocation.isWithinViewport) {
+      pageBreaks.push({
+        iframeRect,
+        link: pageList[index],
+        rect: elementRect,
+        offset: {
+          x: iframeRect.left,
+          y: iframeRect.top,
+        },
+      });
+    } else {
+      // If this element isn't visible, there shouldn't be any more beyond it
+      return;
+    }
+  }
+
   private isElementVisibleInViewport(
     element: HTMLElement,
     iframe: HTMLElement,
-  ): {isWithinViewport: boolean, isBeforeViewport: boolean, isAfterViewport: boolean
-    , elementRect: ClientRect | DOMRect} {
+    viewportRect: ClientRect | DOMRect,
+  ): {pageBreakLocation: PageBreakLocation, elementRect: ClientRect | DOMRect} {
     const elStyle = window.getComputedStyle(element);
     // Ensure the element is visible before calculations are made
     let displayChanged = false;
@@ -258,7 +259,6 @@ export class PageTitleTocResolver {
 
     const elementRect = element.getBoundingClientRect();
     const iframeRect = iframe.getBoundingClientRect();
-    const viewportRect = this.rendition.viewport.getBoundingClientRect();
 
     // Doesn't factor in scroll. There may be other factors missing. Add them if necessary.
     const absPosX = elementRect.left + iframeRect.left;
@@ -282,7 +282,16 @@ export class PageTitleTocResolver {
       element.style.removeProperty('visibility');
     }
 
-    return { isWithinViewport, isBeforeViewport, isAfterViewport, elementRect };
+    let pageBreakLocation: number = -1;
+    if (isWithinViewport) {
+      pageBreakLocation = PageBreakLocation.isWithinViewport;
+    } else if (isBeforeViewport) {
+      pageBreakLocation = PageBreakLocation.isBeforeViewport;
+    } else if (isAfterViewport) {
+      pageBreakLocation = PageBreakLocation.isAfterViewport;
+    }
+
+    return { pageBreakLocation, elementRect };
   }
 
   private setAllPageBreaksVisibilityForView(
@@ -290,7 +299,8 @@ export class PageTitleTocResolver {
     visible: PageBreakVisibility,
   ): void {
     const contentView = spineInfo.view.getContentView();
-    const link = spineInfo.view.getSpineItemLink(spineInfo.spineItemIndex);
+    const pub = this.rendition.getPublication();
+    const link = pub.readingOrder[spineInfo.spineItemIndex];
     if (!link) {
       console.error('No link returned');
       return;
