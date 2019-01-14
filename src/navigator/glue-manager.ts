@@ -38,12 +38,8 @@ export class GlueManager {
     }
     this.frameID += 1;
 
-    this.addGlueHandler(win, new Highlighting(win));
     this.addGlueHandler(win, new LinkHandling(win), (glue: LinkHandling) => {
       glue.addEventListener('body', 'click', [], this.handleLink);
-    });
-    this.addGlueHandler(win, new SelectionHandling(win), (glue: SelectionHandling) => {
-      glue.addEventListener('body', this.handleSelection);
     });
   }
 
