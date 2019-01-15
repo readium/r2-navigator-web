@@ -101,6 +101,7 @@ export class Rendition {
     }
 
     this.setPageSize(pageWidth, pageHeight);
+    this.viewport.onPageSizeChanged(pageWidth, numOfPagesPerSpread);
   }
 
   public refreshPageLayout(): void {

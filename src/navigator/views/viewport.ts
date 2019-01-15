@@ -27,6 +27,7 @@ export class Viewport {
   private endPos?: PaginationInfo;
 
   private root: HTMLElement;
+  private contentContainer: HTMLElement;
   private clipContatiner: HTMLElement;
 
   private scrollRequestToken?: CancellationToken;
@@ -102,6 +103,9 @@ export class Viewport {
         this.root.style.width = `${this.visibleViewportSize}px`;
         this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
       }
+
+      this.contentContainer.style.width = this.root.style.width;
+      this.contentContainer.style.height = this.root.style.height;
 
       this.clipContatiner.style.width = this.root.style.width;
       this.clipContatiner.style.height = this.root.style.height;
@@ -355,17 +359,32 @@ export class Viewport {
     this.bookView.endViewUpdate();
   }
 
+  public onPageSizeChanged(pageWidth: number, numOfPages: number): void {
+    if (numOfPages === 0) {
+      this.contentContainer.style.width = this.root.style.width;
+      return;
+    }
+    this.contentContainer.style.width = `${pageWidth * numOfPages}px`;
+  }
+
   private onLocationChanged(): void {
     this.locationChangedCallbacks.forEach(eventCb => eventCb());
   }
 
   private init(): void {
+    this.contentContainer = document.createElement('div');
+    this.contentContainer.id = 'viewport-content';
+    this.contentContainer.style.margin = 'auto';
+    this.contentContainer.style.overflowX = 'hidden';
+    this.contentContainer.style.overflowY = 'hidden';
+    this.root.appendChild(this.contentContainer);
+
     this.clipContatiner = document.createElement('div');
     this.clipContatiner.id = 'viewport-clipper';
     this.clipContatiner.style.position = 'absolute';
     this.clipContatiner.style.overflowX = 'hidden';
     this.clipContatiner.style.overflowY = 'hidden';
-    this.root.appendChild(this.clipContatiner);
+    this.contentContainer.appendChild(this.clipContatiner);
   }
 
   private bindEvents(): void {
@@ -541,9 +560,13 @@ export class Viewport {
     if (numOfPagePerSpread === 2) {
       const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(start);
       this.clipContatiner.style.right = '';
+      this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
         if (doublepageSpreadLayout === 'right') {
           this.clipContatiner.style.right = '0';
+        } else if (doublepageSpreadLayout === 'center') {
+          this.clipContatiner.style.position = '';
+          this.clipContatiner.style.margin = 'auto';
         }
         numOfPagePerSpread = 1;
       }
