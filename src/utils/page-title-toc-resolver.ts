@@ -17,10 +17,6 @@ export interface PageBreakData {
   link: Link;
   rect: ClientRect | DOMRect;
   iframeRect: ClientRect | DOMRect;
-  offset: {
-    x: number,
-    y: number,
-  };
 }
 
 export enum PageBreakVisibility {
@@ -229,10 +225,6 @@ export class PageTitleTocResolver {
         iframeRect,
         link: pageList[index],
         rect: elementRect,
-        offset: {
-          x: iframeRect.left,
-          y: iframeRect.top,
-        },
       });
     } else {
       // If this element isn't visible, there shouldn't be any more beyond it
