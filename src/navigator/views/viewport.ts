@@ -582,7 +582,11 @@ export class Viewport {
   }
 
   private getEndOffset(): number {
-    return this.viewOffset + this.getScaledViewportSize();
+    let offset = this.viewOffset + this.visibleViewportSize;
+    if (offset > this.bookView.getLoadedEndPosition()) {
+      offset = this.bookView.getLoadedEndPosition();
+    }
+    return offset;
   }
 
   private async onPagesReady(token?: CancellationToken): Promise<void> {
