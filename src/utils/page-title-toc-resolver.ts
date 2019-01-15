@@ -47,12 +47,14 @@ export class PageTitleTocResolver {
     this.rendition = rendCtx.rendition;
     this.pub = this.rendition.getPublication();
 
-    this.pub.pageList.forEach((link) => {
-      const href = link.href.split('#')[0];
-      const links = this.pageListMapByHref.get(href) || [];
-      links.push(link);
-      this.pageListMapByHref.set(href, links);
-    });
+    if (this.pub.pageList) {
+      this.pub.pageList.forEach((link) => {
+        const href = link.href.split('#')[0];
+        const links = this.pageListMapByHref.get(href) || [];
+        links.push(link);
+        this.pageListMapByHref.set(href, links);
+      });
+    }
 
   }
 
@@ -127,8 +129,7 @@ export class PageTitleTocResolver {
     viewportRect: ClientRect | DOMRect,
   ): PageBreakData[] {
     const contentView = spineInfo.view.getContentView();
-    const pub = this.rendition.getPublication();
-    const link = pub.readingOrder[spineInfo.spineItemIndex];
+    const link = this.pub.readingOrder[spineInfo.spineItemIndex];
     if (!link) {
       console.error('No link returned');
       return [];
@@ -354,7 +355,7 @@ export class PageTitleTocResolver {
       }
       const ret = EPUBcfi.Interpreter.compareCFIs(`epubcfi(/99!${info.cfi})`,
                                                   `epubcfi(/99!${locationCfi})`);
-      if (ret >= 0) {
+      if (ret[0] <= 0) {
         matchedLink = info.link;
       }
     }
@@ -408,6 +409,9 @@ export class PageTitleTocResolver {
   }
 
   private tryCreateLinkLocationInfo(link: Link, href: string): LinkLocationInfo | null {
+    if (!link.href) {
+      return null;
+    }
     const [siHref, elementId] = this.getHrefAndElementId(link.href);
     if (siHref !== href) {
       return null;
