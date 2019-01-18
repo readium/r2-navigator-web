@@ -192,6 +192,10 @@ export class Rendition {
     return this.bookView.getCfiFromAnchor(href, elementId);
   }
 
+  public getNumOfPagesPerSpread(): number {
+    return this.numOfPagesPerSpread;
+  }
+
   // // tslint:disable-next-line:no-any
   // public getReadiumPackageDocument(): any {
   //   return this.bookView.getRsjPackageDocument();

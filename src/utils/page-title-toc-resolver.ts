@@ -3,17 +3,21 @@ import * as EPUBcfi from 'readium-cfi-js';
 import { Publication } from '../streamer/publication';
 import { Location } from '../navigator/location';
 import { Rendition } from '../navigator/rendition';
+import { Navigator } from '../navigator/navigator';
 import { Link } from '@readium/shared-models/lib/models/publication/link';
-import { RenditionContext } from '../navigator';
+import { RenditionContext, SpineItemView } from '../navigator';
 import { PaginationInfo } from '../navigator/views/layout-view';
 import { IContentView } from '../navigator/views/content-view/content-view';
 
 class LinkLocationInfo {
   link: Link;
+  spineItemIndex: number;
   cfi?: string;
+  pageIndex?: number;
 }
 
 export interface PageBreakData {
+  isOnLeftSide: boolean;
   link: Link;
   rect: ClientRect | DOMRect;
   iframeRect: ClientRect | DOMRect;
@@ -31,26 +35,24 @@ export enum PageBreakLocation {
   isAfterViewport,
 }
 
+//    Start and end must both be from the same spine item
+interface LocationRange {
+  start?: Location;
+  end?: Location;
+}
+
 export class PageTitleTocResolver {
   private pub: Publication;
   private rendition: Rendition;
+  private navigator: Navigator;
 
   private pageListMap: Map<string, LinkLocationInfo[]> = new Map<string, LinkLocationInfo[]>();
   private tocMap: Map<string, LinkLocationInfo[]> = new Map<string, LinkLocationInfo[]>();
-  private pageListMapByHref: Map<string, Link[]> = new Map<string, Link[]>();
 
   public constructor(rendCtx: RenditionContext) {
     this.rendition = rendCtx.rendition;
+    this.navigator = rendCtx.navigator;
     this.pub = this.rendition.getPublication();
-
-    if (this.pub.pageList) {
-      this.pub.pageList.forEach((link) => {
-        const href = link.href.split('#')[0];
-        const links = this.pageListMapByHref.get(href) || [];
-        links.push(link);
-        this.pageListMapByHref.set(href, links);
-      });
-    }
 
   }
 
@@ -69,47 +71,68 @@ export class PageTitleTocResolver {
     return this.findMatchLink(loc, this.tocMap);
   }
 
-  public async getVisiblePageBreaks(viewportRect: ClientRect | DOMRect): Promise<PageBreakData[]> {
-    return this.getPageBreaks((spineInfo: PaginationInfo) => {
-      return this.findVisiblePageBreaksForView(spineInfo, viewportRect);
+  public async getVisiblePageBreaks(): Promise<PageBreakData[]> {
+    return this.getStartEndLocations((locationRange: LocationRange[]) => {
+      return this.findVisiblePageBreaksForLocations(locationRange);
     });
+  }
+
+  public async updatePageListMap(): Promise<void> {
+    const startLoc = this.navigator.getScreenBegin();
+    const endLoc = this.navigator.getScreenEnd();
+    if (!startLoc || !endLoc) {
+      return;
+    }
+    const startHref = startLoc.getHref();
+    const endHref = endLoc.getHref();
+    this.ensureSpineItemPageListMap(startHref, true);
+
+    if (startHref !== endHref) {
+      this.ensureSpineItemPageListMap(endHref, true);
+    }
   }
 
   public async setPageBreakVisibility(visible: PageBreakVisibility): Promise<void> {
-    this.getPageBreaks((spineInfo: PaginationInfo) => {
-      this.setAllPageBreaksVisibilityForView(spineInfo, visible);
+    this.getStartEndLocations((locationRanges: LocationRange[]) => {
+      this.setAllPageBreaksVisibilityForLocations(locationRanges, visible);
     });
   }
 
-  private async getPageBreaks(findPageBreakFunc: Function): Promise<PageBreakData[]> {
-    const screenBegin = this.rendition.viewport.getStartPosition();
-    const screenEnd = this.rendition.viewport.getEndPosition();
+  private async getStartEndLocations(func: Function): Promise<PageBreakData[]> {
+    const screenBegin = await this.navigator.getScreenBeginAsync();
+    const screenEnd = await this.navigator.getScreenEndAsync();
 
     if (!screenBegin || !screenEnd) {
       console.error('screenBegin or screenEnd not obtained');
       return [];
     }
 
-    const indexBegin = screenBegin.spineItemIndex;
-    const indexEnd = screenEnd.spineItemIndex;
-    const hasMultipleIFrames = (indexBegin !== indexEnd);
-
-    const spineInfo: PaginationInfo[] = [screenBegin];
+    const hasMultipleIFrames = (screenBegin.getHref() !== screenEnd.getHref());
+    const locations: LocationRange[] = [];
 
     if (hasMultipleIFrames) {
-      spineInfo.push(screenEnd);
+      locations.push({
+        start: screenBegin,
+      });
+      locations.push({
+        end: screenEnd,
+      });
+    } else {
+      locations.push({
+        start: screenBegin,
+        end: screenEnd,
+      });
     }
 
-    return this.findVisiblePageBreaksAllViews(spineInfo, findPageBreakFunc);
+    return func(locations);
   }
 
-  private findVisiblePageBreaksAllViews(
-    spineInfo: PaginationInfo[],
-    findPageBreakFunc: Function,
+  private findVisiblePageBreaksForLocations(
+    locations: LocationRange[],
   ): PageBreakData[] {
     let pageBreaks: PageBreakData[] = [];
-    spineInfo.forEach((spineInfo) => {
-      const pb = findPageBreakFunc(spineInfo);
+    locations.forEach((locationRange) => {
+      const pb = this.findVisiblePageBreaks(locationRange);
       pageBreaks = pageBreaks.concat(pb);
     });
 
@@ -120,123 +143,139 @@ export class PageTitleTocResolver {
     return pageBreaks;
   }
 
-  private findVisiblePageBreaksForView(
-    spineInfo: PaginationInfo,
-    viewportRect: ClientRect | DOMRect,
+  private findVisiblePageBreaks(
+    locationRange: LocationRange,
   ): PageBreakData[] {
-    const contentView = spineInfo.view.getContentView();
-    const link = this.pub.readingOrder[spineInfo.spineItemIndex];
-    if (!link) {
-      console.error('No link returned');
+    if (!locationRange.start && !locationRange.end) {
+      console.log('invalid locationRange given');
       return [];
     }
 
-    const links = this.pageListMapByHref.get(link.href);
-    let pageBreaks: PageBreakData[] = [];
-    if (links) {
-      const link = this.findAnyVisiblePageBreakIndexInPageList(links, contentView, viewportRect);
-      // tslint:disable-next-line
-      pageBreaks = link ? this.findVisibleSiblingsInPageList(link, links, contentView, viewportRect) : [];
-    }
+    const href = this.getHrefFromLocationRange(locationRange);
 
-    return pageBreaks;
-  }
-
-  private findAnyVisiblePageBreakIndexInPageList(
-    pageList: Link[],
-    contentView: IContentView,
-    viewportRect: ClientRect | DOMRect,
-  ): Link | null | undefined {
-    if (pageList.length === 0) {
-      return undefined;
-    }
-
-    const middleIndex = Math.floor((pageList.length - 1) / 2);
-    const href = pageList[middleIndex].href.split('#')[1];
-    const element = contentView.getElementById(href);
-    const iframeEl = contentView.element().getElementsByTagName('iframe')[0];
-    if (!element || !iframeEl) {
-      return null;
-    }
-
-    const { pageBreakLocation } =
-      this.isElementVisibleInViewport(element, iframeEl, viewportRect);
-
-    // A visible pagebreak was found. Check siblings
-    if (pageBreakLocation === PageBreakLocation.isWithinViewport) {
-      return pageList[middleIndex];
-    }
-    if (pageBreakLocation === PageBreakLocation.isBeforeViewport) {
-      const subset = pageList.slice(middleIndex + 1, pageList.length);
-      return this.findAnyVisiblePageBreakIndexInPageList(subset, contentView, viewportRect);
-    }
-    if (pageBreakLocation === PageBreakLocation.isAfterViewport) {
-      const subset = pageList.slice(0, middleIndex);
-      return this.findAnyVisiblePageBreakIndexInPageList(subset, contentView, viewportRect);
-    }
-  }
-
-  // Find visible siblings based on an index that's already been determined
-  // to be within the viewport
-  private findVisibleSiblingsInPageList(
-    startLink: Link,
-    pageList: Link[],
-    contentView: IContentView,
-    viewportRect: ClientRect | DOMRect,
-  ): PageBreakData[] {
-    const startIndex = pageList.indexOf(startLink);
+    const linkInfos = this.pageListMap.get(href);
     const pageBreaks: PageBreakData[] = [];
-
-    // Look at elements that fall at and beyond the start index
-    for (let i = startIndex; i < pageList.length; i += 1) {
-      this.addToPageBreaks(pageBreaks, pageList, i, contentView, viewportRect);
-    }
-
-    // Look at elements that fall before the start index
-    for (let i = startIndex - 1; i >= 0; i -= 1) {
-      this.addToPageBreaks(pageBreaks, pageList, i, contentView, viewportRect);
+    const spineItemIndex = this.pub.findSpineItemIndexByHref(href);
+    const spineItemView = this.rendition.viewport.getSpineItemView(spineItemIndex);
+    if (linkInfos && spineItemView) {
+      linkInfos.forEach((linkInfo) => {
+        const withinViewport = this.isLinkWithinViewport(linkInfo, locationRange, spineItemView);
+        if (withinViewport && spineItemView) {
+          this.addToPageBreaks(pageBreaks, linkInfo, spineItemView);
+        }
+      });
     }
 
     return pageBreaks;
+  }
+
+  private getHrefFromLocationRange(locationRange: LocationRange): string {
+    let href = '';
+    if (locationRange.start) {
+      href = locationRange.start.getHref();
+    }
+    if (locationRange.end) {
+      href = locationRange.end.getHref();
+    }
+
+    return href;
+  }
+
+  private isLinkWithinViewport(
+    linkInfo: LinkLocationInfo,
+    locationRange: LocationRange,
+    spineItemView: SpineItemView,
+  ): boolean {
+    if ((!linkInfo.pageIndex && linkInfo.pageIndex !== 0)) {
+      return false;
+    }
+
+    // Check if link shares the same pageIndex as the locationRange
+    const startCfi = locationRange.start && locationRange.start.getLocation();
+    const endCfi = locationRange.end && locationRange.end.getLocation();
+    const startPageIndex = startCfi ? spineItemView.getPageIndexOffsetFromCfi(startCfi) : -1;
+    const endPageIndex = endCfi ? spineItemView.getPageIndexOffsetFromCfi(endCfi) : -1;
+    const hasSamePageIndex = linkInfo.pageIndex >= startPageIndex
+      || linkInfo.pageIndex <= endPageIndex;
+
+    if (!hasSamePageIndex) {
+      return false;
+    }
+
+    // Check in further detail to see if it's on the visible portion of the viewport
+    return this.isLinkWithinLocationRange(linkInfo, locationRange);
+  }
+
+  private isLinkWithinLocationRange(
+    linkInfo: LinkLocationInfo,
+    locationRange: LocationRange,
+  ): boolean {
+    let isBeyondStart = false;
+    // If there is no start defined, assume this page contains two iframes
+    // and as a result the start location is within the viewport.
+    if (!locationRange.start) {
+      isBeyondStart = true;
+    } else {
+      const compareCfi = EPUBcfi.Interpreter.compareCFIs(
+        `epubcfi(/99!${linkInfo.cfi})`,
+        `epubcfi(/99!${locationRange.start.getLocation()})`,
+      );
+      if (compareCfi[0] >= 0) {
+        isBeyondStart = true;
+      }
+    }
+
+    let isBeforeEnd = false;
+    if (!locationRange.end) {
+      isBeforeEnd = true;
+    } else {
+      const compareCfi = EPUBcfi.Interpreter.compareCFIs(
+        `epubcfi(/99!${linkInfo.cfi})`,
+        `epubcfi(/99!${locationRange.end.getLocation()})`,
+      );
+      if (compareCfi[0] <= 0) {
+        isBeforeEnd = true;
+      }
+    }
+
+    return isBeyondStart && isBeforeEnd;
   }
 
   private addToPageBreaks(
     pageBreaks: PageBreakData[],
-    pageList: Link[],
-    index: number,
-    contentView: IContentView,
-    viewportRect: ClientRect | DOMRect,
+    linkInfo: LinkLocationInfo,
+    spineItemView: SpineItemView,
   ): void {
-    const iframeEl = contentView.element().getElementsByTagName('iframe')[0];
-    const pl = pageList[index];
-    const href = pl ? pageList[index].href.split('#')[1] : '';
-    const el = contentView.getElementById(href);
-    if (!iframeEl || !el) {
-      console.error('iframe or element not found');
+    const contentView = spineItemView.getContentView();
+    const iframe = contentView.element().getElementsByTagName('iframe')[0];
+    const [href, elementId] = this.getHrefAndElementId(linkInfo.link.href);
+    const el = contentView.getElementById(elementId);
+    if (!el || !iframe) {
       return;
     }
-    const iframeRect = iframeEl.getBoundingClientRect();
+    const elementRect = this.getElementRect(el);
+    const iframeRect = iframe.getBoundingClientRect();
 
-    const { pageBreakLocation, elementRect } =
-      this.isElementVisibleInViewport(el, iframeEl, viewportRect);
-
-    if (pageBreakLocation === PageBreakLocation.isWithinViewport) {
-      pageBreaks.push({
-        iframeRect,
-        link: pageList[index],
-        rect: elementRect,
-      });
-    } else {
-      // If this element isn't visible, there shouldn't be any more beyond it
-      return;
+    // Determine if the pageBreak should sit on the left or right hand side of the viewport
+    const numPagesPerSpread = this.rendition.getNumOfPagesPerSpread();
+    let isOnLeftSide = false;
+    if (numPagesPerSpread === 2) {
+      const absPosX = elementRect.left + iframeRect.left;
+      const pageWidth = this.rendition.getPageWidth();
+      isOnLeftSide = absPosX <= pageWidth;
     }
+
+    pageBreaks.push({
+      isOnLeftSide,
+      iframeRect,
+      link: linkInfo.link,
+      rect: elementRect,
+    });
   }
 
-  private isElementVisibleInViewport(
+  private getElementRect(
     element: HTMLElement,
-    iframe: HTMLElement,
-    viewportRect: ClientRect | DOMRect,
-  ): {pageBreakLocation: PageBreakLocation, elementRect: ClientRect | DOMRect} {
+  ): ClientRect | DOMRect {
     const elStyle = window.getComputedStyle(element);
     // Ensure the element is visible before calculations are made
     let displayChanged = false;
@@ -251,21 +290,6 @@ export class PageTitleTocResolver {
     }
 
     const elementRect = element.getBoundingClientRect();
-    const iframeRect = iframe.getBoundingClientRect();
-
-    // Doesn't factor in scroll. There may be other factors missing. Add them if necessary.
-    const absPosX = elementRect.left + iframeRect.left;
-    const absPosY = elementRect.top + iframeRect.top;
-
-    const isBeforeViewport =
-      (absPosX + elementRect.width <= viewportRect.left) ||
-      (absPosY + elementRect.height <= viewportRect.top);
-
-    const isAfterViewport =
-      (absPosX >= viewportRect.left + viewportRect.width) ||
-      (absPosY >= viewportRect.top + viewportRect.height);
-
-    const isWithinViewport = !isBeforeViewport && !isAfterViewport;
 
     // Set the element back to it's original state
     if (displayChanged) {
@@ -275,57 +299,60 @@ export class PageTitleTocResolver {
       element.style.removeProperty('visibility');
     }
 
-    let pageBreakLocation: number = -1;
-    if (isWithinViewport) {
-      pageBreakLocation = PageBreakLocation.isWithinViewport;
-    } else if (isBeforeViewport) {
-      pageBreakLocation = PageBreakLocation.isBeforeViewport;
-    } else if (isAfterViewport) {
-      pageBreakLocation = PageBreakLocation.isAfterViewport;
-    }
-
-    return { pageBreakLocation, elementRect };
+    return elementRect;
   }
 
-  private setAllPageBreaksVisibilityForView(
-    spineInfo: PaginationInfo,
+  private setAllPageBreaksVisibilityForLocations(
+    locationRanges: LocationRange[],
     visible: PageBreakVisibility,
   ): void {
-    const contentView = spineInfo.view.getContentView();
-    const pub = this.rendition.getPublication();
-    const link = pub.readingOrder[spineInfo.spineItemIndex];
-    if (!link) {
-      console.error('No link returned');
+    locationRanges.forEach((locationRange) => {
+      if (!locationRange.start && !locationRange.end) {
+        console.log('invalid locationRange given');
+        return;
+      }
+
+      const href = this.getHrefFromLocationRange(locationRange);
+      const linkInfos = this.pageListMap.get(href);
+      const spineItemIndex = this.pub.findSpineItemIndexByHref(href);
+      const spineItemView = this.rendition.viewport.getSpineItemView(spineItemIndex);
+      if (linkInfos && spineItemView) {
+        linkInfos.forEach((linkInfo) => {
+          this.setPageBreakVisibilityForLinkInfo(linkInfo, visible, spineItemView);
+        });
+      }
+    });
+  }
+
+  private setPageBreakVisibilityForLinkInfo(
+    linkInfo: LinkLocationInfo,
+    visible: PageBreakVisibility,
+    spineItemView: SpineItemView,
+  ): void {
+    const contentView = spineItemView.getContentView();
+    const link = linkInfo.link;
+    const [href, elementId] = this.getHrefAndElementId(link.href);
+    const element = contentView.getElementById(elementId);
+    if (!element) {
       return;
     }
 
-    const links = this.pageListMapByHref.get(link.href);
-    if (links) {
-      links.forEach((link) => {
-        const href = link.href.split('#')[1];
-        const element = contentView.getElementById(href);
-        if (!element) {
-          return;
-        }
-
-        // TODO: Ideally, I think a class name should be added / removed instead of adding all the
-        // styles individually.
-        if (visible === PageBreakVisibility.Visible) {
-          element.style.setProperty('border', '1px solid rgb(190,190,190)');
-          element.style.setProperty('color', 'rgb(190, 190, 190)');
-          element.style.setProperty('padding', '0.1rem 0.3rem');
-          element.style.setProperty('margin', '0 0.2rem');
-          element.style.setProperty('display', 'inline');
-        } else if (visible === PageBreakVisibility.None) {
-          element.style.setProperty('display', 'none');
-        } else {
-          element.style.removeProperty('border');
-          element.style.removeProperty('color');
-          element.style.removeProperty('padding');
-          element.style.removeProperty('margin');
-          element.style.removeProperty('display');
-        }
-      });
+    // TODO: Ideally, I think a class name should be added / removed instead of adding all the
+    // styles individually.
+    if (visible === PageBreakVisibility.Visible) {
+      element.style.setProperty('border', '1px solid rgb(190,190,190)');
+      element.style.setProperty('color', 'rgb(190, 190, 190)');
+      element.style.setProperty('padding', '0.1rem 0.3rem');
+      element.style.setProperty('margin', '0 0.2rem');
+      element.style.setProperty('display', 'inline');
+    } else if (visible === PageBreakVisibility.None) {
+      element.style.setProperty('display', 'none');
+    } else {
+      element.style.removeProperty('border');
+      element.style.removeProperty('color');
+      element.style.removeProperty('padding');
+      element.style.removeProperty('margin');
+      element.style.removeProperty('display');
     }
   }
 
@@ -355,8 +382,8 @@ export class PageTitleTocResolver {
     return matchedLink;
   }
 
-  private ensureSpineItemPageListMap(href: string): void {
-    if (this.pageListMap.has(href)) {
+  private ensureSpineItemPageListMap(href: string, recalculateData?: boolean): void {
+    if (this.pageListMap.has(href) && !recalculateData) {
       return;
     }
 
@@ -414,7 +441,14 @@ export class PageTitleTocResolver {
       console.warn(`failed to get cfi for ${link.href}`);
     }
 
-    return { link, cfi };
+    const spineItemIndex = this.pub.findSpineItemIndexByHref(href);
+    const spineItemView = this.rendition.viewport.getSpineItemView(spineItemIndex);
+    let pageIndex;
+    if (spineItemView) {
+      pageIndex = spineItemView.getPageIndexOffsetFromElementId(elementId);
+    }
+
+    return { link, spineItemIndex, cfi, pageIndex };
   }
 
   private getHrefAndElementId(fullHref: string): [string, string] {
