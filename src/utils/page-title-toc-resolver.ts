@@ -261,8 +261,8 @@ export class PageTitleTocResolver {
     let isOnLeftSide = false;
     if (numPagesPerSpread === 2) {
       const absPosX = elementRect.left + iframeRect.left;
-      const pageWidth = this.rendition.getPageWidth();
-      isOnLeftSide = absPosX <= pageWidth;
+      const halfWidth = this.rendition.viewport.getViewportSize() / 2;
+      isOnLeftSide = absPosX <= halfWidth;
     }
 
     pageBreaks.push({
