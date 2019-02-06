@@ -625,7 +625,7 @@ export class Viewport {
       return;
     }
 
-    const contentView = pageInfo[0].view.getContentView();
+    const contentView = pageInfo[pageInfo.length - 1].view.getContentView();
     for (const callback of this.visiblePagesReadyCallbacks) {
       callback(contentView);
     }
