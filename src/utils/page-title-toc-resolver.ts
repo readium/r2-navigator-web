@@ -263,10 +263,15 @@ export class PageTitleTocResolver {
     // Determine if the pageBreak should sit on the left or right hand side of the viewport
     const numPagesPerSpread = this.rendition.getNumOfPagesPerSpread();
     let isOnLeftSide = false;
-    if (numPagesPerSpread === 2) {
-      const absPosX = elementRect.left + iframeRect.left;
-      const halfWidth = this.rendition.viewport.getViewportSize() / 2;
-      isOnLeftSide = absPosX <= halfWidth;
+    const startPos = this.rendition.viewport.getStartPosition();
+    const endPos = this.rendition.viewport.getEndPosition();
+    if (numPagesPerSpread === 2 && startPos && endPos) {
+      const pageWidth = this.rendition.getPageWidth();
+      if (startPos.spineItemIndex !== endPos.spineItemIndex) {
+        isOnLeftSide = linkInfo.spineItemIndex === startPos.spineItemIndex;
+      } else {
+        isOnLeftSide = elementRect.left <= startPos.offsetInView + pageWidth;
+      }
     }
 
     pageBreaks.push({
