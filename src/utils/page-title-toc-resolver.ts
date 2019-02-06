@@ -80,7 +80,7 @@ export class PageTitleTocResolver {
   public async updatePageListMap(): Promise<void> {
     const startLoc = this.navigator.getScreenBegin();
     const endLoc = this.navigator.getScreenEnd();
-    if (!startLoc || !endLoc) {
+    if (!startLoc || !endLoc || !this.pub.pageList) {
       return;
     }
     const startHref = startLoc.getHref();
@@ -210,7 +210,11 @@ export class PageTitleTocResolver {
     linkInfo: LinkLocationInfo,
     locationRange: LocationRange,
   ): boolean {
+    if (!linkInfo.cfi) {
+      return false;
+    }
     let isBeyondStart = false;
+
     // If there is no start defined, assume this page contains two iframes
     // and as a result the start location is within the viewport.
     if (!locationRange.start) {
