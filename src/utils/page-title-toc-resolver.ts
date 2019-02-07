@@ -20,7 +20,6 @@ export interface PageBreakData {
   isOnLeftSide: boolean;
   link: Link;
   rect: ClientRect | DOMRect;
-  iframeRect: ClientRect | DOMRect;
 }
 
 export enum PageBreakVisibility {
@@ -257,7 +256,6 @@ export class PageTitleTocResolver {
       return;
     }
     const elementRect = this.getElementRect(el);
-    const iframeRect = iframe.getBoundingClientRect();
 
     // Determine if the pageBreak should sit on the left or right hand side of the viewport
     const numPagesPerSpread = this.rendition.getNumOfPagesPerSpread();
@@ -275,7 +273,6 @@ export class PageTitleTocResolver {
 
     pageBreaks.push({
       isOnLeftSide,
-      iframeRect,
       link: linkInfo.link,
       rect: elementRect,
     });
