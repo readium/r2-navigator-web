@@ -98,7 +98,7 @@ export class PageTitleTocResolver {
     });
   }
 
-  private async getStartEndLocations(func: Function): Promise<PageBreakData[]> {
+  private async getStartEndLocations(func: Function): Promise<any> {
     const screenBegin = await this.navigator.getScreenBeginAsync();
     const screenEnd = await this.navigator.getScreenEndAsync();
 
@@ -203,29 +203,31 @@ export class PageTitleTocResolver {
     }
 
     // Check in further detail to see if it's on the visible portion of the viewport
-    return this.isLinkWithinLocationRange(linkInfo, locationRange);
+    return this.isLinkWithinLocationRange(linkInfo, locationRange, spineItemView);
   }
 
   private isLinkWithinLocationRange(
     linkInfo: LinkLocationInfo,
     locationRange: LocationRange,
+    spineItemView: SpineItemView,
   ): boolean {
-    if (!linkInfo.cfi) {
+    const contentView = spineItemView.getContentView();
+    let isBeyondStart = false;
+    const [href, elementId] = this.getHrefAndElementId(linkInfo.link.href);
+    const linkEl = contentView.getElementById(elementId);
+    if (!linkEl) {
       return false;
     }
-    let isBeyondStart = false;
+    const linkRect = linkEl.getBoundingClientRect();
 
     // If there is no start defined, assume this page contains two iframes
     // and as a result the start location is within the viewport.
     if (!locationRange.start) {
       isBeyondStart = true;
     } else {
-      const compareCfi = EPUBcfi.Interpreter.compareCFIs(
-        `epubcfi(/99!${linkInfo.cfi})`,
-        `epubcfi(/99!${locationRange.start.getLocation()})`,
-      );
-      if (compareCfi[0] >= 0) {
-        isBeyondStart = true;
+      const startPos = this.rendition.viewport.getStartPosition();
+      if (startPos) {
+        isBeyondStart = linkRect.left >= startPos.offsetInView;
       }
     }
 
@@ -233,12 +235,9 @@ export class PageTitleTocResolver {
     if (!locationRange.end) {
       isBeforeEnd = true;
     } else {
-      const compareCfi = EPUBcfi.Interpreter.compareCFIs(
-        `epubcfi(/99!${linkInfo.cfi})`,
-        `epubcfi(/99!${locationRange.end.getLocation()})`,
-      );
-      if (compareCfi[0] <= 0) {
-        isBeforeEnd = true;
+      const endPos = this.rendition.viewport.getEndPosition();
+      if (endPos) {
+        isBeforeEnd = linkRect.left <= endPos.offsetInView;
       }
     }
 
