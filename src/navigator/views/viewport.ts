@@ -381,7 +381,6 @@ export class Viewport {
 
     this.clipContatiner = document.createElement('div');
     this.clipContatiner.id = 'viewport-clipper';
-    this.clipContatiner.style.position = 'absolute';
     this.clipContatiner.style.overflowX = 'hidden';
     this.clipContatiner.style.overflowY = 'hidden';
     this.contentContainer.appendChild(this.clipContatiner);
