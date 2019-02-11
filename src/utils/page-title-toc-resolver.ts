@@ -14,6 +14,7 @@ class LinkLocationInfo {
   spineItemIndex: number;
   cfi?: string;
   pageIndex?: number;
+  offset?: number;
 }
 
 export interface PageBreakData {
@@ -189,18 +190,6 @@ export class PageTitleTocResolver {
       return false;
     }
 
-    // Check if link shares the same pageIndex as the locationRange
-    const startCfi = locationRange.start && locationRange.start.getLocation();
-    const endCfi = locationRange.end && locationRange.end.getLocation();
-    const startPageIndex = startCfi ? spineItemView.getPageIndexOffsetFromCfi(startCfi) : -1;
-    const endPageIndex = endCfi ? spineItemView.getPageIndexOffsetFromCfi(endCfi) : -1;
-    const hasSamePageIndex = linkInfo.pageIndex >= startPageIndex
-      || linkInfo.pageIndex <= endPageIndex;
-
-    if (!hasSamePageIndex) {
-      return false;
-    }
-
     // Check in further detail to see if it's on the visible portion of the viewport
     return this.isLinkWithinLocationRange(linkInfo, locationRange, spineItemView);
   }
@@ -217,7 +206,6 @@ export class PageTitleTocResolver {
     if (!linkEl) {
       return false;
     }
-    const linkRect = linkEl.getBoundingClientRect();
 
     // If there is no start defined, assume this page contains two iframes
     // and as a result the start location is within the viewport.
@@ -225,8 +213,8 @@ export class PageTitleTocResolver {
       isBeyondStart = true;
     } else {
       const startPos = this.rendition.viewport.getStartPosition();
-      if (startPos) {
-        isBeyondStart = linkRect.left >= startPos.offsetInView;
+      if (startPos && linkInfo.offset) {
+        isBeyondStart = linkInfo.offset >= startPos.offsetInView;
       }
     }
 
@@ -235,8 +223,8 @@ export class PageTitleTocResolver {
       isBeforeEnd = true;
     } else {
       const endPos = this.rendition.viewport.getEndPosition();
-      if (endPos) {
-        isBeforeEnd = linkRect.left <= endPos.offsetInView;
+      if (endPos && linkInfo.offset) {
+        isBeforeEnd = linkInfo.offset <= endPos.offsetInView;
       }
     }
 
@@ -449,11 +437,13 @@ export class PageTitleTocResolver {
     const spineItemIndex = this.pub.findSpineItemIndexByHref(href);
     const spineItemView = this.rendition.viewport.getSpineItemView(spineItemIndex);
     let pageIndex;
+    let offset;
     if (spineItemView) {
       pageIndex = spineItemView.getPageIndexOffsetFromElementId(elementId);
+      offset = spineItemView.getOffsetFromElementId(elementId);
     }
 
-    return { link, spineItemIndex, cfi, pageIndex };
+    return { link, spineItemIndex, cfi, pageIndex, offset };
   }
 
   private getHrefAndElementId(fullHref: string): [string, string] {
