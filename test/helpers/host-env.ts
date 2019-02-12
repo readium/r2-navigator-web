@@ -1,4 +1,4 @@
-import { LayoutView, Rendition, SettingName } from '../../src/navigator';
+import { LayoutView, Rendition, RenditionContext, SettingName } from '../../src/navigator';
 import { IFrameLoader } from '../../src/navigator/iframe-loader';
 import {
   ElementBlacklistedChecker,
@@ -23,6 +23,7 @@ export class HostEnv {
   private layoutView?: LayoutView;
 
   private rendition?: Rendition;
+  private renditionCtx?: RenditionContext;
 
   public constructor() {
     this.initViewport();
@@ -50,6 +51,8 @@ export class HostEnv {
     this.cvFactory = new R2ContentViewFactory(loader);
     this.viewSettings = new ViewSettings();
     this.eleChecker = new ElementBlacklistedChecker([], [], []);
+    this.rendition = new Rendition(this.publication, this.viewportDiv, this.cvFactory);
+    this.renditionCtx = new RenditionContext(this.rendition, loader);
   }
 
   public createSpineItemView(pageWidth: number, pageHeight: number,
@@ -86,10 +89,17 @@ export class HostEnv {
 
   public getRendition(): Rendition {
     if (!this.rendition) {
-      this.rendition = new Rendition(this.publication, this.viewportDiv, this.cvFactory);
+      throw 'No Rendition initialized';
     }
 
     return this.rendition;
+  }
+
+  public getRenditionContext(): RenditionContext {
+    if (!this.renditionCtx) {
+      throw 'No RenditionContext initialized';
+    }
+    return this.renditionCtx;
   }
 
   public getIframe(): HTMLIFrameElement {

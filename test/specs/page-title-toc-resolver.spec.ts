@@ -34,8 +34,8 @@ describe('PageTitleTocResolver', () => {
       rendition.viewport.setScrollMode(ScrollMode.None);
 
       await rendition.render();
-      const navigator = new Navigator(rendition);
-      const pageListManager = new PageTitleTocResolver(rendition);
+      const navigator = hostEnv.getRenditionContext().navigator;
+      const pageListManager = new PageTitleTocResolver(hostEnv.getRenditionContext());
 
       await rendition.viewport.renderAtSpineItem(2);
 
@@ -60,8 +60,8 @@ describe('PageTitleTocResolver', () => {
       rendition.viewport.setScrollMode(ScrollMode.None);
 
       await rendition.render();
-      const navigator = new Navigator(rendition);
-      const pageListManager = new PageTitleTocResolver(rendition);
+      const navigator = hostEnv.getRenditionContext().navigator;
+      const pageListManager = new PageTitleTocResolver(hostEnv.getRenditionContext());
 
       await rendition.viewport.renderAtSpineItem(2);
 
