@@ -6,8 +6,6 @@ import { Rendition } from '../navigator/rendition';
 import { Navigator } from '../navigator/navigator';
 import { Link } from '@readium/shared-models/lib/models/publication/link';
 import { RenditionContext, SpineItemView } from '../navigator';
-import { PaginationInfo } from '../navigator/views/layout-view';
-import { IContentView } from '../navigator/views/content-view/content-view';
 
 class LinkLocationInfo {
   link: Link;
@@ -72,12 +70,11 @@ export class PageTitleTocResolver {
   }
 
   public async getVisiblePageBreaks(): Promise<PageBreakData[]> {
-    return this.getStartEndLocations((locationRange: LocationRange[]) => {
-      return this.findVisiblePageBreaksForLocations(locationRange);
-    });
+    const locationRanges = await this.getStartEndLocations();
+    return this.findVisiblePageBreaksForLocations(locationRanges);
   }
 
-  public async updatePageListMap(): Promise<void> {
+  public updatePageListMap(): void {
     const startLoc = this.navigator.getScreenBegin();
     const endLoc = this.navigator.getScreenEnd();
     if (!startLoc || !endLoc || !this.pub.pageList) {
@@ -93,12 +90,11 @@ export class PageTitleTocResolver {
   }
 
   public async setPageBreakVisibility(visible: PageBreakVisibility): Promise<void> {
-    this.getStartEndLocations((locationRanges: LocationRange[]) => {
-      this.setAllPageBreaksVisibilityForLocations(locationRanges, visible);
-    });
+    const locationRanges = await this.getStartEndLocations();
+    this.setAllPageBreaksVisibilityForLocations(locationRanges, visible);
   }
 
-  private async getStartEndLocations(func: Function): Promise<any> {
+  private async getStartEndLocations(): Promise<any> {
     const screenBegin = await this.navigator.getScreenBeginAsync();
     const screenEnd = await this.navigator.getScreenEndAsync();
 
@@ -124,7 +120,7 @@ export class PageTitleTocResolver {
       });
     }
 
-    return func(locations);
+    return locations;
   }
 
   private findVisiblePageBreaksForLocations(
@@ -199,13 +195,12 @@ export class PageTitleTocResolver {
     locationRange: LocationRange,
     spineItemView: SpineItemView,
   ): boolean {
-    const contentView = spineItemView.getContentView();
-    let isBeyondStart = false;
-    const [href, elementId] = this.getHrefAndElementId(linkInfo.link.href);
-    const linkEl = contentView.getElementById(elementId);
+    const linkEl = this.getElementFromHref(spineItemView, linkInfo.link.href);
     if (!linkEl) {
       return false;
     }
+
+    let isBeyondStart = false;
 
     // If there is no start defined, assume this page contains two iframes
     // and as a result the start location is within the viewport.
@@ -236,11 +231,8 @@ export class PageTitleTocResolver {
     linkInfo: LinkLocationInfo,
     spineItemView: SpineItemView,
   ): void {
-    const contentView = spineItemView.getContentView();
-    const iframe = contentView.element().getElementsByTagName('iframe')[0];
-    const [href, elementId] = this.getHrefAndElementId(linkInfo.link.href);
-    const el = contentView.getElementById(elementId);
-    if (!el || !iframe) {
+    const el = this.getElementFromHref(spineItemView, linkInfo.link.href);
+    if (!el) {
       return;
     }
     const elementRect = this.getElementRect(el);
@@ -322,10 +314,8 @@ export class PageTitleTocResolver {
     visible: PageBreakVisibility,
     spineItemView: SpineItemView,
   ): void {
-    const contentView = spineItemView.getContentView();
     const link = linkInfo.link;
-    const [href, elementId] = this.getHrefAndElementId(link.href);
-    const element = contentView.getElementById(elementId);
+    const element = this.getElementFromHref(spineItemView, link.href);
     if (!element) {
       return;
     }
@@ -452,5 +442,11 @@ export class PageTitleTocResolver {
     const anchor = hrefCompontents.length >= 2 ? hrefCompontents[1] : '';
 
     return [href, anchor];
+  }
+
+  private getElementFromHref(view: SpineItemView, href: string): HTMLElement | null {
+    const contentView = view.getContentView();
+    const [_, elementId] = this.getHrefAndElementId(href);
+    return contentView.getElementById(elementId);
   }
 }
