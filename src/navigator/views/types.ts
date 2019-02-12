@@ -20,6 +20,8 @@ export enum SettingName {
   BackgroundColor = 'background-color', // string
   TextAlign = 'text-align', // string
   FontOverride = 'font-override', // string
+  AdvancedSettings = 'advanced-settings', // string
+  LineHeight = 'line-height', // number
 }
 
 export interface ISettingEntry {
@@ -29,11 +31,14 @@ export interface ISettingEntry {
 }
 
 const SETTING_NAME_MAP: Map<string, SettingName> = new Map([
+  [SettingName.AdvancedSettings, SettingName.AdvancedSettings],
   [SettingName.BackgroundColor, SettingName.BackgroundColor],
   [SettingName.ColumnGap, SettingName.ColumnGap],
+  [SettingName.LineHeight, SettingName.LineHeight],
   [SettingName.MaxColumnWidth, SettingName.MaxColumnWidth],
   [SettingName.MinColumnWidth, SettingName.MinColumnWidth],
   [SettingName.FontFamily, SettingName.FontFamily],
+  [SettingName.FontOverride, SettingName.FontOverride],
   [SettingName.FontSize, SettingName.FontSize],
   [SettingName.ReadingMode, SettingName.ReadingMode],
   [SettingName.SpreadMode, SettingName.SpreadMode],
