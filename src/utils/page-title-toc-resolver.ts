@@ -19,7 +19,7 @@ export interface PageBreakData {
   isOnLeftSide: boolean;
   link: Link;
   rect: ClientRect | DOMRect;
-  offset?: number;
+  spineItemOffset?: number;
 }
 
 export enum PageBreakVisibility {
@@ -134,8 +134,8 @@ export class PageTitleTocResolver {
     });
 
     pageBreaks.sort((a, b) => {
-      if (a.offset && b.offset) {
-        return a.offset - b.offset;
+      if (a.spineItemOffset && b.spineItemOffset) {
+        return a.spineItemOffset - b.spineItemOffset;
       }
       return a.rect.left - b.rect.left;
     });
@@ -261,7 +261,7 @@ export class PageTitleTocResolver {
       isOnLeftSide,
       link: linkInfo.link,
       rect: elementRect,
-      offset: startOffset,
+      spineItemOffset: startOffset,
     });
   }
 
