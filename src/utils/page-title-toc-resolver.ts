@@ -130,14 +130,8 @@ export class PageTitleTocResolver {
     let pageBreaks: PageBreakData[] = [];
     locations.forEach((locationRange) => {
       const pb = this.findVisiblePageBreaks(locationRange);
-      pageBreaks = pageBreaks.concat(pb);
-    });
 
-    pageBreaks.sort((a, b) => {
-      if (a.spineItemOffset && b.spineItemOffset) {
-        return a.spineItemOffset - b.spineItemOffset;
-      }
-      return a.rect.left - b.rect.left;
+      pageBreaks = pageBreaks.concat(pb);
     });
 
     return pageBreaks;
@@ -235,9 +229,21 @@ export class PageTitleTocResolver {
     linkInfo: LinkLocationInfo,
     spineItemView: SpineItemView,
   ): void {
+    const pageBreakData = this.createPageBreakData(linkInfo, spineItemView);
+    if (!pageBreakData) {
+      return;
+    }
+
+    pageBreaks.push(pageBreakData);
+  }
+
+  private createPageBreakData(
+    linkInfo: LinkLocationInfo,
+    spineItemView: SpineItemView,
+  ): PageBreakData | null {
     const el = this.getElementFromHref(spineItemView, linkInfo.link.href);
     if (!el) {
-      return;
+      return null;
     }
     const elementRect = this.getElementRect(el);
 
@@ -257,12 +263,12 @@ export class PageTitleTocResolver {
       startOffset = this.rendition.viewport.getOffsetInSpineItemView(linkInfo.spineItemIndex);
     }
 
-    pageBreaks.push({
+    return {
       isOnLeftSide,
       link: linkInfo.link,
       rect: elementRect,
       spineItemOffset: startOffset,
-    });
+    };
   }
 
   private getElementRect(
