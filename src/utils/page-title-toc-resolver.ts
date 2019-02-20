@@ -276,26 +276,15 @@ export class PageTitleTocResolver {
   ): ClientRect | DOMRect {
     const elStyle = window.getComputedStyle(element);
     // Ensure the element is visible before calculations are made
-    let displayChanged = false;
-    if (elStyle.display === 'none') {
-      element.style.setProperty('display', 'inline');
-      displayChanged = true;
-    }
-    let visiblityChanged = false;
-    if (elStyle.visibility === 'hidden') {
-      element.style.setProperty('visibility', 'visible');
-      visiblityChanged = true;
-    }
+    element.style.setProperty('visibility', 'visible');
+    element.style.setProperty('display', 'inline');
+    element.style.setProperty('vertical-align', 'middle');
 
     const elementRect = element.getBoundingClientRect();
 
-    // Set the element back to it's original state
-    if (displayChanged) {
-      element.style.removeProperty('display');
-    }
-    if (visiblityChanged) {
-      element.style.removeProperty('visibility');
-    }
+    element.style.removeProperty('visibility');
+    element.style.removeProperty('display');
+    element.style.removeProperty('vertical-align');
 
     return elementRect;
   }
