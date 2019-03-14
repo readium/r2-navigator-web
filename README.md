@@ -1,4 +1,4 @@
-# r2-navigator-web [![Build Status](https://travis-ci.com/evidentpoint/r2-navigator-web.svg?branch=master)](https://travis-ci.com/evidentpoint/r2-navigator-web)
+# r2-navigator-web [![Build Status](https://travis-ci.com/readium/r2-navigator-web.svg?branch=master)](https://travis-ci.com/readium/r2-navigator-web)
 A web-based Readium Navigator implementation, written in TypeScript.
 
 ## Usage
