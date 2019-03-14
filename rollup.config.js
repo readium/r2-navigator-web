@@ -1,4 +1,4 @@
-import string from 'rollup-plugin-string';
+import { string } from 'rollup-plugin-string';
 import typescript2 from 'rollup-plugin-typescript2';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
