@@ -580,6 +580,7 @@ export class LayoutView extends View {
 
   private clearLoadedContent(): void {
     this.spineItemViewStatus.forEach((v: SpineItemViewStatus) => {
+      v.view.unloadSpineItem();
       this.layoutRoot.removeChild(v.viewContainer);
     });
 
