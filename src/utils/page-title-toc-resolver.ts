@@ -217,7 +217,7 @@ export class PageTitleTocResolver {
     } else {
       const endPos = this.rendition.viewport.getEndPosition();
       if (endPos && linkInfo.offset) {
-        isBeforeEnd = linkInfo.offset <= endPos.offsetInView;
+        isBeforeEnd = linkInfo.offset < endPos.offsetInView;
       }
     }
 
@@ -258,7 +258,7 @@ export class PageTitleTocResolver {
       if (startPos.spineItemIndex !== endPos.spineItemIndex) {
         isOnLeftSide = linkInfo.spineItemIndex === startPos.spineItemIndex;
       } else {
-        isOnLeftSide = elementRect.left <= startPos.offsetInView + pageWidth;
+        isOnLeftSide = elementRect.left < startPos.offsetInView + pageWidth;
       }
       startOffset = this.rendition.viewport.getOffsetInSpineItemView(linkInfo.spineItemIndex);
     }
