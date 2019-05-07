@@ -368,7 +368,7 @@ export class PageTitleTocResolver {
   }
 
   private ensureSpineItemPageListMap(href: string, recalculateData?: boolean): void {
-    if (this.pageListMap.has(href) && !recalculateData) {
+    if (!this.pub.pageList || (this.pageListMap.has(href) && !recalculateData)) {
       return;
     }
 
