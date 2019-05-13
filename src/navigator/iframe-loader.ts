@@ -1,7 +1,6 @@
 import { URL } from 'isomorphic-url-shim';
 // @ts-ignore
 // tslint:disable-next-line:no-submodule-imports
-import ReadiumGluePayloadJs from 'r2-glue-js/dist/ReadiumGlue-payload.js';
 
 interface IR1AttachedDataType {
   // tslint:disable-next-line:no-any
@@ -107,8 +106,6 @@ export class IFrameLoader {
       this.injectReadiumCss(headElement, useOverride);
     }
 
-    this.injectReadiumGlue(doc, headElement);
-
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
     }
@@ -150,13 +147,6 @@ export class IFrameLoader {
       const overrideCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-override.css`);
       headEle.insertBefore(overrideCss, refNode);
     }
-  }
-
-  private injectReadiumGlue(doc: Document, headEle: HTMLHeadElement): void {
-    // This lives within the iframe
-    const payload = this.createJSElement(ReadiumGluePayloadJs);
-
-    headEle.appendChild(payload);
   }
 
   private creatCssLink(href: string): HTMLLinkElement {
