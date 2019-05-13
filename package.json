@@ -62,7 +62,6 @@
     "rollup-plugin-execute": "^1.0.0",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-typescript2": "^0.20.1",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^5.3.3",
@@ -76,7 +75,6 @@
   "dependencies": {
     "@readium/shared-models": "^1.0.0-alpha.2",
     "isomorphic-url-shim": "^1.0.2",
-    "r2-glue-js": "^0.0.0-alpha.0",
     "readium-cfi-js": "^1.0.0-alpha.1"
   }
 }
