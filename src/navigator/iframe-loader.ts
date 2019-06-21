@@ -1,4 +1,5 @@
 import { URL } from 'isomorphic-url-shim';
+import { Resource, applyResourcesToDocument } from '../utils/injection-resolver';
 // @ts-ignore
 // tslint:disable-next-line:no-submodule-imports
 
@@ -19,6 +20,7 @@ export class IFrameLoader {
 
   private readiumCssBasePath?: string;
   private loaderEvents: { [eventName: string]: Function[] } = {};
+  private injectableResources: Resource[];
 
   constructor(publicationURI?: string) {
     this.publicationURI = publicationURI;
@@ -85,6 +87,10 @@ export class IFrameLoader {
     return resp.text();
   }
 
+  public registerInjectableResources(resources: Resource[]): void {
+    this.injectableResources = resources;
+  }
+
   private inject(sourceText: string,
                  contentType: string,
                  href: string,
@@ -105,6 +111,8 @@ export class IFrameLoader {
       const useOverride = config.useReadiumCssOverride === true;
       this.injectReadiumCss(headElement, useOverride);
     }
+
+    applyResourcesToDocument(this.injectableResources, doc);
 
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
@@ -193,13 +201,17 @@ export class IFrameLoader {
     callback: any,
   ): void {
     let documentDataUri: string = '';
+    const basedContentData = this.inject(
+      contentDocumentData,
+      contentType,
+      new URL(
+        contentDocumentURI,
+        iframe.baseURI || document.baseURI || location.href,
+      ).href,
+      config,
+    );
+
     if (!this.isIE) {
-      const basedContentData = this.inject(
-        contentDocumentData,
-        contentType,
-        new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
-        config,
-      );
       documentDataUri = window.URL.createObjectURL(
         new Blob([basedContentData], { type: contentType }),
       );
@@ -220,11 +232,11 @@ export class IFrameLoader {
         // tslint:disable-next-line:no-disable-auto-sanitization
         MSApp.execUnsafeLocalFunction(() => {
           if (iframe.contentWindow) {
-            iframe.contentWindow.document.write(contentDocumentData);
+            iframe.contentWindow.document.write(basedContentData);
           }
         });
       } else {
-        iframe.contentWindow.document.write(contentDocumentData);
+        iframe.contentWindow.document.write(basedContentData);
       }
     }
 
