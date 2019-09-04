@@ -101,7 +101,7 @@ export class Viewport {
         this.root.style.height = `${this.viewportSize}px`;
       } else {
         this.root.style.width = `${this.visibleViewportSize}px`;
-        this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
+        this.root.style.height = `${this.viewportSize2nd}px`;
       }
 
       this.contentContainer.style.width = this.root.style.width;
