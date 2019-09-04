@@ -596,6 +596,9 @@ export class Viewport {
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
     this.clipContatiner.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
 
+    const clipperLeft = Math.max(0, this.root.offsetWidth - this.visibleViewportSize);
+    this.clipContatiner.style.left = `${clipperLeft / 2}px`;
+
     return firstPage[0];
   }
 
