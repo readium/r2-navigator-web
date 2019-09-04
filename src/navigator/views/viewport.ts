@@ -277,7 +277,7 @@ export class Viewport {
   }
 
   public async prevScreen(token?: CancellationToken): Promise<void> {
-    let newPos = this.viewOffset - this.getScaledViewportSize();
+    let newPos = this.viewOffset - this.visibleViewportSize;
     const loadedStartPos = this.bookView.getLoadedStartPostion();
     // Ensure not to go beyond begining of the book
     if (newPos < loadedStartPos && !this.bookView.hasMoreBeforeStart()) {
