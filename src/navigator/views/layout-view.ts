@@ -167,6 +167,10 @@ export class LayoutView extends View {
     }
   }
 
+  public getPageWidth(): number {
+    return this.pageWidth;
+  }
+
   public setNumberOfPagesPerSpread(num: number): void {
     this.numOfPagesPerSpread = num;
   }

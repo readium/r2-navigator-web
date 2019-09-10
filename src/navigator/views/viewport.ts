@@ -551,29 +551,40 @@ export class Viewport {
   }
 
   private clipToVisibleRange(start: number, end: number): number {
-    let numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
+    const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
     if (numOfPagePerSpread < 1) {
       return start;
     }
 
+    let actualStart = start;
+    let actualEnd = end;
+    const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(start);
     if (numOfPagePerSpread === 2) {
-      const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(start);
-      this.clipContatiner.style.right = '';
       this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
         if (doublepageSpreadLayout === 'right') {
-          this.clipContatiner.style.right = '0';
+          // start/end is shifted one page left if current page is marked 'right'
+          const pageWidth = this.bookView.getPageWidth();
+          actualStart -= pageWidth;
+          actualEnd -= pageWidth;
         } else if (doublepageSpreadLayout === 'center') {
           this.clipContatiner.style.position = '';
           this.clipContatiner.style.margin = 'auto';
         }
-        numOfPagePerSpread = 1;
       }
     }
 
-    const pageRanges = this.bookView.visiblePages(start, end);
-    if (pageRanges.length < numOfPagePerSpread) {
-      return start;
+    actualStart -= 1; // avoid rounding errors
+    actualEnd += 1; // avoid rounding errors
+    const pageRanges = this.bookView.visiblePages(actualStart, actualEnd);
+    if (pageRanges.length < numOfPagePerSpread && doublepageSpreadLayout === 'right') {
+      // this can happen on first page, when it is marked right
+      let clipperLeft = Math.max(0, this.root.offsetWidth - this.bookView.getPageWidth() * 2);
+      clipperLeft /= 2;
+      clipperLeft += this.bookView.getPageWidth();
+      this.clipContatiner.style.left = `${clipperLeft}px`; // left overrides right from below
+    } else {
+      this.clipContatiner.style.left = '';
     }
 
     pageRanges.sort((page1: [number, number], page2: [number, number]) => {
@@ -596,8 +607,14 @@ export class Viewport {
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
     this.clipContatiner.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
 
-    const clipperLeft = Math.max(0, this.root.offsetWidth - this.visibleViewportSize);
-    this.clipContatiner.style.left = `${clipperLeft / 2}px`;
+    // center viewport clipper
+    const clipperRight = this.root.offsetWidth - this.visibleViewportSize;
+    if (clipperRight <= 0) {
+      // clipper great than viewport
+      this.clipContatiner.style.right = '';
+    } else {
+      this.clipContatiner.style.right = `${clipperRight / 2}px`;
+    }
 
     return firstPage[0];
   }
