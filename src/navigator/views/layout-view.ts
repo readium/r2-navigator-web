@@ -29,6 +29,7 @@ export class LayoutView extends View {
   private spineItemViewStatus: SpineItemViewStatus[] = [];
   private spineItemViewSizes: number[] = [];
   private spineItemViewPageCounts: number[] = [];
+  private spineItemViewSpreadProp: PageProperty[] = [];
 
   private host: HTMLElement;
   private layoutRoot: HTMLElement;
@@ -83,6 +84,8 @@ export class LayoutView extends View {
     this.spineItemViewSizes = new Array<number>(pub.spine.length).fill(-1);
     // tslint:disable-next-line:prefer-array-literal
     this.spineItemViewPageCounts = new Array<number>(pub.spine.length).fill(-1);
+
+    this.updateSpineItemSpreadProp();
   }
 
   public reset(): void {
@@ -498,49 +501,27 @@ export class LayoutView extends View {
     return pageRanges;
   }
 
-  public arrangeDoublepageSpreads(pos: number): PageProperty | undefined {
+  public arrangeDoublepageSpreads(pos: number): [PageProperty | undefined, PageProperty, PageProperty | undefined] | undefined {
+    if (!this.isFixedLayout) {
+      return undefined;
+    }
+
     const startPageInfo = this.getPaginationInfoAtOffset(pos);
     if (startPageInfo.length === 0) {
       return undefined;
     }
 
     const spineItemIndex = startPageInfo[startPageInfo.length - 1].spineItemIndex;
-
-    const firstPage = this.publication.readingOrder[spineItemIndex];
-    let firstPageProp : PageProperty | undefined;
-    if (firstPage.properties) {
-      firstPageProp = firstPage.properties.page;
+    const prevProp = this.spineItemViewSpreadProp[spineItemIndex - 1];
+    let prop = this.spineItemViewSpreadProp[spineItemIndex];
+    const nextProp = this.spineItemViewSpreadProp[spineItemIndex + 1];
+    if (prevProp === 'left' && prop === 'right') {
+      return [prevProp, prop, undefined];
+    } else if (prop === 'left' && nextProp === 'right') {
+      return [undefined, prop, nextProp];
     }
 
-    if (firstPageProp === 'center' || firstPageProp === 'right') {
-      return firstPageProp;
-    }
-
-    if (spineItemIndex + 1 >= this.publication.readingOrder.length) {
-      return firstPageProp;
-    }
-
-    const secondPage = this.publication.readingOrder[spineItemIndex + 1];
-    let secondPageProp : PageProperty | undefined;
-    if (secondPage.properties) {
-      secondPageProp = secondPage.properties.page;
-    }
-
-    if (secondPageProp === 'right') {
-      return undefined;
-    }
-
-    if (secondPageProp === 'left' || secondPageProp === 'center') {
-      if (!firstPageProp) {
-        if (spineItemIndex !== 0) {
-          return 'left';
-        }
-        return 'right';
-      }
-      return 'left';
-    }
-
-    return undefined;
+    return [undefined, prop, undefined];
   }
 
   public removeOutOfRangeSpineItems(start: number, end: number): void {
@@ -890,6 +871,29 @@ export class LayoutView extends View {
     this.loadedContentRange[1] -= adj;
     this.paginatedRange[0] -= adj;
     this.paginatedRange[1] -= adj;
+  }
+
+  private updateSpineItemSpreadProp(): void {
+    if (!this.isFixedLayout) {
+      return;
+    }
+
+    let defaultProp: PageProperty = this.isRtl ? 'right' : 'left';
+    let isFirstPageInSpread = false;
+    for (const si of this.publication.readingOrder) {
+      let prop : PageProperty | undefined;
+      if (si.properties) {
+        prop = si.properties.page;
+      }
+
+      if (!prop) {
+        prop = isFirstPageInSpread ? defaultProp :
+          defaultProp == 'left' ? 'right' : 'left';
+      }
+
+      this.spineItemViewSpreadProp.push(prop);
+      isFirstPageInSpread = prop != defaultProp;
+    }
   }
 
 }

@@ -561,13 +561,15 @@ export class Viewport {
       this.clipContatiner.style.right = '';
       this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
-        if (doublepageSpreadLayout === 'right') {
+        if (doublepageSpreadLayout[1] === 'right') {
           this.clipContatiner.style.right = '0';
-        } else if (doublepageSpreadLayout === 'center') {
+        } else if (doublepageSpreadLayout[1] === 'center') {
           this.clipContatiner.style.position = '';
           this.clipContatiner.style.margin = 'auto';
         }
-        numOfPagePerSpread = 1;
+        if (!doublepageSpreadLayout[0] && !doublepageSpreadLayout[2]) {
+          numOfPagePerSpread = 1;
+        }
       }
     }
 
