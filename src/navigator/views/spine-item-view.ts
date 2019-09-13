@@ -224,6 +224,18 @@ export class SpineItemView extends View {
     return pageWidth;
   }
 
+  public getPageHeight(pageHeight: number): number {
+    if (this.isFixedLayout) {
+      return this.contentView.metaHeight() * this.scale;
+    }
+
+    if (this.isVertical) {
+      return this.contentHeight;
+    }
+
+    return pageHeight;
+  }
+
   public getCfi(offsetMain: number, offset2nd: number, backward: boolean): string {
     if (this.contentStatus !== ContentLoadingStatus.Loaded) {
       return '';

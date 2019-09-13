@@ -476,8 +476,8 @@ export class LayoutView extends View {
     this.layoutRoot.style.overflow = 'hidden';
   }
 
-  public visiblePages(start: number, end: number): [number, number][] {
-    const pageRanges: [number, number][] = [];
+  public visiblePages(start: number, end: number): [[number, number], number][] {
+    const pageRanges: [[number, number], number][] = [];
     for (const vs of this.spineItemViewStatus) {
       if (vs.offset + vs.viewSize < start) {
         continue;
@@ -489,12 +489,13 @@ export class LayoutView extends View {
       const pageCount = vs.view.getTotalPageCount();
       const pageSize = vs.view.fixedLayout() ? this.spineItemViewSizes[vs.spineItemIndex] :
                                                vs.view.getPageSize(this.pageWidth);
-      for (let i = 1; i <= pageCount; i = i + 1) {
-        const pageStart = vs.offset + (i - 1) * pageSize;
+      const pageHeight = vs.view.getPageHeight(this.pageHeight);
+      for (let i = 0; i < pageCount; i = i + 1) {
+        const pageStart = vs.offset + i * pageSize;
         const pageEnd = pageStart + pageSize;
         if (pageStart >= start && pageStart <= end &&
             pageEnd >= start && pageEnd <= end) {
-          pageRanges.push([pageStart, pageEnd]);
+          pageRanges.push([[pageStart, pageEnd], pageHeight]);
         }
       }
     }

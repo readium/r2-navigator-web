@@ -67,8 +67,8 @@ export class Viewport {
   }
 
   public setScrollMode(mode: ScrollMode): void {
-    this.root.style.overflowX = 'hidden';
-    this.root.style.overflowY = 'hidden';
+    this.root.style.overflowX = 'auto';
+    this.root.style.overflowY = 'auto';
     // tslint:disable-next-line:no-any
     (<any>this.root.style).webkitOverflowScrolling = 'auto';
 
@@ -587,11 +587,11 @@ export class Viewport {
       this.clipContatiner.style.left = '';
     }
 
-    pageRanges.sort((page1: [number, number], page2: [number, number]) => {
-      const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0]),
-                                 Math.abs(this.viewOffset - page1[1]));
-      const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0]),
-                                 Math.abs(this.viewOffset - page2[1]));
+    pageRanges.sort((page1: [[number, number], number], page2: [[number, number], number]) => {
+      const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0][0]),
+                                 Math.abs(this.viewOffset - page1[0][1]));
+      const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0][0]),
+                                 Math.abs(this.viewOffset - page2[0][1]));
 
       return page1Dist - page2Dist;
     });
@@ -600,12 +600,12 @@ export class Viewport {
 
     let firstPage = spreadPages[0];
     let lastPage = spreadPages[spreadPages.length - 1];
-    if (lastPage[0] < firstPage[0]) {
+    if (lastPage[0][0] < firstPage[0][0]) {
       [firstPage, lastPage] = [lastPage, firstPage];
     }
-    this.visibleViewportSize = lastPage[1] - firstPage[0];
+    this.visibleViewportSize = lastPage[0][1] - firstPage[0][0];
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
-    this.clipContatiner.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
+    this.clipContatiner.style.height = `${Math.max(firstPage[1], lastPage[1])}px`;
 
     // center viewport clipper
     const clipperRight = this.root.offsetWidth - this.visibleViewportSize;
@@ -616,7 +616,7 @@ export class Viewport {
       this.clipContatiner.style.right = `${clipperRight / 2}px`;
     }
 
-    return firstPage[0];
+    return firstPage[0][0];
   }
 
   private getScaledViewportSize(): number {
