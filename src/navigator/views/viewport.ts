@@ -516,7 +516,7 @@ export class Viewport {
 
     let newPos = pos;
     if (this.scrollMode === ScrollMode.None) {
-      newPos = this.clipToVisibleRange(pos, pos + this.getScaledViewportSize());
+      newPos = this.clipToVisibleRange(pos);
     }
 
     this.updatePositions();
@@ -550,14 +550,13 @@ export class Viewport {
     this.bookView.showOnlySpineItemRange(this.startPos.spineItemIndex);
   }
 
-  private clipToVisibleRange(start: number, end: number): number {
+  private clipToVisibleRange(start: number): number {
     const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
     if (numOfPagePerSpread < 1) {
       return start;
     }
 
     let actualStart = start;
-    let actualEnd = end;
     const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(start);
     if (numOfPagePerSpread === 2) {
       this.clipContatiner.style.position = 'absolute';
@@ -566,7 +565,6 @@ export class Viewport {
           // start/end is shifted one page left if current page is marked 'right'
           const pageWidth = this.bookView.getPageWidth();
           actualStart -= pageWidth;
-          actualEnd -= pageWidth;
         } else if (doublepageSpreadLayout === 'center') {
           this.clipContatiner.style.position = '';
           this.clipContatiner.style.margin = 'auto';
@@ -575,8 +573,7 @@ export class Viewport {
     }
 
     actualStart -= 1; // avoid rounding errors
-    actualEnd += 1; // avoid rounding errors
-    const pageRanges = this.bookView.visiblePages(actualStart, actualEnd);
+    const pageRanges = this.bookView.pageSizes(actualStart, numOfPagePerSpread);
     if (pageRanges.length < numOfPagePerSpread && doublepageSpreadLayout === 'right') {
       // this can happen on first page, when it is marked right
       let clipperLeft = Math.max(0, this.root.offsetWidth - this.bookView.getPageWidth() * 2);
