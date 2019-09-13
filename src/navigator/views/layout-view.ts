@@ -476,10 +476,35 @@ export class LayoutView extends View {
     this.layoutRoot.style.overflow = 'hidden';
   }
 
-  public pageSizes(start: number, numOfPages: number): [[number, number], number][] {
+  public pageSizes(start: number, pagesAfterStart: number, pagesBeforeStart: number): [[number, number], number][] {
     const pageRanges: [[number, number], number][] = [];
-    for (const vs of this.spineItemViewStatus) {
-      if (pageRanges.length >= numOfPages) {
+    for (const vs of this.spineItemViewStatus.reverse()) {
+      // backward pass
+      if (pageRanges.length >= pagesBeforeStart) {
+        break;
+      }
+
+      const pageCount = vs.view.getTotalPageCount();
+      const pageSize = vs.view.fixedLayout() ? this.spineItemViewSizes[vs.spineItemIndex] :
+        vs.view.getPageSize(this.pageWidth);
+      const pageHeight = vs.view.getPageHeight(this.pageHeight);
+      for (let i = 0; i < pageCount; i = i + 1) {
+        const pageStart = vs.offset + i * pageSize;
+        const pageEnd = pageStart + pageSize;
+        if (pageStart < start) {
+          pageRanges.push([[pageStart, pageEnd], pageHeight]);
+        }
+
+        if (pageRanges.length >= pagesBeforeStart) {
+          break;
+        }
+      }
+    }
+
+    let pagesToGo = pagesAfterStart;
+    for (const vs of this.spineItemViewStatus.reverse()) {
+      // forward pass
+      if (pagesToGo <= 0) {
         break;
       }
 
@@ -489,16 +514,17 @@ export class LayoutView extends View {
 
       const pageCount = vs.view.getTotalPageCount();
       const pageSize = vs.view.fixedLayout() ? this.spineItemViewSizes[vs.spineItemIndex] :
-                                               vs.view.getPageSize(this.pageWidth);
+        vs.view.getPageSize(this.pageWidth);
       const pageHeight = vs.view.getPageHeight(this.pageHeight);
       for (let i = 0; i < pageCount; i = i + 1) {
         const pageStart = vs.offset + i * pageSize;
         const pageEnd = pageStart + pageSize;
         if (pageStart >= start) {
           pageRanges.push([[pageStart, pageEnd], pageHeight]);
+          pagesToGo -= 1;
         }
 
-        if (pageRanges.length >= numOfPages) {
+        if (pagesToGo <= 0) {
           break;
         }
       }
