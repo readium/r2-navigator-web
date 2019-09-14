@@ -557,13 +557,15 @@ export class Viewport {
     }
 
     let pagesBefore = 0;
+    let pagesAfter = numOfPagePerSpread - pagesBefore - 1;
     const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(Math.ceil(start));
     if (numOfPagePerSpread === 2) {
       this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
         if (doublepageSpreadLayout[1] === 'right') {
-          // start is shifted one page left if current page is marked 'right'
+          // shift current page all the wait to the right
           pagesBefore = numOfPagePerSpread - 1;
+          pagesAfter = numOfPagePerSpread - pagesBefore - 1;
         } else if (doublepageSpreadLayout[1] === 'center') {
           this.clipContatiner.style.position = '';
           this.clipContatiner.style.margin = 'auto';
@@ -571,7 +573,7 @@ export class Viewport {
       }
     }
 
-    const pageRanges = this.bookView.pageSizes(Math.floor(start), numOfPagePerSpread - pagesBefore, pagesBefore);
+    const pageRanges = this.bookView.pageSizes(Math.ceil(start), pagesAfter, pagesBefore);
     if (pageRanges.length < numOfPagePerSpread && doublepageSpreadLayout && doublepageSpreadLayout[1] === 'right') {
       // this can happen on first page, when it is marked right
       let clipperLeft = Math.max(0, this.root.offsetWidth - this.bookView.getPageWidth() * 2);
@@ -582,11 +584,11 @@ export class Viewport {
       this.clipContatiner.style.left = '';
     }
 
-    pageRanges.sort((page1: [[number, number], number], page2: [[number, number], number]) => {
-      const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0][0]),
-                                 Math.abs(this.viewOffset - page1[0][1]));
-      const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0][0]),
-                                 Math.abs(this.viewOffset - page2[0][1]));
+    pageRanges.sort((page1: [number, number, number], page2: [number, number, number]) => {
+      const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0]),
+                                 Math.abs(this.viewOffset - page1[1]));
+      const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0]),
+                                 Math.abs(this.viewOffset - page2[1]));
 
       return page1Dist - page2Dist;
     });
@@ -595,12 +597,12 @@ export class Viewport {
 
     let firstPage = spreadPages[0];
     let lastPage = spreadPages[spreadPages.length - 1];
-    if (lastPage[0][0] < firstPage[0][0]) {
+    if (lastPage[0] < firstPage[0]) {
       [firstPage, lastPage] = [lastPage, firstPage];
     }
-    this.visibleViewportSize = lastPage[0][1] - firstPage[0][0];
+    this.visibleViewportSize = lastPage[1] - firstPage[0];
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
-    this.clipContatiner.style.height = `${Math.max(firstPage[1], lastPage[1])}px`;
+    this.clipContatiner.style.height = `${Math.max(firstPage[2], lastPage[2])}px`;
 
     // center viewport clipper
     const clipperRight = this.root.offsetWidth - this.visibleViewportSize;
@@ -611,7 +613,7 @@ export class Viewport {
       this.clipContatiner.style.right = `${clipperRight / 2}px`;
     }
 
-    return firstPage[0][0];
+    return firstPage[0];
   }
 
   private getScaledViewportSize(): number {

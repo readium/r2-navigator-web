@@ -479,12 +479,20 @@ export class LayoutView extends View {
     this.layoutRoot.style.overflow = 'hidden';
   }
 
-  public pageSizes(start: number, pagesAfterStart: number, pagesBeforeStart: number): [[number, number], number][] {
-    const pageRanges: [[number, number], number][] = [];
+  public pageSizes(startOffset: number, pagesAfterStart: number, pagesBeforeStart: number): [number, number, number][] {
+    // gets start offset, end offset and height of pages:
+    //  - page at "offset = start" (call it start page)
+    //  - pages after start offset, numbering pagesAfterStart
+    //  - pages before start offset, numbering pagesBeforeStart
+    const pageRanges: [number, number, number][] = [];
     for (const vs of this.spineItemViewStatus.reverse()) {
       // backward pass
       if (pageRanges.length >= pagesBeforeStart) {
         break;
+      }
+
+      if (vs.offset >= startOffset) {
+        continue;
       }
 
       const pageCount = vs.view.getTotalPageCount();
@@ -494,8 +502,8 @@ export class LayoutView extends View {
       for (let i = 0; i < pageCount; i = i + 1) {
         const pageStart = vs.offset + i * pageSize;
         const pageEnd = pageStart + pageSize;
-        if (pageStart < start) {
-          pageRanges.push([[pageStart, pageEnd], pageHeight]);
+        if (pageEnd <= startOffset) {
+          pageRanges.push([pageStart, pageEnd, pageHeight]);
         }
 
         if (pageRanges.length >= pagesBeforeStart) {
@@ -511,7 +519,7 @@ export class LayoutView extends View {
         break;
       }
 
-      if (vs.offset + vs.viewSize < start) {
+      if (vs.offset + vs.viewSize <= startOffset) {
         continue;
       }
 
@@ -522,13 +530,33 @@ export class LayoutView extends View {
       for (let i = 0; i < pageCount; i = i + 1) {
         const pageStart = vs.offset + i * pageSize;
         const pageEnd = pageStart + pageSize;
-        if (pageStart >= start) {
-          pageRanges.push([[pageStart, pageEnd], pageHeight]);
+        if (pageStart > startOffset) {
+          pageRanges.push([pageStart, pageEnd, pageHeight]);
           pagesToGo -= 1;
         }
 
         if (pagesToGo <= 0) {
           break;
+        }
+      }
+    }
+
+    for (const vs of this.spineItemViewStatus) {
+      if (vs.offset + vs.viewSize < startOffset) {
+        continue;
+      }
+
+      const pageCount = vs.view.getTotalPageCount();
+      const pageSize = vs.view.fixedLayout() ? this.spineItemViewSizes[vs.spineItemIndex] :
+        vs.view.getPageSize(this.pageWidth);
+      const pageHeight = vs.view.getPageHeight(this.pageHeight);
+      for (let i = 0; i < pageCount; i = i + 1) {
+        const pageStart = vs.offset + i * pageSize;
+        const pageEnd = pageStart + pageSize;
+        if (pageStart <= startOffset && pageEnd > startOffset) {
+          // spineitem/page at start offset
+          pageRanges.push([pageStart, pageEnd, pageHeight]);
+          return pageRanges;
         }
       }
     }
