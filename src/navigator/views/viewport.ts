@@ -602,7 +602,6 @@ export class Viewport {
     }
     this.visibleViewportSize = lastPage[1] - firstPage[0];
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
-    this.clipContatiner.style.height = `${Math.max(firstPage[2], lastPage[2])}px`;
 
     // center viewport clipper
     const clipperRight = this.root.offsetWidth - this.visibleViewportSize;
@@ -612,6 +611,13 @@ export class Viewport {
     } else {
       this.clipContatiner.style.right = `${clipperRight / 2}px`;
     }
+
+    let clipperHeight = Math.max(firstPage[2], lastPage[2]);
+    if (clipperHeight === 0) {
+      // first/last page height hasn't loaded or not set yet
+      clipperHeight = this.clipContatiner.scrollHeight;
+    }
+    this.clipContatiner.style.height = `${clipperHeight}px`;
 
     return firstPage[0];
   }
