@@ -383,6 +383,8 @@ export class Viewport {
     this.clipContatiner.id = 'viewport-clipper';
     this.clipContatiner.style.overflowX = 'hidden';
     this.clipContatiner.style.overflowY = 'hidden';
+    this.clipContatiner.style.position = 'absolute';
+    this.clipContatiner.style.margin = '';
     this.contentContainer.appendChild(this.clipContatiner);
   }
 
@@ -517,6 +519,7 @@ export class Viewport {
     let newPos = pos;
     if (this.scrollMode === ScrollMode.None) {
       newPos = this.clipToVisibleRange(pos);
+      this.alignClipper(newPos);
     }
 
     this.updatePositions();
@@ -550,6 +553,35 @@ export class Viewport {
     this.bookView.showOnlySpineItemRange(this.startPos.spineItemIndex);
   }
 
+  private alignClipper(start: number): void {
+    this.clipContatiner.style.left = '';
+    this.clipContatiner.style.right = '';
+
+    const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
+    const pageProps = this.bookView.arrangeDoublepageSpreads(start);
+    if (pageProps === undefined) {
+      return;
+    }
+
+    const pages = pageProps.filter(value => value !== undefined).length;
+    if (numOfPagePerSpread === 1 || pageProps[1] === 'center' || pages === 2) {
+      // center viewport clipper
+      const margin = (this.root.offsetWidth - this.visibleViewportSize) / 2;
+      if (margin > 0) {
+        this.clipContatiner.style.left = `${margin}px`;
+      }
+    } else if (pages === 1) {
+      // double page view, but only one page displayed
+      // e.g., first or last page
+      const margin = Math.max(this.root.offsetWidth / 2, this.visibleViewportSize);
+      if (pageProps[1] === 'left') {
+        this.clipContatiner.style.right = `${margin}px`;
+      } else if (pageProps[1] === 'right') {
+        this.clipContatiner.style.left = `${margin}px`;
+      }
+    }
+  }
+
   private clipToVisibleRange(start: number): number {
     const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
     if (numOfPagePerSpread < 1) {
@@ -560,30 +592,18 @@ export class Viewport {
     let pagesAfter = numOfPagePerSpread - pagesBefore - 1;
     const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(Math.ceil(start));
     if (numOfPagePerSpread === 2) {
-      this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
         if (doublepageSpreadLayout[1] === 'right') {
           // shift current page all the wait to the right
           pagesBefore = numOfPagePerSpread - 1;
           pagesAfter = numOfPagePerSpread - pagesBefore - 1;
         } else if (doublepageSpreadLayout[1] === 'center') {
-          this.clipContatiner.style.position = '';
-          this.clipContatiner.style.margin = 'auto';
+          pagesAfter = 0;
         }
       }
     }
 
     const pageRanges = this.bookView.pageSizes(Math.ceil(start), pagesAfter, pagesBefore);
-    if (pageRanges.length < numOfPagePerSpread && doublepageSpreadLayout && doublepageSpreadLayout[1] === 'right') {
-      // this can happen on first page, when it is marked right
-      let clipperLeft = Math.max(0, this.root.offsetWidth - this.bookView.getPageWidth() * 2);
-      clipperLeft /= 2;
-      clipperLeft += this.bookView.getPageWidth();
-      this.clipContatiner.style.left = `${clipperLeft}px`; // left overrides right from below
-    } else {
-      this.clipContatiner.style.left = '';
-    }
-
     pageRanges.sort((page1: [number, number, number], page2: [number, number, number]) => {
       const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0]),
                                  Math.abs(this.viewOffset - page1[1]));
@@ -602,15 +622,6 @@ export class Viewport {
     }
     this.visibleViewportSize = lastPage[1] - firstPage[0];
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
-
-    // center viewport clipper
-    const clipperRight = this.root.offsetWidth - this.visibleViewportSize;
-    if (clipperRight <= 0) {
-      // clipper great than viewport
-      this.clipContatiner.style.right = '';
-    } else {
-      this.clipContatiner.style.right = `${clipperRight / 2}px`;
-    }
 
     let clipperHeight = Math.max(firstPage[2], lastPage[2]);
     if (clipperHeight === 0) {
