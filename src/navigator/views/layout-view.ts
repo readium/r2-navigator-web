@@ -315,7 +315,7 @@ export class LayoutView extends View {
       inSpineItemOffset = siv.view.getOffsetFromCfi(loc.getLocation());
     } else {
       const pageIndexOffset = siv.view.getPageIndexOffsetFromCfi(loc.getLocation());
-      inSpineItemOffset = pageIndexOffset < 0 ? -1 : pageIndexOffset * this.pageWidth;
+      inSpineItemOffset = pageIndexOffset < 0 ? 0 : pageIndexOffset * this.pageWidth;
     }
 
     if (inSpineItemOffset < 0) {
