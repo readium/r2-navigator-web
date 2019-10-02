@@ -561,10 +561,10 @@ export class Viewport {
     if (numOfPagePerSpread === 2) {
       this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
-        if (doublepageSpreadLayout === 'right') {
+        if (doublepageSpreadLayout[1] === 'right') {
           // start is shifted one page left if current page is marked 'right'
           pagesBefore = numOfPagePerSpread - 1;
-        } else if (doublepageSpreadLayout === 'center') {
+        } else if (doublepageSpreadLayout[1] === 'center') {
           this.clipContatiner.style.position = '';
           this.clipContatiner.style.margin = 'auto';
         }
@@ -572,7 +572,7 @@ export class Viewport {
     }
 
     const pageRanges = this.bookView.pageSizes(Math.floor(start), numOfPagePerSpread - pagesBefore, pagesBefore);
-    if (pageRanges.length < numOfPagePerSpread && doublepageSpreadLayout === 'right') {
+    if (pageRanges.length < numOfPagePerSpread && doublepageSpreadLayout && doublepageSpreadLayout[1] === 'right') {
       // this can happen on first page, when it is marked right
       let clipperLeft = Math.max(0, this.root.offsetWidth - this.bookView.getPageWidth() * 2);
       clipperLeft /= 2;
