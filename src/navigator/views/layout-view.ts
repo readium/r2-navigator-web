@@ -764,6 +764,9 @@ export class LayoutView extends View {
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
       spineItemView.loadSpineItem(this.publication.spine[index], this.vs, token).then(() => {
         this.onSpineItemLoaded(spineItemView);
+        spineItemView.onSelfResize(() => {
+          this.rePaginate();
+        });
       });
     } else {
       this.hasUnknownSizeSpineItemLoading = true;
