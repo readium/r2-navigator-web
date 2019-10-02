@@ -120,6 +120,10 @@ export class Viewport {
     return this.viewportSize2nd;
   }
 
+  public getVisibleViewportSize(): number {
+    return this.visibleViewportSize;
+  }
+
   public setPrefetchSize(size: number): void {
     this.prefetchSize = size;
   }

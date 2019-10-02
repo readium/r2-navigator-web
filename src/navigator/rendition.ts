@@ -86,6 +86,8 @@ export class Rendition {
           pageWidth = Math.min(viewportSize / 2, maxPageWidth);
         }
         numOfPagesPerSpread = 2;
+      } else {
+        pageWidth = Math.min(pageWidth, maxPageWidth);
       }
     } else if (spreadMode === SpreadMode.FitViewportDoubleSpread) {
       if (this.viewAsVertical) {
