@@ -132,6 +132,42 @@ describe('Navigator', () => {
       await initBook('/fixtures/publications/igp-twss-fxl/manifest.json', true, false);
     });
 
+    it('GoToRightPageDoublePageSpread', async () => {
+      const rendition = hostEnv.getRendition();
+      rendition.viewport.setPrefetchSize(100);
+      rendition.setPageLayout({ spreadMode: SpreadMode.FitViewportDoubleSpread });
+
+      const rightPageLocation = new Location('', 'OPS/s011-Poem-001.xhtml');
+      await navigator.gotoLocation(rightPageLocation);
+
+      const loc = await navigator.getScreenBegin();
+      assert(loc);
+      assert.equal(loc!.getHref(), 'OPS/s010-Section-004.xhtml');
+
+      const endLoc = await navigator.getScreenEnd();
+      assert(endLoc);
+      assert.equal(endLoc!.getHref(), rightPageLocation.getHref());
+    });
+
+    it('GoToFirstPageDoublePageSpread', async () => {
+      // first page marked right by default unless explicitly defined
+
+      const rendition = hostEnv.getRendition();
+      rendition.viewport.setPrefetchSize(100);
+      rendition.setPageLayout({ spreadMode: SpreadMode.FitViewportDoubleSpread });
+
+      const rightPageLocation = new Location('', 'OPS/s001-Cover-01.xhtml');
+      await navigator.gotoLocation(rightPageLocation);
+
+      const loc = await navigator.getScreenBegin();
+      assert(loc);
+      assert.equal(loc!.getHref(), rightPageLocation.getHref());
+
+      const endLoc = await navigator.getScreenEnd();
+      assert(endLoc);
+      assert.equal(endLoc!.getHref(), rightPageLocation.getHref());
+    });
+
     it('nextScreen()', async () => {
       await navigator.nextScreen();
       await navigator.nextScreen();

@@ -61,8 +61,13 @@ export class Rendition {
     const minColWidth = this.vs.getSettingWithDefaultValue<number>(SettingName.MinColumnWidth, 400);
     const colGap = this.vs.getSettingWithDefaultValue<number>(SettingName.ColumnGap, 0);
 
-    const maxPageWidth = maxColWidth + colGap;
     const minPageWidth = minColWidth + colGap;
+    let maxPageWidth;
+    if (this.pub.metadata.rendition && this.pub.metadata.rendition.layout === 'fixed') {
+      maxPageWidth = Number.MAX_SAFE_INTEGER;
+    } else {
+      maxPageWidth = maxColWidth + colGap;
+    }
 
     let numOfPagesPerSpread: number = 1;
     if (spreadMode === SpreadMode.Freeform) {

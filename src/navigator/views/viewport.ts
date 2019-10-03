@@ -67,8 +67,8 @@ export class Viewport {
   }
 
   public setScrollMode(mode: ScrollMode): void {
-    this.root.style.overflowX = 'hidden';
-    this.root.style.overflowY = 'hidden';
+    this.root.style.overflowX = 'auto';
+    this.root.style.overflowY = 'auto';
     // tslint:disable-next-line:no-any
     (<any>this.root.style).webkitOverflowScrolling = 'auto';
 
@@ -101,7 +101,7 @@ export class Viewport {
         this.root.style.height = `${this.viewportSize}px`;
       } else {
         this.root.style.width = `${this.visibleViewportSize}px`;
-        this.root.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
+        this.root.style.height = `${this.viewportSize2nd}px`;
       }
 
       this.contentContainer.style.width = this.root.style.width;
@@ -281,7 +281,7 @@ export class Viewport {
   }
 
   public async prevScreen(token?: CancellationToken): Promise<void> {
-    let newPos = this.viewOffset - this.getScaledViewportSize();
+    let newPos = this.viewOffset - this.visibleViewportSize;
     const loadedStartPos = this.bookView.getLoadedStartPostion();
     // Ensure not to go beyond begining of the book
     if (newPos < loadedStartPos && !this.bookView.hasMoreBeforeStart()) {
@@ -387,6 +387,8 @@ export class Viewport {
     this.clipContatiner.id = 'viewport-clipper';
     this.clipContatiner.style.overflowX = 'hidden';
     this.clipContatiner.style.overflowY = 'hidden';
+    this.clipContatiner.style.position = 'absolute';
+    this.clipContatiner.style.margin = '';
     this.contentContainer.appendChild(this.clipContatiner);
   }
 
@@ -520,7 +522,8 @@ export class Viewport {
 
     let newPos = pos;
     if (this.scrollMode === ScrollMode.None) {
-      newPos = this.clipToVisibleRange(pos, pos + this.getScaledViewportSize());
+      newPos = this.clipToVisibleRange(pos);
+      this.alignClipper(newPos);
     }
 
     this.updatePositions();
@@ -554,35 +557,58 @@ export class Viewport {
     this.bookView.showOnlySpineItemRange(this.startPos.spineItemIndex);
   }
 
-  private clipToVisibleRange(start: number, end: number): number {
-    let numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
+  private alignClipper(start: number): void {
+    this.clipContatiner.style.left = '';
+    this.clipContatiner.style.right = '';
+
+    const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
+    const pageProps = this.bookView.arrangeDoublepageSpreads(start);
+    if (pageProps === undefined) {
+      return;
+    }
+
+    const pages = pageProps.filter(value => value !== undefined).length;
+    if (numOfPagePerSpread === 1 || pageProps[1] === 'center' || pages === 2) {
+      // center viewport clipper
+      const margin = (this.root.offsetWidth - this.visibleViewportSize) / 2;
+      if (margin > 0) {
+        this.clipContatiner.style.left = `${margin}px`;
+      }
+    } else if (pages === 1) {
+      // double page view, but only one page displayed
+      // e.g., first or last page
+      const margin = Math.max(this.root.offsetWidth / 2, this.visibleViewportSize);
+      if (pageProps[1] === 'left') {
+        this.clipContatiner.style.right = `${margin}px`;
+      } else if (pageProps[1] === 'right') {
+        this.clipContatiner.style.left = `${margin}px`;
+      }
+    }
+  }
+
+  private clipToVisibleRange(start: number): number {
+    const numOfPagePerSpread = this.bookView.numberOfPagesPerSpread();
     if (numOfPagePerSpread < 1) {
       return start;
     }
 
+    let pagesBefore = 0;
+    let pagesAfter = numOfPagePerSpread - pagesBefore - 1;
+    const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(Math.ceil(start));
     if (numOfPagePerSpread === 2) {
-      const doublepageSpreadLayout = this.bookView.arrangeDoublepageSpreads(start);
-      this.clipContatiner.style.right = '';
-      this.clipContatiner.style.position = 'absolute';
       if (doublepageSpreadLayout) {
         if (doublepageSpreadLayout[1] === 'right') {
-          this.clipContatiner.style.right = '0';
+          // shift current page all the wait to the right
+          pagesBefore = numOfPagePerSpread - 1;
+          pagesAfter = numOfPagePerSpread - pagesBefore - 1;
         } else if (doublepageSpreadLayout[1] === 'center') {
-          this.clipContatiner.style.position = '';
-          this.clipContatiner.style.margin = 'auto';
-        }
-        if (!doublepageSpreadLayout[0] && !doublepageSpreadLayout[2]) {
-          numOfPagePerSpread = 1;
+          pagesAfter = 0;
         }
       }
     }
 
-    const pageRanges = this.bookView.visiblePages(start, end);
-    if (pageRanges.length < numOfPagePerSpread) {
-      return start;
-    }
-
-    pageRanges.sort((page1: [number, number], page2: [number, number]) => {
+    const pageRanges = this.bookView.pageSizes(Math.ceil(start), pagesAfter, pagesBefore);
+    pageRanges.sort((page1: [number, number, number], page2: [number, number, number]) => {
       const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0]),
                                  Math.abs(this.viewOffset - page1[1]));
       const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0]),
@@ -600,7 +626,13 @@ export class Viewport {
     }
     this.visibleViewportSize = lastPage[1] - firstPage[0];
     this.clipContatiner.style.width = `${this.visibleViewportSize}px`;
-    this.clipContatiner.style.height = `${this.viewportSize2nd * this.bookView.getZoomScale()}px`;
+
+    let clipperHeight = Math.max(firstPage[2], lastPage[2]);
+    if (clipperHeight === 0) {
+      // first/last page height hasn't loaded or not set yet
+      clipperHeight = this.clipContatiner.scrollHeight;
+    }
+    this.clipContatiner.style.height = `${clipperHeight}px`;
 
     return firstPage[0];
   }
