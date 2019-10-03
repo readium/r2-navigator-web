@@ -240,7 +240,9 @@ export class SpineItemView extends View {
     if (this.contentStatus !== ContentLoadingStatus.Loaded) {
       return '';
     }
-    return this.contentView.getCfi(offsetMain, offset2nd, backward);
+
+    const cfi = this.contentView.getCfi(offsetMain, offset2nd, backward);
+    return cfi ? cfi : '';
   }
 
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
