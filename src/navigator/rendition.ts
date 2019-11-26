@@ -52,7 +52,10 @@ export class Rendition {
   }
 
   public setPageLayout(layoutSetting: PageLayoutSettings): void {
-    const spreadMode = layoutSetting.spreadMode;
+    let spreadMode = layoutSetting.spreadMode;
+    if (this.pub.metadata.rendition && this.pub.metadata.rendition.spread === 'none') {
+      spreadMode = SpreadMode.FitViewportSingleSpread;
+    }
     const viewportSize = this.viewport.getViewportSize();
     let pageWidth = this.viewAsVertical ? this.viewport.getViewportSize2nd() : viewportSize;
     let pageHeight = this.viewAsVertical ? viewportSize : this.viewport.getViewportSize2nd();
@@ -226,7 +229,13 @@ export class Rendition {
 
   private initDefaultViewSettings(): void {
     const columnGapSetting = { name: SettingName.ColumnGap, value: 20 };
-    this.vs.updateSetting([columnGapSetting]);
+    const settings = [];
+    settings.push(columnGapSetting);
+    if (this.pub.metadata.rendition && this.pub.metadata.rendition.spread === 'none') {
+      const spreadSetting = { name: SettingName.SpreadMode, value: SpreadMode.FitViewportSingleSpread };
+      settings.push(spreadSetting);
+    }
+    this.vs.updateSetting(settings);
   }
 
   private setPageSize(pageWidth: number, pageHeight: number): void {
