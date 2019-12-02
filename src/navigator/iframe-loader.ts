@@ -149,7 +149,7 @@ export class IFrameLoader {
 
     headEle.insertBefore(beforeCss, refNode);
     headEle.insertBefore(defaultCss, refNode);
-    headEle.insertBefore(afterCss, refNode);
+    headEle.appendChild(afterCss);
 
     if (useOverride) {
       const overrideCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-override.css`);
