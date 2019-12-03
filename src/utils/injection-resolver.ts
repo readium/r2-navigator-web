@@ -49,7 +49,7 @@ export function applyResource(resource: Resource, document: Document): boolean {
   if (target === 'head') {
     targetElement = document.head;
   } else {
-    targetElement = document.querySelector('target');
+    targetElement = document.querySelector(target);
   }
 
   if (!targetElement) {
