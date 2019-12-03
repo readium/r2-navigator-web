@@ -1,1 +1,1 @@
-declare module 'readium-cfi-js';
+declare module '@evidentpoint/readium-cfi-js';

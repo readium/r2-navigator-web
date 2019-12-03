@@ -1,6 +1,6 @@
 {
   "name": "@readium/navigator-web",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Readium Navigator module for the web, written in TypeScript",
   "main": "./dist/readium-navigator-web.umd.js",
   "module": "./dist/readium-navigator-web.esm.js",
@@ -75,6 +75,6 @@
   "dependencies": {
     "@readium/shared-models": "^1.0.0-alpha.2",
     "isomorphic-url-shim": "^1.0.2",
-    "readium-cfi-js": "^1.0.0-alpha.1"
+    "@evidentpoint/readium-cfi-js": "^1.2.1"
   }
 }
