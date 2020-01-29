@@ -26,7 +26,7 @@ class SpineItemViewStatus {
 }
 
 export class LayoutView extends View {
-  private spineItemViewStatus: SpineItemViewStatus[] = [];
+  public spineItemViewStatus: SpineItemViewStatus[] = [];
   private spineItemViewSizes: number[] = [];
   private spineItemViewPageCounts: number[] = [];
   private spineItemViewSpreadProp: PageProperty[] = [];
@@ -823,7 +823,7 @@ export class LayoutView extends View {
 
     this.layoutRoot.appendChild(spineItemViewContainer);
 
-    let viewLength: number;
+    let viewLength = 0;
     if (this.spineItemViewSizes[index] > 0) {
       viewLength = this.spineItemViewSizes[index];
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
@@ -843,15 +843,15 @@ export class LayoutView extends View {
         this.layoutRoot.removeChild(spineItemViewContainer);
       } else {
         this.onSpineItemLoaded(spineItemView);
+        viewLength = spineItemView.getTotalSize(this.pageWidth);
+        this.spineItemViewSizes[index] = viewLength;
+        this.spineItemViewPageCounts[index] = spineItemView.getTotalPageCount();
       }
 
       spineItemView.onSelfResize(() => {
         this.rePaginate();
       });
 
-      viewLength = spineItemView.getTotalSize(this.pageWidth);
-      this.spineItemViewSizes[index] = viewLength;
-      this.spineItemViewPageCounts[index] = spineItemView.getTotalPageCount();
     }
 
     if (token && token.isCancelled) {
