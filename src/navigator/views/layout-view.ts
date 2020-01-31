@@ -26,7 +26,7 @@ class SpineItemViewStatus {
 }
 
 export class LayoutView extends View {
-  public spineItemViewStatus: SpineItemViewStatus[] = [];
+  private spineItemViewStatus: SpineItemViewStatus[] = [];
   private spineItemViewSizes: number[] = [];
   private spineItemViewPageCounts: number[] = [];
   private spineItemViewSpreadProp: PageProperty[] = [];
