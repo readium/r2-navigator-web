@@ -74,7 +74,7 @@ export class CfiNavigationLogic {
     return null;
   }
 
-  public getElementByCfi(cfi: string): Node | null {
+  public getElementByCfi(cfi: string): HTMLElement | null {
     return this.getElementByPartialCfi(cfi);
   }
 
@@ -179,7 +179,7 @@ export class CfiNavigationLogic {
     return visChecker.getElementStartOffset(ele);
   }
 
-  private getElementByPartialCfi(cfi: string): Node | null {
+  private getElementByPartialCfi(cfi: string): HTMLElement | null {
     const wrappedCfi = this.wrapCfi(cfi);
     // tslint:disable-next-line:no-any
     let $element: any;
