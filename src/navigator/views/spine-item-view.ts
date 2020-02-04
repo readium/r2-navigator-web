@@ -22,7 +22,6 @@ export class SpineItemView extends View {
 
   protected cvFactory: IContentViewFactory;
 
-  protected spineItem: Link;
   protected spineItemIndex: number;
   protected spineItemPageCount: number = 0;
 
@@ -58,7 +57,7 @@ export class SpineItemView extends View {
   }
 
   public getSpineItem(): Link {
-    return this.spineItem;
+    return this.contentView.getSpineItem();
   }
 
   public getOffsetFromCfi(cfi: string): number {

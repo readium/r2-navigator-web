@@ -11,6 +11,8 @@ export interface IContentView {
                 viewSettings: ViewSettings,
                 token?: CancellationToken): Promise<void>;
 
+  getSpineItem(): Link;
+
   spineItemLoadedPromise(token?: CancellationToken): Promise<void>;
 
   unloadSpineItem(): void;

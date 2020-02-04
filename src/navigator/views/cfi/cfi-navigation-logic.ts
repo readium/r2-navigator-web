@@ -199,7 +199,11 @@ export class CfiNavigationLogic {
       return null;
     }
 
-    return $element[0];
+    const node = $element[0];
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.parentElement;
+    }
+    return node;
   }
 
   private getNodeRangeInfoFromCfi(cfi: string): Range | null {
