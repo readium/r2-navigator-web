@@ -75,3 +75,17 @@ export function triggerLayout(iframe: HTMLIFrameElement): void {
     const val = doc.body.offsetTop; // triggers layout
   }
 }
+
+export function getAllAncestors(element: Element | null) : Element[] {
+  if (!element) {
+    return [];
+  }
+
+  return [...getAllAncestors(element.parentElement), element];
+}
+
+export function getAllAncestorIds(elements: Element[]) : string[] {
+  return elements
+    .filter(element => element.hasAttribute('id'))
+    .map(element => element.getAttribute('id')!);
+}
