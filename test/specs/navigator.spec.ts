@@ -102,7 +102,14 @@ describe('Navigator', () => {
     });
 
     it('gotoLocation()', async () => {
-      const newLoc = new Location('/4/2[copyright-page]/2/2/1:32', 'OEBPS/copyright.html');
+      // TODO Fragments isn't used in Navigator yet, so it's empty at the moment
+      const newLoc =
+        new Location(
+          '/4/2[copyright-page]/2/2/1:32',
+          'text/html',
+          'OEBPS/copyright.html',
+          [],
+        );
       await navigator.gotoLocation(newLoc);
 
       const loc = await navigator.getCurrentLocation();
@@ -137,7 +144,12 @@ describe('Navigator', () => {
       rendition.viewport.setPrefetchSize(100);
       rendition.setPageLayout({ spreadMode: SpreadMode.FitViewportDoubleSpread });
 
-      const rightPageLocation = new Location('', 'OPS/s011-Poem-001.xhtml');
+      const rightPageLocation = new Location(
+        '',
+        'application/xhtml+xml',
+        'OPS/s011-Poem-001.xhtml',
+        [],
+      );
       await navigator.gotoLocation(rightPageLocation);
 
       const loc = await navigator.getScreenBegin();
@@ -156,7 +168,12 @@ describe('Navigator', () => {
       rendition.viewport.setPrefetchSize(100);
       rendition.setPageLayout({ spreadMode: SpreadMode.FitViewportDoubleSpread });
 
-      const rightPageLocation = new Location('', 'OPS/s001-Cover-01.xhtml');
+      const rightPageLocation = new Location(
+        '',
+        'application/xhtml+xml',
+        'OPS/s001-Cover-01.xhtml',
+        [],
+      );
       await navigator.gotoLocation(rightPageLocation);
 
       const loc = await navigator.getScreenBegin();
@@ -179,8 +196,12 @@ describe('Navigator', () => {
     });
 
     it('gotoLocation()', async () => {
-      const newLoc = new Location('/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0',
-                                  'OPS/s005-Epigraph-01.xhtml');
+      const newLoc = new Location(
+        '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0',
+        'application/xhtml+xml',
+        'OPS/s005-Epigraph-01.xhtml',
+        [],
+      );
       await navigator.gotoLocation(newLoc);
 
       const loc = await navigator.getCurrentLocation();
@@ -203,7 +224,12 @@ describe('Navigator', () => {
     });
 
     it('gotoLocation()', async () => {
-      const newLoc = new Location('/4/2[chapter-i]/4/2/1:276', 'OEBPS/chapter-001-chapter-i.html');
+      const newLoc = new Location(
+        '/4/2[chapter-i]/4/2/1:276',
+        'text/html',
+        'OEBPS/chapter-001-chapter-i.html',
+        [],
+      );
       await navigator.gotoLocation(newLoc);
 
       const loc = await navigator.getCurrentLocation();

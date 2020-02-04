@@ -70,6 +70,10 @@ export class R2ContentView implements IContentView {
     return this.iframeLoadedPromise();
   }
 
+  public getSpineItem(): Link {
+    return this.spineItem;
+  }
+
   public spineItemLoadedPromise(token?: CancellationToken | undefined): Promise<void> {
     return this.iframeLoadedPromise();
   }
