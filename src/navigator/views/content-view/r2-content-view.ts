@@ -143,7 +143,7 @@ export class R2ContentView implements IContentView {
     return this.cfiNavLogic.getElementById(elementId);
   }
 
-  public getElementByCfi(cfi: string): Node | null {
+  public getElementByCfi(cfi: string): HTMLElement | null {
     return this.cfiNavLogic.getElementByCfi(cfi);
   }
 

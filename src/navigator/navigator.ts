@@ -179,12 +179,19 @@ export class Navigator {
   private async locationFromPaginationAsync(pos: PaginationInfo, backward: boolean): Promise<Location> {
     await pos.view.ensureContentLoaded();
 
-    return new Location(pos.view.getCfi(pos.offsetInView, 0, backward),
-                        this.pub.spine[pos.spineItemIndex].href);
+    return this.createLocation(pos, backward);
   }
 
   private locationFromPagination(pos: PaginationInfo, backward: boolean): Location {
-    return new Location(pos.view.getCfi(pos.offsetInView, 0, backward),
-                        this.pub.spine[pos.spineItemIndex].href);
+    return this.createLocation(pos, backward);
+  }
+
+  private createLocation(pos: PaginationInfo, backward: boolean): Location {
+    const cfi = pos.view.getCfi(pos.offsetInView, 0, backward);
+    const type = pos.view.getSpineItem().type;
+    const href = this.pub.spine[pos.spineItemIndex].href;
+    const fragments = pos.view.getFragments(cfi);
+
+    return new Location(cfi, type, href, fragments);
   }
 }

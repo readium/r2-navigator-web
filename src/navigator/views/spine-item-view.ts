@@ -5,6 +5,7 @@ import { ViewSettings } from './view-settings';
 
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
+import { getAllAncestorIds, getAllAncestors } from './content-view/dom-utils';
 
 export enum ContentLoadingStatus {
   NotLoaded,
@@ -54,6 +55,10 @@ export class SpineItemView extends View {
 
   public getContentView(): IContentView {
     return this.contentView;
+  }
+
+  public getSpineItem(): Link {
+    return this.spineItem;
   }
 
   public getOffsetFromCfi(cfi: string): number {
@@ -243,6 +248,11 @@ export class SpineItemView extends View {
 
     const cfi = this.contentView.getCfi(offsetMain, offset2nd, backward);
     return cfi ? cfi : '';
+  }
+
+  public getFragments(cfi: string) : string[] {
+    const element = this.contentView.getElementByCfi(cfi);
+    return getAllAncestorIds(getAllAncestors(element));
   }
 
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
