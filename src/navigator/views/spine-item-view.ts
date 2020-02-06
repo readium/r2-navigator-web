@@ -5,7 +5,10 @@ import { ViewSettings } from './view-settings';
 
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
-import { getAllAncestorIds, getAllAncestors } from './content-view/dom-utils';
+import {
+  getIdsFromElements,
+  getAllPrecedingElements,
+} from './content-view/dom-utils';
 
 export enum ContentLoadingStatus {
   NotLoaded,
@@ -251,7 +254,14 @@ export class SpineItemView extends View {
 
   public getFragments(cfi: string) : string[] {
     const element = this.contentView.getElementByCfi(cfi);
-    return getAllAncestorIds(getAllAncestors(element));
+    const body = element?.ownerDocument?.body as Element;
+
+    // TODO: what if body is null?
+    if (!body) {
+      return [];
+    }
+
+    return getIdsFromElements(getAllPrecedingElements(body, element));
   }
 
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
