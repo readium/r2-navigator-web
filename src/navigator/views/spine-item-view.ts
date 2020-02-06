@@ -254,14 +254,18 @@ export class SpineItemView extends View {
 
   public getFragments(cfi: string) : string[] {
     const element = this.contentView.getElementByCfi(cfi);
-    const body = element?.ownerDocument?.body as Element;
+    const contextDocument = element?.ownerDocument;
 
-    // TODO: what if body is null?
-    if (!body) {
+    if (!element || !contextDocument) {
       return [];
     }
 
-    return getIdsFromElements(getAllPrecedingElements(body, element));
+    let root = contextDocument.body;
+    if (!root) {
+      root = contextDocument.documentElement;
+    }
+
+    return getIdsFromElements(getAllPrecedingElements(root, element));
   }
 
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
