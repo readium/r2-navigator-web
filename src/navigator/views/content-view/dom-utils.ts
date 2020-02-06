@@ -76,6 +76,33 @@ export function triggerLayout(iframe: HTMLIFrameElement): void {
   }
 }
 
+export function getAllPrecedingElements(root: Element, element: Element | null) : Element[] {
+  const iterator = document.createNodeIterator(
+    root,
+    NodeFilter.SHOW_ELEMENT,
+    {
+      acceptNode(node: Node): number {
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    },
+  );
+
+  const elements = [];
+  let next: Element | null = iterator.nextNode() as Element;
+
+  while (next) {
+    elements.push(next);
+
+    if (next === element) {
+      break;
+    }
+
+    next = iterator.nextNode() as Element;
+  }
+
+  return elements;
+}
+
 export function getAllAncestors(element: Element | null) : Element[] {
   if (!element) {
     return [];
@@ -84,7 +111,7 @@ export function getAllAncestors(element: Element | null) : Element[] {
   return [...getAllAncestors(element.parentElement), element];
 }
 
-export function getAllAncestorIds(elements: Element[]) : string[] {
+export function getIdsFromElements(elements: Element[]) : string[] {
   return elements
     .filter(element => element.hasAttribute('id'))
     .map(element => element.getAttribute('id')!);
