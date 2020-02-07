@@ -130,6 +130,25 @@ describe('Navigator', () => {
       assert.equal(loc!.getLocation(), '/4/2[chapter-ii]/2/4/1:0');
     });
 
+    it('getPrecedingElements()', async () => {
+
+      const loc = await navigator.getCurrentLocationAsync();
+      assert.equal(loc!.getFragments()[0], 'title-page');
+
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+      await navigator.nextScreen();
+
+      const loc2 = await navigator.getCurrentLocationAsync();
+      assert.equal(loc2!.getFragments()[0], 'chapter-i');
+    });
+
     // it('gotoScreen()', async () => {
     //   await navigator.nextScreen();
     //   await navigator.nextScreen();
@@ -219,6 +238,21 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0');
       assert.equal(loc!.getHref(), 'OPS/s005-Epigraph-01.xhtml');
+    });
+
+    it('getPrecedingIds()', async () => {
+      const newLoc = new Location(
+        '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0',
+        'application/xhtml+xml',
+        'OPS/s005-Epigraph-01.xhtml',
+        [],
+      );
+      await navigator.gotoLocation(newLoc);
+
+      const loc = await navigator.getCurrentLocation();   
+      assert.equal(loc!.getFragments()[0], 'Epigraph1');
+      assert.equal(loc!.getFragments()[1], 'title-block2');
+      assert.equal(loc!.getFragments()[2], 'h12');
     });
 
     it('gotoAnchorLocation()', async () => {
