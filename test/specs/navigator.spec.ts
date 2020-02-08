@@ -135,15 +135,15 @@ describe('Navigator', () => {
       const loc = await navigator.getCurrentLocationAsync();
       assert.equal(loc!.getFragments()[0], 'title-page');
 
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
-      await navigator.nextScreen();
+      const newLoc =
+        new Location(
+          '/4/2[chapter-i]/4/36/1:664',
+          'application/xhtml+xml',
+          'OEBPS/chapter-001-chapter-i.html',
+          [],
+        );
+
+      await navigator.gotoLocation(newLoc);
 
       const loc2 = await navigator.getCurrentLocationAsync();
       assert.equal(loc2!.getFragments()[0], 'chapter-i');
@@ -249,7 +249,7 @@ describe('Navigator', () => {
       );
       await navigator.gotoLocation(newLoc);
 
-      const loc = await navigator.getCurrentLocation();   
+      const loc = await navigator.getCurrentLocation();
       assert.equal(loc!.getFragments()[0], 'Epigraph1');
       assert.equal(loc!.getFragments()[1], 'title-block2');
       assert.equal(loc!.getFragments()[2], 'h12');
