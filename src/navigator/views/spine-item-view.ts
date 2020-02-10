@@ -5,10 +5,6 @@ import { ViewSettings } from './view-settings';
 
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
-import {
-  getIdsFromElements,
-  getAllPrecedingElements,
-} from './content-view/dom-utils';
 
 export enum ContentLoadingStatus {
   NotLoaded,
@@ -253,19 +249,7 @@ export class SpineItemView extends View {
   }
 
   public getFragments(cfi: string) : string[] {
-    const element = this.contentView.getElementByCfi(cfi);
-    const contextDocument = element?.ownerDocument;
-
-    if (!element || !contextDocument) {
-      return [];
-    }
-
-    let root = contextDocument.body;
-    if (!root) {
-      root = contextDocument.documentElement;
-    }
-
-    return getIdsFromElements(getAllPrecedingElements(root, element));
+    return this.contentView.getFragments(cfi);
   }
 
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {

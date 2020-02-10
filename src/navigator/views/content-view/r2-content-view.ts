@@ -5,6 +5,7 @@ import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
 import { IContentView, SelfResizeCallbackType } from './content-view';
+import { getAllPrecedingElements, getIdsFromElements } from './dom-utils';
 
 type IframeLoadedCallback = (success: boolean) => void;
 
@@ -141,6 +142,22 @@ export class R2ContentView implements IContentView {
   public getCfiFromElementId(elementId: string): string {
     const cfi = this.cfiNavLogic.getCfiFromElementId(elementId);
     return cfi === null ? '' : cfi;
+  }
+
+  public getFragments(cfi: string): string[] {
+    const element = this.getElementByCfi(cfi);
+    const contextDocument = element?.ownerDocument;
+
+    if (!element || !contextDocument) {
+      return [];
+    }
+
+    let root = contextDocument.body;
+    if (!root) {
+      root = contextDocument.documentElement;
+    }
+
+    return getIdsFromElements(getAllPrecedingElements(root, element));
   }
 
   public getElementById(elementId: string): HTMLElement | null {
