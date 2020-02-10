@@ -32,6 +32,8 @@ export interface IContentView {
   getOffsetFromCfi(cfi: string): number;
   getOffsetFromElementId(cfi: string): number;
 
+  getFragments(cfi: string): string[];
+
   getPageIndexOffsetFromCfi(cfi: string): number;
   getPageIndexOffsetFromElementId(elementId: string): number;
   getCfi(offsetMain: number, offset2nd: number, backward: boolean): string;
