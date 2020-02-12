@@ -107,6 +107,9 @@ export class HostEnv {
   }
 
   public clear(): void {
+    if (this.rendition) {
+      this.rendition.reset();
+    }
     document.body.removeChild(this.viewportDiv);
   }
 
