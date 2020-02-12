@@ -1,11 +1,13 @@
 import { Link } from '@readium/shared-models/lib/models/publication/link';
+// tslint:disable-next-line: import-name
+import ResizeSensor from 'resize-sensor';
 import { IFrameLoader } from '../../iframe-loader';
 import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
 import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
-import { IContentView, SelfResizeCallbackType } from './content-view';
 import { getAllPrecedingElements, getIdsFromElements } from './dom-utils';
+import { IContentView, SelfResizeCallback } from './content-view';
 
 type IframeLoadedCallback = (success: boolean) => void;
 
@@ -18,6 +20,7 @@ export class R2ContentView implements IContentView {
   protected iframe: HTMLIFrameElement;
 
   protected iframeLoadedCallbacks: IframeLoadedCallback[] = [];
+  protected selfResizeCallbacks: SelfResizeCallback[] = [];
 
   protected spineItem: Link;
   protected spineItemIndex: number;
@@ -32,6 +35,8 @@ export class R2ContentView implements IContentView {
 
   protected elementChecker: ElementBlacklistedChecker;
   protected cfiNavLogic: CfiNavigationLogic;
+
+  protected resizeSensor: any = null;
 
   public constructor(loader: IFrameLoader, eleChecker: ElementBlacklistedChecker) {
     this.iframeLoader = loader;
@@ -172,8 +177,8 @@ export class R2ContentView implements IContentView {
     return;
   }
 
-  public onSelfResize(callback: SelfResizeCallbackType): void {
-    return;
+  public onSelfResize(callback: SelfResizeCallback): void {
+    this.selfResizeCallbacks.push(callback);
   }
 
   protected setupIframe(): void {
@@ -210,6 +215,13 @@ export class R2ContentView implements IContentView {
 
     const doc = <Document>this.iframe.contentDocument;
     this.cfiNavLogic = new CfiNavigationLogic(doc, this.elementChecker);
+
+    this.resizeSensor = new ResizeSensor(doc.body, () => {
+      this.onResize();
+      for (const callback of this.selfResizeCallbacks) {
+        callback(this.spineItemIndex);
+      }
+    });
   }
 
   protected getHostSize(): [number, number] | null {

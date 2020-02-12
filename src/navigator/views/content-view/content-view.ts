@@ -2,7 +2,7 @@ import { Link } from '@readium/shared-models/lib/models/publication/link';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
 
-export type SelfResizeCallbackType = (spineItemIndex: number) => void;
+export type SelfResizeCallback = (spineItemIndex: number) => void;
 
 export interface IContentView {
   render(): void;
@@ -43,5 +43,5 @@ export interface IContentView {
 
   onResize(): void;
 
-  onSelfResize(callback: SelfResizeCallbackType): void;
+  onSelfResize(callback: SelfResizeCallback): void;
 }
