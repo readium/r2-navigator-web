@@ -1,5 +1,5 @@
 import { Link } from '@readium/shared-models/lib/models/publication/link';
-import { IContentView, SelfResizeCallbackType } from './content-view/content-view';
+import { IContentView, SelfResizeCallback } from './content-view/content-view';
 import { IContentViewFactory } from './content-view/content-view-factory';
 import { ViewSettings } from './view-settings';
 
@@ -277,7 +277,7 @@ export class SpineItemView extends View {
     return this.contentView.getCfiFromElementId(elementId);
   }
 
-  public onSelfResize(callback: SelfResizeCallbackType): void {
+  public onSelfResize(callback: SelfResizeCallback): void {
     this.contentView.onSelfResize(callback);
   }
 

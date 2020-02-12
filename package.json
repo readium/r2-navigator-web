@@ -75,6 +75,7 @@
   "dependencies": {
     "@readium/shared-models": "^1.0.0-alpha.2",
     "isomorphic-url-shim": "^1.0.2",
-    "@evidentpoint/readium-cfi-js": "^1.2.1"
+    "@evidentpoint/readium-cfi-js": "^1.2.1",
+    "resize-sensor": "^0.0.6"
   }
 }
