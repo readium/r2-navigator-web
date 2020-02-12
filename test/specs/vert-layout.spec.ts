@@ -3,6 +3,7 @@
 // tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { Location, Navigator, ScrollMode, SpreadMode } from '../../src/navigator';
+import { sleep } from '../../src/utils/misc';
 
 import { HostEnv } from '../helpers/host-env';
 
@@ -65,11 +66,12 @@ describe('Vertical Layout', () => {
         [],
       );
       await navigator.gotoLocation(newLoc);
+      await sleep(1000);
 
       const loc = await navigator.getCurrentLocation();
 
       assert(loc);
-      assert.equal(loc!.getLocation(), '/4/2[chapter-i]/4/2/1:219');
+      assert.equal(loc!.getLocation(), '/4/2[chapter-i]/4/2/1:227');
       assert.equal(loc!.getHref(), 'OEBPS/chapter-001-chapter-i.html');
     });
 

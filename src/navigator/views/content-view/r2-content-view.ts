@@ -85,6 +85,10 @@ export class R2ContentView implements IContentView {
   }
 
   public unloadSpineItem(): void {
+    this.selfResizeCallbacks = [];
+    if (this.resizeSensor) {
+      this.resizeSensor.detach();
+    }
     this.host.removeChild(this.iframeContainer);
   }
 

@@ -34,6 +34,10 @@ describe('SpineItemView', () => {
       await hostEnv.loadSpineItem(siv4, 4);
     });
 
+    afterEach(() => {
+      siv4.unloadSpineItem();
+    });
+
     it('loadSpineItem()', async () => {
       const siv = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv, 0);
@@ -63,6 +67,10 @@ describe('SpineItemView', () => {
       hostEnv.setColumnGap(20);
       siv4 = hostEnv.createSpineItemView(pageWidth, 800, true, false);
       await hostEnv.loadSpineItem(siv4, 4);
+    });
+
+    afterEach(() => {
+      siv4.unloadSpineItem();
     });
 
     it('loadSpineItem()', async () => {

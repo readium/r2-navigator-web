@@ -42,6 +42,7 @@ describe('Viewport', () => {
   });
 
   afterEach(() => {
+    layoutView.reset();
     document.body.removeChild(viewportDiv);
   });
 
