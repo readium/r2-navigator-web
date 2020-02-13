@@ -330,7 +330,7 @@ export class LayoutView extends View {
   }
 
   public async getOffsetFromAnchor(href: string,
-                                   elementId: string):
+                                   elementId?: string):
                                    Promise<number | undefined> {
     const siv = await this.getSpineItemViewStatusFromHref(href);
     if (!siv) {
@@ -338,13 +338,15 @@ export class LayoutView extends View {
     }
 
     let inSpineItemOffset: number = 0;
-    if (this.isVertical) {
-      inSpineItemOffset = siv.view.getOffsetFromElementId(elementId);
-    } else {
-      const pageIndexOffset = siv.view.getPageIndexOffsetFromElementId(elementId);
-      inSpineItemOffset = pageIndexOffset < 0 ? -1 : pageIndexOffset * this.pageWidth;
+    if (elementId) {
+      if (this.isVertical) {
+        inSpineItemOffset = siv.view.getOffsetFromElementId(elementId);
+      } else {
+        const pageIndexOffset = siv.view.getPageIndexOffsetFromElementId(elementId);
+        inSpineItemOffset = pageIndexOffset < 0 ? 0 : pageIndexOffset * this.pageWidth;
+      }
     }
-
+    
     if (inSpineItemOffset < 0) {
       return undefined;
     }

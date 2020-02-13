@@ -114,6 +114,22 @@ describe('Navigator', () => {
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
     });
 
+    it('gotoAnchorLocation()', async () => {
+      await navigator.gotoAnchorLocation('OEBPS/chapter-001-chapter-i.html');
+
+      let loc = await navigator.getCurrentLocation();
+
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2[chapter-i]/2/4/1:0');
+
+      await navigator.gotoAnchorLocation('OEBPS/chapter-002-chapter-ii.html', 'chapter-ii');
+
+      loc = await navigator.getCurrentLocation();
+
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2[chapter-ii]/2/4/1:0');
+    });
+
     // it('gotoScreen()', async () => {
     //   await navigator.nextScreen();
     //   await navigator.nextScreen();
