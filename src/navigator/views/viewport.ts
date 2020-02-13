@@ -88,6 +88,8 @@ export class Viewport {
         this.root.style.overflowX = 'scroll';
       }
 
+      this.clipContatiner.style.overflow = 'visible';
+
       // tslint:disable-next-line:no-any
       (<any>this.root.style).webkitOverflowScrolling = 'touch';
     }
