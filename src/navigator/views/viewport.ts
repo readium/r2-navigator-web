@@ -231,7 +231,7 @@ export class Viewport {
     await this.updatePrefetch(token);
   }
 
-  public async renderAtAnchorLocation(href: string, eleId: string,
+  public async renderAtAnchorLocation(href: string, eleId?: string,
                                       token?: CancellationToken): Promise<void> {
     const spineItemIndex = this.bookView.findSpineItemIndexByHref(href);
     if (spineItemIndex < 0) {

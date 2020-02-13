@@ -77,7 +77,7 @@ export class Navigator {
     );
   }
 
-  public async gotoAnchorLocation(href: string, eleId: string): Promise<void> {
+  public async gotoAnchorLocation(href: string, eleId?: string): Promise<void> {
     await this.requestManager.executeNavigationAction(
       async (token) => {
         await this.rendition.viewport.renderAtAnchorLocation(href, eleId, token);
