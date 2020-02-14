@@ -658,14 +658,20 @@ export class LayoutView extends View {
   }
 
   private visibleViewStatus(): SpineItemViewStatus {
+    let visibleVs = this.spineItemViewStatus[0];
+    if (!this.getViewOffset) {
+      return visibleVs;
+    }
+
     for (const vs of this.spineItemViewStatus) {
       let start = vs.offset;
       let end = vs.viewSize + start;
       if (this.getViewOffset() >= start && this.getViewOffset() < end) {
-        return vs;
+        visibleVs = vs;
+        break;
       }
     }
-    return this.spineItemViewStatus[0];
+    return visibleVs;
   }
 
   private nextIndexAfterEnd(): number {
@@ -698,7 +704,7 @@ export class LayoutView extends View {
     return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
   }
 
-  private getViewOffset : () => number;
+  private getViewOffset : (() => number) | undefined = undefined;
   public setViewOffsetGetter(getter: () => number): void {
     this.getViewOffset = getter;
   }
