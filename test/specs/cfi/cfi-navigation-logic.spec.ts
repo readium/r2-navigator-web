@@ -44,7 +44,7 @@ describe('CfiNavigationLogic', () => {
       const lastVisCfi = navLogic.getFirstVisibleCfi(viewportRect, true);
 
       assert.equal(firstVisCfi, '/4/2[chapter-i]/4/8/1:118');
-      console.log(lastVisCfi);
+      assert.equal(lastVisCfi, '/4/2[chapter-i]/4/12/1:172');
     });
 
     it('getElementByCfi()', async () => {
