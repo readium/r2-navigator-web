@@ -118,6 +118,7 @@ export class R2SinglePageContentView extends R2ContentView  {
 
     const cfi = this.cfiNavLogic.getFirstVisibleCfi(new Rect(left, top, right, bottom), backward);
 
+
     return cfi ? cfi : '';
   }
 

@@ -53,7 +53,7 @@ export class CfiNavigationLogic {
                                                     this.elementChecker);
     const visibleEleInfo = visChecker.findFirstVisibleElement(fromEnd);
 
-    return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport);
+    return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport, fromEnd);
   }
 
   public getOffsetByCfi(cfi: string): [number, number] | null {
@@ -116,7 +116,11 @@ export class CfiNavigationLogic {
     return this.rootDocument.getElementById(eleId);
   }
 
-  private findVisibleLeafNodeCfi(visNode: IVisibleElementInfo, viewport: Rect): string | null {
+  private findVisibleLeafNodeCfi(
+    visNode: IVisibleElementInfo,
+    viewport: Rect,
+    fromEnd: boolean,
+  ): string | null {
     const element = visNode.element;
     const textNode = visNode.textNode;
 
@@ -126,7 +130,7 @@ export class CfiNavigationLogic {
                                                       this.columnSize,
                                                       viewport,
                                                       this.elementChecker);
-      const visibleRange = visChecker.getVisibleTextRange(textNode, true);
+      const visibleRange = visChecker.getVisibleTextRange(textNode, fromEnd);
 
       return this.generateCfiFromRange(visibleRange);
     }
