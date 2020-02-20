@@ -47,8 +47,11 @@ describe('ElementChecker', () => {
       // console.log(visEle.textNode);
       assert.isNotNull(visEle.textNode);
 
-      const range = visChecker.getVisibleTextRange(<Node>visEle.textNode, true);
+      const range = visChecker.getVisibleTextRange(<Node>visEle.textNode, false);
       assert.equal(range.startOffset, 118);
+
+      const rangeBackward = visChecker.getVisibleTextRange(<Node>visEle.textNode, true);
+      assert.equal(rangeBackward.startOffset, 851);
     });
   });
 });
