@@ -177,10 +177,10 @@ export class ElementVisibilityChecker {
     return { textNode, percentVisible, element: firstVisibleElement };
   }
 
-  public getVisibleTextRange(textNode: Node, toStart: boolean): Range {
+  public getVisibleTextRange(textNode: Node, fromEnd: boolean): Range {
     let ranges = this.splitRange(this.createRangeFromNode(textNode));
-    const activeIndex = toStart ? 0 : 1;
-    const otherIndex = toStart ? 1 : 0;
+    const activeIndex = !fromEnd ? 0 : 1;
+    const otherIndex = !fromEnd ? 1 : 0;
     while (ranges.length > 1) {
       const currRange = ranges[activeIndex];
       const fragments = this.getRangeRectangles(currRange);
@@ -193,7 +193,8 @@ export class ElementVisibilityChecker {
 
     const resultRange = ranges[0];
     if (resultRange) {
-      resultRange.collapse(toStart);
+      // Always collapse
+      resultRange.collapse(true);
     }
 
     return resultRange;
