@@ -12,7 +12,8 @@
     "build:types": "dts-bundle --configJson dts-bundle.json",
     "test": "npm run test:build && npm run test:start",
     "test:clean": "rimraf test/dist",
-    "test:build": "npm run test:clean && cd test && webpack",
+    "test:copy-dep": "cpx \"node_modules/@readium/glue-modules/dist/**/*\" test/fixtures/glue-js && cpx \"node_modules/@readium/glue-rpc/dist/**/*\" test/fixtures/glue-js && cpx \"node_modules/@readium/glue-shared/dist/**/*\" test/fixtures/glue-js",
+    "test:build": "npm run test:clean && npm run test:copy-dep && cd test && webpack",
     "test:start": "cd test && karma start karma.config.js",
     "test:debug": "npm run test:start -- --singleRun=false",
     "test:watch": "echo \"not implemented\"",
@@ -46,6 +47,7 @@
     "@types/mocha": "^5.0.0",
     "@types/node": "^12.0.1",
     "chai": "^4.1.2",
+    "cpx": "^1.5.0",
     "dts-bundle": "^0.7.3",
     "glob": "^7.1.4",
     "karma": "^4.1.0",
@@ -63,6 +65,7 @@
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-typescript2": "^0.21.0",
+    "simulate-event": "^1.4.0",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^6.0.0",
     "tslint": "^5.16.0",
@@ -75,6 +78,7 @@
   "dependencies": {
     "@readium/shared-models": "^1.0.0-alpha.2",
     "isomorphic-url-shim": "^1.0.2",
-    "@evidentpoint/readium-cfi-js": "^1.2.1"
+    "@evidentpoint/readium-cfi-js": "^1.2.1",
+    "@readium/glue-modules": "1.3.2"
   }
 }

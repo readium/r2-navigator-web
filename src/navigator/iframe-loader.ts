@@ -1,5 +1,6 @@
 import { URL } from 'isomorphic-url-shim';
-import { Resource, applyResourcesToDocument } from '../utils/injection-resolver';
+import { applyResourcesToDocument, Resource } from '../utils/injection-resolver';
+import { IContentLoader, ILoaderConfig, ContentType } from './content-loader';
 // @ts-ignore
 // tslint:disable-next-line:no-submodule-imports
 
@@ -8,12 +9,12 @@ interface IR1AttachedDataType {
   spineItem: any;
 }
 
-interface ILoaderConfig {
+interface IIframeLoaderConfig extends ILoaderConfig {
   useReadiumCss?: boolean;
   useReadiumCssOverride?: boolean;
 }
 
-export class IFrameLoader {
+export class IFrameLoader implements IContentLoader {
   private publicationURI?: string;
 
   private isIE: boolean;
@@ -21,6 +22,8 @@ export class IFrameLoader {
   private readiumCssBasePath?: string;
   private loaderEvents: { [eventName: string]: Function[] } = {};
   private injectableResources: Resource[];
+
+  private loaderConfig: IIframeLoaderConfig;
 
   constructor(publicationURI?: string) {
     this.publicationURI = publicationURI;
@@ -33,22 +36,29 @@ export class IFrameLoader {
     this.readiumCssBasePath = path;
   }
 
-  public addIFrameLoadedListener(callback: Function): void {
+  public addContentLoadedListener(listener: Function): void {
     const eventName = 'iframeLoaded';
-    this.addListener(eventName, callback);
+    this.addListener(eventName, listener);
   }
 
-  public addIFrameUnloadedListener(callback: Function): void {
+  public addContentUnloadedListener(listener: Function): void {
     const eventName = 'iframeUnloaded';
-    this.addListener(eventName, callback);
+    this.addListener(eventName, listener);
   }
 
-  public loadIframe(
+  public contentType(): ContentType {
+    return ContentType.Html;
+  }
+
+  public setConfig(config: IIframeLoaderConfig): void {
+    this.loaderConfig = config;
+  }
+
+  public loadContent(
     iframe: HTMLIFrameElement,
     src: string,
     // tslint:disable-next-line:no-any
     callback: any,
-    config: ILoaderConfig,
     // tslint:disable-next-line:no-any
     attachedData: string | IR1AttachedDataType,
   ): void {
@@ -70,7 +80,7 @@ export class IFrameLoader {
     }
 
     this.fetchContentDocument(contentUri).then((contentData: string) => {
-      this.loadIframeWithDocument(iframe, contentUri, contentData, contentType, config, callback);
+      this.loadIframeWithDocument(iframe, contentUri, contentData, contentType, callback);
     });
   }
 
@@ -94,7 +104,7 @@ export class IFrameLoader {
   private inject(sourceText: string,
                  contentType: string,
                  href: string,
-                 config: ILoaderConfig): string {
+                 config: IIframeLoaderConfig): string {
     const parser = new DOMParser();
     // @ts-ignore
     const doc = parser.parseFromString(sourceText, <SupportedType>(contentType));
@@ -196,7 +206,6 @@ export class IFrameLoader {
     contentDocumentURI: string,
     contentDocumentData: string,
     contentType: string,
-    config: ILoaderConfig,
     // tslint:disable-next-line:no-any
     callback: any,
   ): void {
@@ -208,7 +217,7 @@ export class IFrameLoader {
         contentDocumentURI,
         iframe.baseURI || document.baseURI || location.href,
       ).href,
-      config,
+      this.loaderConfig,
     );
 
     if (!this.isIE) {

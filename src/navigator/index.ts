@@ -4,6 +4,7 @@ export { ReadingSystem } from './reading-system';
 export { Location } from './location';
 export { Rendition, SpreadMode } from './rendition';
 export { IFrameLoader } from './iframe-loader';
+export { ContentEventManager } from './content-event-manager';
 export { NavigationRequestManager } from './request-manager';
 export { SpineItemView } from './views/spine-item-view';
 export { ScrollMode, Viewport } from './views/viewport';
