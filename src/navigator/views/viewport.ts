@@ -59,6 +59,9 @@ export class Viewport {
   public setView(v: LayoutView): void {
     this.bookView = v;
     this.bookView.attachToHost(this.clipContatiner);
+    this.bookView.setViewOffsetGetter(() => {
+      return this.viewOffset;
+    });
   }
 
   public reset(): void {

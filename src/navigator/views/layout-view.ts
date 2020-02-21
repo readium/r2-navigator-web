@@ -659,6 +659,23 @@ export class LayoutView extends View {
     return this.spineItemViewStatus[this.spineItemViewStatus.length - 1];
   }
 
+  private visibleViewStatus(): SpineItemViewStatus {
+    let visibleVs = this.spineItemViewStatus[0];
+    if (!this.getViewOffset) {
+      return visibleVs;
+    }
+
+    for (const vs of this.spineItemViewStatus) {
+      let start = vs.offset;
+      let end = vs.viewSize + start;
+      if (this.getViewOffset() >= start && this.getViewOffset() < end) {
+        visibleVs = vs;
+        break;
+      }
+    }
+    return visibleVs;
+  }
+
   private nextIndexAfterEnd(): number {
     let nextIndex = 0;
     if (this.spineItemViewStatus.length > 0) {
@@ -689,6 +706,32 @@ export class LayoutView extends View {
     return nextIndex >= 0 && this.spineItemViewSizes[nextIndex] > 0;
   }
 
+  private getViewOffset : (() => number) | undefined = undefined;
+  public setViewOffsetGetter(getter: () => number): void {
+    this.getViewOffset = getter;
+  }
+
+  private paginateView(vs: SpineItemViewStatus) {
+    if (this.isViewSettingChanged) {
+      vs.view.setViewSettings(this.vs);
+    }
+    
+    if (this.isPageSizeChanged) {
+      vs.viewContainer.style.width = `${this.visualPageWidth()}px`;
+      if (!this.isVertical || this.isFixedLayout) {
+        vs.viewContainer.style.height = `${this.visualPageHeight()}px`;
+      }
+
+      vs.view.setZoomOption(this.zoomOption);
+      vs.view.resize(this.visualPageWidth(), this.visualPageHeight());
+    }
+
+    vs.viewSize = vs.view.getTotalSize(this.pageWidth);
+    
+    this.spineItemViewSizes[vs.spineItemIndex] = vs.viewSize;
+    this.spineItemViewPageCounts[vs.spineItemIndex] = vs.view.getTotalPageCount();
+  }
+
   private rePaginate(): void {
     this.spineItemViewSizes.fill(-1);
 
@@ -696,30 +739,25 @@ export class LayoutView extends View {
       return;
     }
 
-    let offset = this.startViewStatus().offset;
+    const visibleViewStatus = this.visibleViewStatus();
+    let offset = visibleViewStatus.offset;
     this.loadedContentRange[0] = this.paginatedRange[0] = offset;
-    for (const vs of this.spineItemViewStatus) {
-      if (this.isViewSettingChanged) {
-        vs.view.setViewSettings(this.vs);
-      }
-
-      if (this.isPageSizeChanged) {
-        vs.viewContainer.style.width = `${this.visualPageWidth()}px`;
-        if (!this.isVertical || this.isFixedLayout) {
-          vs.viewContainer.style.height = `${this.visualPageHeight()}px`;
-        }
-
-        vs.view.setZoomOption(this.zoomOption);
-        vs.view.resize(this.visualPageWidth(), this.visualPageHeight());
-      }
-
-      vs.viewSize = vs.view.getTotalSize(this.pageWidth);
+    const indexOfVisibleViewStatus = this.spineItemViewStatus.indexOf(visibleViewStatus);
+    for (let i = indexOfVisibleViewStatus - 1; i >= 0; i = i - 1) {
+      const vs = this.spineItemViewStatus[i];
+      this.paginateView(vs);
+      offset -= vs.viewSize;
       vs.offset = offset;
       this.postionSpineItemView(vs);
+    }
 
+    offset = visibleViewStatus.offset;
+    for (let i = indexOfVisibleViewStatus; i < this.spineItemViewStatus.length; i = i + 1) {
+      const vs = this.spineItemViewStatus[i];
+      this.paginateView(vs);
+      vs.offset = offset;
       offset += vs.viewSize;
-      this.spineItemViewSizes[vs.spineItemIndex] = vs.viewSize;
-      this.spineItemViewPageCounts[vs.spineItemIndex] = vs.view.getTotalPageCount();
+      this.postionSpineItemView(vs);
     }
 
     this.loadedContentRange[1] = this.paginatedRange[1] = offset;
