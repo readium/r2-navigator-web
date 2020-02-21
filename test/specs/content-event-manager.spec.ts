@@ -105,13 +105,14 @@ describe('ContentEventManager', () => {
       await sleep(100);
       assert(clicked);
 
-      // clicked = false;
-      // eventManager.removeContentEventListener('click', clickListener);
-      // await eventManager.updateContentEvents();
+      clicked = false;
+      eventManager.removeContentEventListener('click', clickListener);
+      await eventManager.updateContentEvents();
+      await sleep(100);
 
-      // simulateEvent.simulate(iframe.contentWindow?.document!.body, 'click');
-      // await sleep(100);
-      // assert(!clicked);
+      simulateEvent.simulate(iframe.contentWindow?.document!.body, 'click');
+      await sleep(100);
+      assert(!clicked);
     });
 
   });
