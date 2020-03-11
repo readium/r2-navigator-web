@@ -6,6 +6,7 @@ import {
 import { Rect } from '../../../src/navigator/views/cfi/rect';
 
 import { HostEnv } from '../../helpers/host-env';
+import { sleep } from '../../../src/utils/misc';
 
 describe('CfiNavigationLogic', () => {
   let hostEnv: HostEnv;
@@ -32,6 +33,7 @@ describe('CfiNavigationLogic', () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
+      await sleep(100);
 
       const iframe = hostEnv.getIframe();
       const doc = <Document>(iframe.contentDocument);
@@ -51,6 +53,7 @@ describe('CfiNavigationLogic', () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
+      await sleep(100);
 
       const iframe = hostEnv.getIframe();
       const doc = <Document>(iframe.contentDocument);
@@ -69,6 +72,7 @@ describe('CfiNavigationLogic', () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
+      await sleep(100);
 
       const iframe = hostEnv.getIframe();
       const doc = <Document>(iframe.contentDocument);
