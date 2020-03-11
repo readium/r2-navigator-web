@@ -5,3 +5,4 @@ build_test_temp
 dist
 .rpt2_cache
 yarn-error.log
+.vscode
