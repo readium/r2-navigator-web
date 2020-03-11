@@ -5,11 +5,16 @@ import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { IContentView } from './content-view';
 import { R2MultiPageContentView } from './r2-multi-page-content-view';
 import { R2SinglePageContentView } from './r2-single-page-content-view';
+import { classBlacklist, idBlacklist, elementBlacklist } from '../cfi/default-blacklist';
 
 export class R2ContentViewFactory implements IContentViewFactory {
   private iframeLoader: IFrameLoader;
 
-  private eleChecker: ElementBlacklistedChecker = new ElementBlacklistedChecker([], [], []);
+  private eleChecker: ElementBlacklistedChecker = new ElementBlacklistedChecker(
+    classBlacklist,
+    idBlacklist,
+    elementBlacklist,
+  );
 
   public constructor(loader: IFrameLoader) {
     this.iframeLoader = loader;
