@@ -77,7 +77,7 @@ describe('SpineItemView', () => {
       const siv = hostEnv.createSpineItemView(pageWidth, 800, true, false);
       await hostEnv.loadSpineItem(siv, 0);
       // wait for auto-resize
-      await sleep(1000);
+      await sleep(100);
       const pageSize = siv.getTotalSize(pageWidth);
       assert.equal(pageSize, 285);
 
