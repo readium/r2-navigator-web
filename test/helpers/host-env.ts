@@ -9,6 +9,7 @@ import { R2ContentViewFactory } from '../../src/navigator/views/content-view/r2-
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
+import { classBlacklist, idBlacklist, elementBlacklist } from '../../src/navigator/views/cfi/default-blacklist';
 
 export class HostEnv {
   private pubUrl: string;
@@ -50,7 +51,7 @@ export class HostEnv {
 
     this.cvFactory = new R2ContentViewFactory(loader);
     this.viewSettings = new ViewSettings();
-    this.eleChecker = new ElementBlacklistedChecker([], [], []);
+    this.eleChecker = new ElementBlacklistedChecker(classBlacklist, idBlacklist, elementBlacklist);
     this.rendition = new Rendition(this.publication, this.viewportDiv, this.cvFactory);
     this.renditionCtx = new RenditionContext(this.rendition, loader);
   }
