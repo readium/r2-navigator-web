@@ -5,7 +5,6 @@ import { ViewSettings } from '../view-settings';
 import { R2ContentView } from './r2-content-view';
 
 export class R2MultiPageContentView extends R2ContentView {
-
   private hostWidth: number;
   private hostHeight: number;
 
@@ -69,9 +68,9 @@ export class R2MultiPageContentView extends R2ContentView {
     const right = left + this.hostWidth;
     const bottom = offset2nd + this.hostHeight;
     const cfi = this.cfiNavLogic.getFirstVisibleCfi(
-                  new Rect(left, offset2nd, right, bottom),
-                  backward,
-                );
+      new Rect(left, offset2nd, right, bottom),
+      backward,
+    );
 
     return cfi ? cfi : '';
   }

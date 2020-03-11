@@ -1,9 +1,7 @@
+import { assert } from 'chai';
 import { HostEnv } from '../helpers/host-env';
 import { PageTitleTocResolver } from '../../src/utils/page-title-toc-resolver';
-import { Navigator, ScrollMode, SpreadMode } from '../../src/navigator';
-
-// tslint:disable-next-line:no-implicit-dependencies
-import { assert } from 'chai';
+import { ScrollMode, SpreadMode } from '../../src/navigator';
 
 describe('PageTitleTocResolver', () => {
   let hostEnv: HostEnv;

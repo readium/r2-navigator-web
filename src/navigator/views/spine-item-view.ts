@@ -12,8 +12,6 @@ export enum ContentLoadingStatus {
   Loaded,
 }
 
-/* tslint:disable:no-any */
-
 export class SpineItemView extends View {
   protected host: HTMLElement;
 
@@ -91,19 +89,23 @@ export class SpineItemView extends View {
     return this.contentView.getPageIndexOffsetFromElementId(elementId);
   }
 
-  public async loadSpineItem(spineItem: Link,
-                             viewSettings: ViewSettings,
-                             token?: CancellationToken): Promise<void> {
+  public async loadSpineItem(
+    spineItem: Link,
+    viewSettings: ViewSettings,
+    token?: CancellationToken,
+  ): Promise<void> {
     this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);
     this.contentView.attachToHost(this.host);
     this.contentView.onSelfResize((spIndex: number) => {
       this.onViewChanged();
     });
     this.contentStatus = ContentLoadingStatus.Loading;
-    await this.contentView.loadSpineItem(spineItem,
-                                         this.spine.indexOf(spineItem),
-                                         viewSettings,
-                                         token);
+    await this.contentView.loadSpineItem(
+      spineItem,
+      this.spine.indexOf(spineItem),
+      viewSettings,
+      token,
+    );
 
     this.contentStatus = ContentLoadingStatus.Loaded;
     this.onViewChanged();
@@ -248,7 +250,7 @@ export class SpineItemView extends View {
     return cfi ? cfi : '';
   }
 
-  public getFragments(cfi: string) : string[] {
+  public getFragments(cfi: string): string[] {
     return this.contentView.getFragments(cfi);
   }
 

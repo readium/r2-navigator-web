@@ -20,9 +20,9 @@ function percentConverter(value: number): string {
 }
 
 const READIUM_CSS_VAR_MAP: Map<string, IReadiumCSSSettingValueConverter> = new Map([
-  [SettingName.FontSize, { name:'--USER__fontSize', converter: percentConverter }],
-  [SettingName.FontFamily, { name:'--USER__fontFamily', converter: stringConverter }],
-  [SettingName.ReadingMode, { name:'--USER__appearance', converter: stringConverter }],
+  [SettingName.FontSize, { name: '--USER__fontSize', converter: percentConverter }],
+  [SettingName.FontFamily, { name: '--USER__fontFamily', converter: stringConverter }],
+  [SettingName.ReadingMode, { name: '--USER__appearance', converter: stringConverter }],
   [SettingName.TextColor, { name: '--USER__textColor', converter: stringConverter }],
   [SettingName.BackgroundColor, { name: '--USER__backgroundColor', converter: stringConverter }],
   [SettingName.FontOverride, { name: '--USER__fontOverride', converter: stringConverter }],
@@ -35,7 +35,7 @@ export class ViewSettings {
   // tslint:disable-next-line:no-any
   private settings: Map<SettingName, any> = new Map();
 
-  public getAllSettings(): ISettingEntry[]  {
+  public getAllSettings(): ISettingEntry[] {
     const ret: ISettingEntry[] = [];
     this.settings.forEach((value, name) => {
       ret.push({ name, value });
@@ -62,7 +62,7 @@ export class ViewSettings {
       return undefined;
     }
 
-    return <T>(val);
+    return <T>val;
   }
 
   public getSettingWithDefaultValue<T>(name: SettingName, defaultVal: T): T {
@@ -71,7 +71,7 @@ export class ViewSettings {
       return defaultVal;
     }
 
-    return <T>(val);
+    return <T>val;
   }
 
   // tslint:disable-next-line:no-any
@@ -81,5 +81,4 @@ export class ViewSettings {
       view.style.setProperty(cssConverter.name, cssConverter.converter(varVal));
     }
   }
-
 }

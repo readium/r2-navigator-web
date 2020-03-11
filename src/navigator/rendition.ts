@@ -232,7 +232,10 @@ export class Rendition {
     const settings = [];
     settings.push(columnGapSetting);
     if (this.pub.metadata.rendition && this.pub.metadata.rendition.spread === 'none') {
-      const spreadSetting = { name: SettingName.SpreadMode, value: SpreadMode.FitViewportSingleSpread };
+      const spreadSetting = {
+        name: SettingName.SpreadMode,
+        value: SpreadMode.FitViewportSingleSpread,
+      };
       settings.push(spreadSetting);
     }
     this.vs.updateSetting(settings);

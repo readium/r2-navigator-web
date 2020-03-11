@@ -33,11 +33,11 @@ export class CfiNavigationLogic {
 
   public getCfiFromElement(element: Element): string {
     let cfi = EPUBcfi.Generator.generateElementCFIComponent(
-                element,
-                this.elementChecker.getClassBlacklist(),
-                this.elementChecker.getElementBlacklist(),
-                this.elementChecker.getIdBlacklist(),
-              );
+      element,
+      this.elementChecker.getClassBlacklist(),
+      this.elementChecker.getElementBlacklist(),
+      this.elementChecker.getIdBlacklist(),
+    );
 
     if (cfi[0] === '!') {
       cfi = cfi.substring(1);
@@ -47,10 +47,12 @@ export class CfiNavigationLogic {
   }
 
   public getFirstVisibleCfi(viewport: Rect, fromEnd: boolean): string | null {
-    const visChecker = new ElementVisibilityChecker(this.rootDocument,
-                                                    this.columnSize,
-                                                    viewport,
-                                                    this.elementChecker);
+    const visChecker = new ElementVisibilityChecker(
+      this.rootDocument,
+      this.columnSize,
+      viewport,
+      this.elementChecker,
+    );
     const visibleEleInfo = visChecker.findFirstVisibleElement(fromEnd);
 
     return this.findVisibleLeafNodeCfi(visibleEleInfo, viewport, fromEnd);
@@ -126,10 +128,12 @@ export class CfiNavigationLogic {
 
     // if a valid text node is found, try to generate a CFI with range offsets
     if (textNode && this.isValidTextNode(textNode)) {
-      const visChecker = new ElementVisibilityChecker(this.rootDocument,
-                                                      this.columnSize,
-                                                      viewport,
-                                                      this.elementChecker);
+      const visChecker = new ElementVisibilityChecker(
+        this.rootDocument,
+        this.columnSize,
+        viewport,
+        this.elementChecker,
+      );
       const visibleRange = visChecker.getVisibleTextRange(textNode, fromEnd);
 
       return this.generateCfiFromRange(visibleRange);
@@ -161,20 +165,27 @@ export class CfiNavigationLogic {
   private generateCfiFromRange(range: Range): string {
     if (range.collapsed && range.startContainer.nodeType === Node.TEXT_NODE) {
       return EPUBcfi.Generator.generateCharacterOffsetCFIComponent(
-        range.startContainer, range.startOffset,
-        ['cfi-marker'], [], ['MathJax_Message', 'MathJax_SVG_Hidden']);
+        range.startContainer,
+        range.startOffset,
+        ['cfi-marker'],
+        [],
+        ['MathJax_Message', 'MathJax_SVG_Hidden'],
+      );
     }
 
     if (range.collapsed) {
-      return this.getCfiFromElement(<Element>(range.startContainer));
+      return this.getCfiFromElement(<Element>range.startContainer);
     }
 
     return EPUBcfi.Generator.generateRangeComponent(
-        range.startContainer, range.startOffset,
-        range.endContainer, range.endOffset,
-        this.elementChecker.getClassBlacklist(),
-        this.elementChecker.getElementBlacklist(),
-        this.elementChecker.getIdBlacklist());
+      range.startContainer,
+      range.startOffset,
+      range.endContainer,
+      range.endOffset,
+      this.elementChecker.getClassBlacklist(),
+      this.elementChecker.getElementBlacklist(),
+      this.elementChecker.getIdBlacklist(),
+    );
   }
 
   private getOffsetByRectangles(ele: Node): [number, number] | null {
@@ -189,10 +200,13 @@ export class CfiNavigationLogic {
     let $element: any;
     try {
       //noinspection JSUnresolvedVariable
-      $element = EPUBcfi.Interpreter.getTargetElement(wrappedCfi, this.rootDocument,
-                                                      this.elementChecker.getClassBlacklist(),
-                                                      this.elementChecker.getElementBlacklist(),
-                                                      this.elementChecker.getIdBlacklist());
+      $element = EPUBcfi.Interpreter.getTargetElement(
+        wrappedCfi,
+        this.rootDocument,
+        this.elementChecker.getClassBlacklist(),
+        this.elementChecker.getElementBlacklist(),
+        this.elementChecker.getIdBlacklist(),
+      );
     } catch (ex) {
       // EPUBcfi.Interpreter can throw a SyntaxError
     }
@@ -218,7 +232,8 @@ export class CfiNavigationLogic {
       try {
         //noinspection JSUnresolvedVariable
         nodeResult = EPUBcfi.Interpreter.getRangeTargetElements(
-          wrappedCfi, this.rootDocument,
+          wrappedCfi,
+          this.rootDocument,
           this.elementChecker.getClassBlacklist(),
           this.elementChecker.getElementBlacklist(),
           this.elementChecker.getIdBlacklist(),
@@ -233,8 +248,12 @@ export class CfiNavigationLogic {
         return null;
       }
 
-      return this.createRange(nodeResult.startElement, nodeResult.startOffset,
-                              nodeResult.endElement, nodeResult.endOffset);
+      return this.createRange(
+        nodeResult.startElement,
+        nodeResult.startOffset,
+        nodeResult.endElement,
+        nodeResult.endOffset,
+      );
     }
 
     if (EPUBcfi.Interpreter.hasTextTerminus(wrappedCfi)) {
@@ -242,10 +261,12 @@ export class CfiNavigationLogic {
       let textTerminusResult: any;
       try {
         textTerminusResult = EPUBcfi.Interpreter.getTextTerminusInfo(
-          wrappedCfi, this.rootDocument,
+          wrappedCfi,
+          this.rootDocument,
           this.elementChecker.getClassBlacklist(),
           this.elementChecker.getElementBlacklist(),
-          this.elementChecker.getIdBlacklist());
+          this.elementChecker.getIdBlacklist(),
+        );
       } catch (ex) {
         // EPUBcfi.Interpreter can throw a SyntaxError
       }
@@ -264,7 +285,6 @@ export class CfiNavigationLogic {
       const end = textTerminusResult.textOffset + 1;
 
       return this.createRange(container, start, container, end);
-
     }
 
     return null;
@@ -274,8 +294,12 @@ export class CfiNavigationLogic {
     return `epubcfi(/99!${partialCfi})`;
   }
 
-  private createRange(startNode: Node, startOffset: number | undefined,
-                      endNode: Node, endOffset: number | undefined): Range {
+  private createRange(
+    startNode: Node,
+    startOffset: number | undefined,
+    endNode: Node,
+    endOffset: number | undefined,
+  ): Range {
     const range = this.rootDocument.createRange();
     range.setStart(startNode, startOffset ? startOffset : 0);
 
@@ -287,5 +311,4 @@ export class CfiNavigationLogic {
 
     return range;
   }
-
 }

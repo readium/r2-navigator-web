@@ -47,9 +47,12 @@ export class R2ContentView implements IContentView {
     throw new Error('Method not implemented.');
   }
 
-  public loadSpineItem(spineItem: Link, spineItemIndex: number,
-                       viewSettings: ViewSettings,
-                       token?: CancellationToken | undefined): Promise<void> {
+  public loadSpineItem(
+    spineItem: Link,
+    spineItemIndex: number,
+    viewSettings: ViewSettings,
+    token?: CancellationToken | undefined,
+  ): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = spineItemIndex;
     this.vs = viewSettings;
@@ -67,11 +70,13 @@ export class R2ContentView implements IContentView {
       useReadiumCssOverride: this.useReadiumCssOverride,
     };
 
-    this.iframeLoader.loadIframe(this.iframe,
-                                 spineItem.href,
-                                 onIframeContentLoaded,
-                                 loaderConfig,
-                                 spineItem.type);
+    this.iframeLoader.loadIframe(
+      this.iframe,
+      spineItem.href,
+      onIframeContentLoaded,
+      loaderConfig,
+      spineItem.type,
+    );
 
     return this.iframeLoadedPromise();
   }

@@ -1,7 +1,5 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { IFrameLoader, LayoutView, Viewport } from '../../src/navigator';
-// tslint:disable-next-line:max-line-length
 import { R2ContentViewFactory } from '../../src/navigator/views/content-view/r2-content-view-factory';
 import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
@@ -14,8 +12,7 @@ describe('Viewport', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -27,8 +24,9 @@ describe('Viewport', () => {
 
     viewport = new Viewport(viewportDiv);
 
-    // tslint:disable-next-line:max-line-length
-    const publication = await Publication.fromURL(`${window.location.origin}/fixtures/publications/metamorphosis/manifest.json`);
+    const publication = await Publication.fromURL(
+      `${window.location.origin}/fixtures/publications/metamorphosis/manifest.json`,
+    );
 
     const loader = new IFrameLoader(publication.getBaseURI());
     loader.setReadiumCssBasePath('/fixtures/readium-css');

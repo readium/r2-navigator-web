@@ -1,6 +1,3 @@
-// tslint:disable:no-non-null-assertion
-
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { Location, Navigator, ScrollMode, SpreadMode } from '../../src/navigator';
 
@@ -39,8 +36,7 @@ describe('Navigator', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -98,13 +94,12 @@ describe('Navigator', () => {
 
     it('gotoLocation()', async () => {
       // TODO Fragments isn't used in Navigator yet, so it's empty at the moment
-      const newLoc =
-        new Location(
-          '/4/2[copyright-page]/2/2/1:32',
-          'text/html',
-          'OEBPS/copyright.html',
-          [],
-        );
+      const newLoc = new Location(
+        '/4/2[copyright-page]/2/2/1:32',
+        'text/html',
+        'OEBPS/copyright.html',
+        [],
+      );
       await navigator.gotoLocation(newLoc);
 
       const loc = await navigator.getCurrentLocation();
@@ -131,17 +126,15 @@ describe('Navigator', () => {
     });
 
     it('getFragments()', async () => {
-
       const loc = await navigator.getCurrentLocationAsync();
       assert.equal(loc!.getFragments()[0], 'title-page');
 
-      const newLoc =
-        new Location(
-          '/4/2[chapter-i]/4/36/1:664',
-          'application/xhtml+xml',
-          'OEBPS/chapter-001-chapter-i.html',
-          [],
-        );
+      const newLoc = new Location(
+        '/4/2[chapter-i]/4/36/1:664',
+        'application/xhtml+xml',
+        'OEBPS/chapter-001-chapter-i.html',
+        [],
+      );
 
       await navigator.gotoLocation(newLoc);
 

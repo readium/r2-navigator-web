@@ -87,8 +87,12 @@ export class ElementVisibilityChecker {
 
   private columnSize: [number, number] = [0, 0];
 
-  public constructor(doc: Document, columnSize: [number, number],
-                     viewport?: Rect, eleChecker?: ElementBlacklistedChecker) {
+  public constructor(
+    doc: Document,
+    columnSize: [number, number],
+    viewport?: Rect,
+    eleChecker?: ElementBlacklistedChecker,
+  ) {
     this.rootDoc = doc;
     this.columnSize = columnSize;
     this.viewport = viewport;
@@ -117,21 +121,18 @@ export class ElementVisibilityChecker {
         return NodeFilter.FILTER_REJECT;
       }
 
-      const visibilityResult = this.checkVisibility(<HTMLElement>(node), false);
+      const visibilityResult = this.checkVisibility(<HTMLElement>node, false);
 
       return visibilityResult ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
     };
-    const treeWalker = document.createTreeWalker(bodyEle,
-                                                 mask,
-                                                 { acceptNode: filter },
-                                                 false);
+    const treeWalker = document.createTreeWalker(bodyEle, mask, { acceptNode: filter }, false);
 
     const nodeIter = new NodeIterator(treeWalker, !fromEnd);
     if (!fromEnd && nodeIter.next() === null) {
       return { textNode, percentVisible, element: firstVisibleElement };
     }
 
-    do  {
+    do {
       const node = treeWalker.currentNode;
 
       if (node.nodeType === Node.TEXT_NODE) {
@@ -161,7 +162,7 @@ export class ElementVisibilityChecker {
           if (childNode.nodeType === Node.TEXT_NODE && this.isValidTextNode(childNode)) {
             const visibilityResult = this.checkVisibility(childNode, true);
             if (visibilityResult) {
-              firstVisibleElement = <HTMLElement>(node);
+              firstVisibleElement = <HTMLElement>node;
               textNode = childNode;
               percentVisible = visibilityResult;
               break;
@@ -169,7 +170,7 @@ export class ElementVisibilityChecker {
           }
         }
       } else if (!hasChildElements) {
-        firstVisibleElement = <HTMLElement>(node);
+        firstVisibleElement = <HTMLElement>node;
         percentVisible = 100;
         textNode = null;
         break;
@@ -277,19 +278,23 @@ export class ElementVisibilityChecker {
       root,
       // tslint:disable-next-line:no-bitwise
       NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-      { acceptNode: (): number => { return NodeFilter.FILTER_ACCEPT; } },
+      {
+        acceptNode: (): number => {
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      },
     );
 
     let node = nodeIterator.nextNode();
     let prevNode = null;
     while (node) {
-      const isLeafNode = node.nodeType === Node.ELEMENT_NODE &&
-                                           (<Element>(node)).childElementCount === 0 &&
-                                           !this.isValidTextNodeContent(node.textContent);
+      const isLeafNode =
+        node.nodeType === Node.ELEMENT_NODE &&
+        (<Element>node).childElementCount === 0 &&
+        !this.isValidTextNodeContent(node.textContent);
       if (isLeafNode || this.isValidTextNode(node)) {
-        const element = (node.nodeType === Node.TEXT_NODE) ? node.parentNode : node;
-        if (!this.elementChecker ||
-            !this.elementChecker.isElementBlacklisted(element)) {
+        const element = node.nodeType === Node.TEXT_NODE ? node.parentNode : node;
+        if (!this.elementChecker || !this.elementChecker.isElementBlacklisted(element)) {
           leafNodeElements.push(node);
         }
         node = nodeIterator.nextNode();
@@ -320,10 +325,10 @@ export class ElementVisibilityChecker {
     if (node.nodeType === Node.TEXT_NODE) {
       const range = this.createRange();
       range.selectNode(node);
-      clientRects = <DOMRectList>(range.getClientRects());
+      clientRects = <DOMRectList>range.getClientRects();
     } else {
-      const ele = <Element>(node);
-      clientRects = <DOMRectList>(ele.getClientRects());
+      const ele = <Element>node;
+      clientRects = <DOMRectList>ele.getClientRects();
     }
 
     return this.normalizeDomRectangles(clientRects);
@@ -335,12 +340,15 @@ export class ElementVisibilityChecker {
 
   private normalizeDomRectangles(rectList: DOMRectList): Rect[] {
     const rects: Rect[] = [];
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < rectList.length; i += 1) {
-      const r = Rect.fromDOMRect(rectList[i]);
+
+    for (const rectangle of Array.from(rectList)) {
+      const r = Rect.fromDOMRect(rectangle);
       // Handle rects returned by Webkit
-      if (this.viewport && this.columnSize[0] > 0 &&
-          (r.top < this.viewport.top || r.bottom > this.viewport.bottom)) {
+      if (
+        this.viewport &&
+        this.columnSize[0] > 0 &&
+        (r.top < this.viewport.top || r.bottom > this.viewport.bottom)
+      ) {
         const columnWidth = this.columnSize[0];
         const columnHeight = this.columnSize[1];
 
@@ -357,8 +365,8 @@ export class ElementVisibilityChecker {
         while (pageRect.top < r.bottom) {
           if (pageRect.overlapVertical(r)) {
             const newTop = Math.max(r.top, pageRect.top) - pageRect.top + this.viewport.top;
-            // tslint:disable-next-line:max-line-length
-            const newBottom = Math.min(r.bottom, pageRect.bottom) - pageRect.top + this.viewport.top;
+            const newBottom =
+              Math.min(r.bottom, pageRect.bottom) - pageRect.top + this.viewport.top;
             rects.push(new Rect(pageRect.left, newTop, pageRect.right, newBottom));
           }
 

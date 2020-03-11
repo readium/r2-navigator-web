@@ -1,4 +1,3 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { sleep } from '../../src/utils/misc';
@@ -10,8 +9,7 @@ describe('SpineItemView', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -54,7 +52,6 @@ describe('SpineItemView', () => {
 
       const cfi2 = siv4.getCfi(600, 0, false);
       console.log(`R2 ${cfi2}`);
-
     });
   });
 
