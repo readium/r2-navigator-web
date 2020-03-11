@@ -1,7 +1,5 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { LayoutView, SettingName } from '../../src/navigator';
-// tslint:disable-next-line:max-line-length
 import { HostEnv } from '../helpers/host-env';
 import { sleep } from '../../src/utils/misc';
 
@@ -12,8 +10,7 @@ describe('LayoutView', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 

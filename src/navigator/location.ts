@@ -5,11 +5,12 @@ export class Location {
   private fragments: string[];
   private isPrecise: boolean;
 
-  constructor(cfi: string,
-              type: string,
-              href: string,
-              fragments: string[],
-              isPrecise: boolean = true,
+  constructor(
+    cfi: string,
+    type: string,
+    href: string,
+    fragments: string[],
+    isPrecise: boolean = true,
   ) {
     this.cfi = cfi;
     this.type = type;

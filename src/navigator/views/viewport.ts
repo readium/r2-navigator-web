@@ -236,8 +236,11 @@ export class Viewport {
     await this.updatePrefetch(token);
   }
 
-  public async renderAtAnchorLocation(href: string, eleId?: string,
-                                      token?: CancellationToken): Promise<void> {
+  public async renderAtAnchorLocation(
+    href: string,
+    eleId?: string,
+    token?: CancellationToken,
+  ): Promise<void> {
     const spineItemIndex = this.bookView.findSpineItemIndexByHref(href);
     if (spineItemIndex < 0) {
       return;
@@ -279,8 +282,7 @@ export class Viewport {
       return;
     }
 
-    if (newPos !== this.viewOffset &&
-        (newPos <= loadedEndPos || this.bookView.hasMoreAfterEnd())) {
+    if (newPos !== this.viewOffset && (newPos <= loadedEndPos || this.bookView.hasMoreAfterEnd())) {
       await this.renderAtOffset(this.viewOffset + this.visibleViewportSize, token);
     }
   }
@@ -293,8 +295,10 @@ export class Viewport {
       newPos = loadedStartPos;
     }
 
-    if (newPos !== this.viewOffset &&
-        (newPos >= loadedStartPos || this.bookView.hasMoreBeforeStart())) {
+    if (
+      newPos !== this.viewOffset &&
+      (newPos >= loadedStartPos || this.bookView.hasMoreBeforeStart())
+    ) {
       await this.renderAtOffset(newPos, token);
     }
   }
@@ -340,7 +344,7 @@ export class Viewport {
   }
 
   public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
-    return  this.bookView.getSpineItemView(spineItemIndex);
+    return this.bookView.getSpineItemView(spineItemIndex);
   }
 
   public getOffsetInSpineItemView(siIndex: number): number | undefined {
@@ -377,7 +381,7 @@ export class Viewport {
   }
 
   private onLocationChanged(): void {
-    this.locationChangedCallbacks.forEach(eventCb => eventCb());
+    this.locationChangedCallbacks.forEach((eventCb) => eventCb());
   }
 
   private init(): void {
@@ -409,8 +413,10 @@ export class Viewport {
       if (this.scrollMode === ScrollMode.Publication) {
         const start = this.viewOffset - this.prefetchSize;
         const end = this.viewOffset + this.viewportSize + this.prefetchSize;
-        if ((end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) ||
-          (start <= this.bookView.getLoadedStartPostion() && this.bookView.hasMoreBeforeStart())) {
+        if (
+          (end >= this.bookView.getLoadedEndPosition() && this.bookView.hasMoreAfterEnd()) ||
+          (start <= this.bookView.getLoadedStartPostion() && this.bookView.hasMoreBeforeStart())
+        ) {
           await this.ensureConentLoadedAtRange(start, end);
           this.adjustScrollPosition();
           await this.onPagesReady(this.scrollRequestToken);
@@ -516,8 +522,10 @@ export class Viewport {
     }
   }
 
-  private async ensureViewportFilledAtPosition(pos: number,
-                                               token?: CancellationToken): Promise<number> {
+  private async ensureViewportFilledAtPosition(
+    pos: number,
+    token?: CancellationToken,
+  ): Promise<number> {
     const start = pos - this.prefetchSize;
     const end = pos + this.getScaledViewportSize() + this.prefetchSize;
     await this.bookView.ensureConentLoadedAtRange(start, end, token);
@@ -540,8 +548,11 @@ export class Viewport {
     return newPos;
   }
 
-  private async ensureContentLoadedAtSpineItemRange(startIndex: number, endIndex: number,
-                                                    token?: CancellationToken): Promise<void> {
+  private async ensureContentLoadedAtSpineItemRange(
+    startIndex: number,
+    endIndex: number,
+    token?: CancellationToken,
+  ): Promise<void> {
     this.reset();
     await this.bookView.ensureContentLoadedAtSpineItemRange(startIndex, endIndex, token);
     if (token && token.isCancelled) {
@@ -572,7 +583,7 @@ export class Viewport {
       return;
     }
 
-    const pages = pageProps.filter(value => value !== undefined).length;
+    const pages = pageProps.filter((value) => value !== undefined).length;
     if (numOfPagePerSpread === 1 || pageProps[1] === 'center' || pages === 2) {
       // center viewport clipper
       const margin = (this.root.offsetWidth - this.visibleViewportSize) / 2;
@@ -614,10 +625,14 @@ export class Viewport {
 
     const pageRanges = this.bookView.pageSizes(Math.ceil(start), pagesAfter, pagesBefore);
     pageRanges.sort((page1: [number, number, number], page2: [number, number, number]) => {
-      const page1Dist = Math.min(Math.abs(this.viewOffset - page1[0]),
-                                 Math.abs(this.viewOffset - page1[1]));
-      const page2Dist = Math.min(Math.abs(this.viewOffset - page2[0]),
-                                 Math.abs(this.viewOffset - page2[1]));
+      const page1Dist = Math.min(
+        Math.abs(this.viewOffset - page1[0]),
+        Math.abs(this.viewOffset - page1[1]),
+      );
+      const page2Dist = Math.min(
+        Math.abs(this.viewOffset - page2[0]),
+        Math.abs(this.viewOffset - page2[1]),
+      );
 
       return page1Dist - page2Dist;
     });

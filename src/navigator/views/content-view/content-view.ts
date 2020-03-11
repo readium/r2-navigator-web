@@ -7,9 +7,12 @@ export type SelfResizeCallback = (spineItemIndex: number) => void;
 export interface IContentView {
   render(): void;
 
-  loadSpineItem(spineItem: Link, spineItemIndex: number,
-                viewSettings: ViewSettings,
-                token?: CancellationToken): Promise<void>;
+  loadSpineItem(
+    spineItem: Link,
+    spineItemIndex: number,
+    viewSettings: ViewSettings,
+    token?: CancellationToken,
+  ): Promise<void>;
 
   getSpineItem(): Link;
 
@@ -38,7 +41,7 @@ export interface IContentView {
   getPageIndexOffsetFromElementId(elementId: string): number;
   getCfi(offsetMain: number, offset2nd: number, backward: boolean): string;
   getCfiFromElementId(elementId: string): string;
-  getElementById(elementId: string): HTMLElement | null ;
+  getElementById(elementId: string): HTMLElement | null;
   getElementByCfi(cfi: string): HTMLElement | null;
 
   onResize(): void;

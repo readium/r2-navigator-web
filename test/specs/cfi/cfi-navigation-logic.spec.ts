@@ -1,8 +1,5 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import {
-  CfiNavigationLogic,
-} from '../../../src/navigator/views/cfi/cfi-navigation-logic';
+import { CfiNavigationLogic } from '../../../src/navigator/views/cfi/cfi-navigation-logic';
 import { Rect } from '../../../src/navigator/views/cfi/rect';
 
 import { HostEnv } from '../../helpers/host-env';
@@ -14,8 +11,7 @@ describe('CfiNavigationLogic', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -36,7 +32,7 @@ describe('CfiNavigationLogic', () => {
       await sleep(100);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const left = pageWidth;
       const right = left + pageWidth;
@@ -56,7 +52,7 @@ describe('CfiNavigationLogic', () => {
       await sleep(100);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
 
@@ -75,7 +71,7 @@ describe('CfiNavigationLogic', () => {
       await sleep(100);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
 

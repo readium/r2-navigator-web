@@ -19,8 +19,9 @@ export class NavigationRequestManager {
     }
   }
 
-  // tslint:disable-next-line:max-line-length
-  public async executeNavigationAction(navAction: (token: CancellationToken) => Promise<void>): Promise<void> {
+  public async executeNavigationAction(
+    navAction: (token: CancellationToken) => Promise<void>,
+  ): Promise<void> {
     const t = this.startRequest();
     await navAction(t);
     this.endRequest(t);

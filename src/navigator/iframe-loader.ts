@@ -1,7 +1,5 @@
 import { URL } from 'isomorphic-url-shim';
 import { Resource, applyResourcesToDocument } from '../utils/injection-resolver';
-// @ts-ignore
-// tslint:disable-next-line:no-submodule-imports
 
 interface IR1AttachedDataType {
   // tslint:disable-next-line:no-any
@@ -49,7 +47,6 @@ export class IFrameLoader {
     // tslint:disable-next-line:no-any
     callback: any,
     config: ILoaderConfig,
-    // tslint:disable-next-line:no-any
     attachedData: string | IR1AttachedDataType,
   ): void {
     const baseURI = this.publicationURI || iframe.baseURI || document.baseURI || location.href;
@@ -60,13 +57,13 @@ export class IFrameLoader {
 
     let contentType = 'text/html';
     // tslint:disable-next-line:no-any
-    if ((<any>(attachedData)).spineItem !== undefined) {
-      const data = <IR1AttachedDataType>(attachedData);
+    if ((<any>attachedData).spineItem !== undefined) {
+      const data = <IR1AttachedDataType>attachedData;
       if (data.spineItem.media_type && data.spineItem.media_type.length) {
         contentType = data.spineItem.media_type;
       }
     } else {
-      contentType = <string>(attachedData);
+      contentType = <string>attachedData;
     }
 
     this.fetchContentDocument(contentUri).then((contentData: string) => {
@@ -91,13 +88,14 @@ export class IFrameLoader {
     this.injectableResources = resources;
   }
 
-  private inject(sourceText: string,
-                 contentType: string,
-                 href: string,
-                 config: ILoaderConfig): string {
+  private inject(
+    sourceText: string,
+    contentType: string,
+    href: string,
+    config: ILoaderConfig,
+  ): string {
     const parser = new DOMParser();
-    // @ts-ignore
-    const doc = parser.parseFromString(sourceText, <SupportedType>(contentType));
+    const doc = parser.parseFromString(sourceText, <SupportedType>contentType);
 
     const headElement = doc.querySelector('head');
     if (!doc.documentElement || !headElement) {
@@ -170,7 +168,7 @@ export class IFrameLoader {
     const el = document.createElement('script');
     el.setAttribute('type', 'text/javascript');
 
-    const blob = new Blob([href], { type : 'application/javascript' });
+    const blob = new Blob([href], { type: 'application/javascript' });
     const url = window.URL.createObjectURL(blob);
     el.setAttribute('src', url);
 
@@ -204,10 +202,7 @@ export class IFrameLoader {
     const basedContentData = this.inject(
       contentDocumentData,
       contentType,
-      new URL(
-        contentDocumentURI,
-        iframe.baseURI || document.baseURI || location.href,
-      ).href,
+      new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
       config,
     );
 

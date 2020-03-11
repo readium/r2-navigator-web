@@ -1,8 +1,5 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import {
-  ElementVisibilityChecker,
-} from '../../../src/navigator/views/cfi/element-checker';
+import { ElementVisibilityChecker } from '../../../src/navigator/views/cfi/element-checker';
 import { Rect } from '../../../src/navigator/views/cfi/rect';
 
 import { HostEnv } from '../../helpers/host-env';
@@ -13,8 +10,7 @@ describe('ElementChecker', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -34,15 +30,17 @@ describe('ElementChecker', () => {
       await hostEnv.loadSpineItem(siv4, 4);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const left = pageWidth;
       const right = left + pageWidth;
       const viewportRect = new Rect(left, 0, right, 800);
-      const visChecker = new ElementVisibilityChecker(doc,
-                                                      [400, 800],
-                                                      viewportRect,
-                                                      hostEnv.getElementChecker());
+      const visChecker = new ElementVisibilityChecker(
+        doc,
+        [400, 800],
+        viewportRect,
+        hostEnv.getElementChecker(),
+      );
       const visEle = visChecker.findFirstVisibleElement(false);
       // console.log(visEle.textNode);
       assert.isNotNull(visEle.textNode);

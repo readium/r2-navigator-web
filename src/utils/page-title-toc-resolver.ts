@@ -52,7 +52,6 @@ export class PageTitleTocResolver {
     this.rendition = rendCtx.rendition;
     this.navigator = rendCtx.navigator;
     this.pub = this.rendition.getPublication();
-
   }
 
   public getPageTitleFromLocation(loc: Location): string {
@@ -104,7 +103,7 @@ export class PageTitleTocResolver {
       return [];
     }
 
-    const hasMultipleIFrames = (screenBegin.getHref() !== screenEnd.getHref());
+    const hasMultipleIFrames = screenBegin.getHref() !== screenEnd.getHref();
     const locations: LocationRange[] = [];
 
     if (hasMultipleIFrames) {
@@ -124,9 +123,7 @@ export class PageTitleTocResolver {
     return locations;
   }
 
-  private findVisiblePageBreaksForLocations(
-    locations: LocationRange[],
-  ): PageBreakData[] {
+  private findVisiblePageBreaksForLocations(locations: LocationRange[]): PageBreakData[] {
     let pageBreaks: PageBreakData[] = [];
     locations.forEach((locationRange) => {
       const pb = this.findVisiblePageBreaks(locationRange);
@@ -137,9 +134,7 @@ export class PageTitleTocResolver {
     return pageBreaks;
   }
 
-  private findVisiblePageBreaks(
-    locationRange: LocationRange,
-  ): PageBreakData[] {
+  private findVisiblePageBreaks(locationRange: LocationRange): PageBreakData[] {
     if (!locationRange.start && !locationRange.end) {
       console.log('invalid locationRange given');
       return [];
@@ -180,7 +175,7 @@ export class PageTitleTocResolver {
     locationRange: LocationRange,
     spineItemView: SpineItemView,
   ): boolean {
-    if ((!linkInfo.pageIndex && linkInfo.pageIndex !== 0)) {
+    if (!linkInfo.pageIndex && linkInfo.pageIndex !== 0) {
       return false;
     }
 
@@ -271,9 +266,7 @@ export class PageTitleTocResolver {
     };
   }
 
-  private getElementRect(
-    element: HTMLElement,
-  ): ClientRect | DOMRect {
+  private getElementRect(element: HTMLElement): ClientRect | DOMRect {
     const elStyle = window.getComputedStyle(element);
     // Ensure the element is visible before calculations are made
     element.style.setProperty('visibility', 'visible');
@@ -357,8 +350,10 @@ export class PageTitleTocResolver {
       if (!info.cfi || info.cfi === '') {
         continue;
       }
-      const ret = EPUBcfi.Interpreter.compareCFIs(`epubcfi(/99!${info.cfi})`,
-                                                  `epubcfi(/99!${locationCfi})`);
+      const ret = EPUBcfi.Interpreter.compareCFIs(
+        `epubcfi(/99!${info.cfi})`,
+        `epubcfi(/99!${locationCfi})`,
+      );
       if (ret[0] <= 0) {
         matchedLink = info.link;
       }

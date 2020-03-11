@@ -1,15 +1,16 @@
 import { LayoutView, Rendition, RenditionContext, SettingName } from '../../src/navigator';
 import { IFrameLoader } from '../../src/navigator/iframe-loader';
-import {
-  ElementBlacklistedChecker,
-} from '../../src/navigator/views/cfi/element-checker';
+import { ElementBlacklistedChecker } from '../../src/navigator/views/cfi/element-checker';
 import { IContentViewFactory } from '../../src/navigator/views/content-view/content-view-factory';
-// tslint:disable-next-line:max-line-length
 import { R2ContentViewFactory } from '../../src/navigator/views/content-view/r2-content-view-factory';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
 import { ViewSettings } from '../../src/navigator/views/view-settings';
 import { Publication } from '../../src/streamer';
-import { classBlacklist, idBlacklist, elementBlacklist } from '../../src/navigator/views/cfi/default-blacklist';
+import {
+  classBlacklist,
+  idBlacklist,
+  elementBlacklist,
+} from '../../src/navigator/views/cfi/default-blacklist';
 
 export class HostEnv {
   private pubUrl: string;
@@ -56,12 +57,18 @@ export class HostEnv {
     this.renditionCtx = new RenditionContext(this.rendition, loader);
   }
 
-  public createSpineItemView(pageWidth: number, pageHeight: number,
-                             isVertical: boolean, isFixedLayout: boolean): SpineItemView {
-    const spineItemView = new SpineItemView(this.publication.spine,
-                                            isVertical,
-                                            isFixedLayout,
-                                            this.cvFactory);
+  public createSpineItemView(
+    pageWidth: number,
+    pageHeight: number,
+    isVertical: boolean,
+    isFixedLayout: boolean,
+  ): SpineItemView {
+    const spineItemView = new SpineItemView(
+      this.publication.spine,
+      isVertical,
+      isFixedLayout,
+      this.cvFactory,
+    );
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.setAttribute('id', 'spine-item-view');
     spineItemViewContainer.style.position = 'absolute';
@@ -104,7 +111,7 @@ export class HostEnv {
   }
 
   public getIframe(): HTMLIFrameElement {
-    return <HTMLIFrameElement>(this.viewportDiv.querySelector('iframe'));
+    return <HTMLIFrameElement>this.viewportDiv.querySelector('iframe');
   }
 
   public clear(): void {

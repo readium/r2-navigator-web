@@ -27,7 +27,10 @@ export class ViewportResizer {
       this.handleViewportResizeStart.bind(this),
       this.handleViewportResizeTick.bind(this),
       this.handleViewportResizeEnd.bind(this),
-      250, 1000, this);
+      250,
+      1000,
+      this,
+    );
 
     window.addEventListener('resize', this.resizeListener);
   }
@@ -51,9 +54,14 @@ export class ViewportResizer {
 
 type EventCallback = (evt: UIEvent) => void;
 
-function extendedThrottle(startCb: EventCallback, tickCb: EventCallback, endCb: EventCallback,
-                          delay?: number, waitThreshold?: number,
-                          context?: any): EventCallback {
+function extendedThrottle(
+  startCb: EventCallback,
+  tickCb: EventCallback,
+  endCb: EventCallback,
+  delay?: number,
+  waitThreshold?: number,
+  context?: any,
+): EventCallback {
   const aDelay = delay === undefined ? 250 : delay;
   const aWaitThreshold = waitThreshold === undefined ? aDelay : waitThreshold;
 
@@ -61,7 +69,7 @@ function extendedThrottle(startCb: EventCallback, tickCb: EventCallback, endCb: 
   let last: number | undefined;
   let deferTimer: number | undefined;
 
-  return function (event: UIEvent): void {
+  return function(event: UIEvent): void {
     const ctx = context;
     const now = (Date.now && Date.now()) || new Date().getTime();
 
@@ -76,12 +84,10 @@ function extendedThrottle(startCb: EventCallback, tickCb: EventCallback, endCb: 
     }
 
     clearTimeout(deferTimer);
-    deferTimer = window.setTimeout(
-      () => {
-        last = now;
-        first = true;
-        endCb(event);
-      },
-      aWaitThreshold);
+    deferTimer = window.setTimeout(() => {
+      last = now;
+      first = true;
+      endCb(event);
+    }, aWaitThreshold);
   };
 }
