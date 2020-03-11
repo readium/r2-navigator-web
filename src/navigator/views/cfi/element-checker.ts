@@ -38,11 +38,11 @@ export class ElementBlacklistedChecker {
     const clsAttr = element.getAttribute('class');
     const classList = clsAttr ? clsAttr.split(' ') : [];
 
-    classList.forEach((cls) => {
-      if (this.classBlacklist.indexOf(cls) >= 0) {
+    for (const className of classList) {
+      if (this.classBlacklist.indexOf(className) >= 0) {
         return true;
       }
-    });
+    }
 
     const id = element.id;
     if (id && id.length > 0 && this.idBlacklist.indexOf(id) >= 0) {
@@ -105,10 +105,12 @@ export class ElementVisibilityChecker {
     // tslint:disable-next-line:no-bitwise
     const mask = NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT;
     const filter = (node: Node): number => {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        if (this.elementChecker && this.elementChecker.isElementBlacklisted(<Element>(node))) {
-          return NodeFilter.FILTER_REJECT;
-        }
+      if (this.elementChecker?.isElementBlacklisted(node)) {
+        return NodeFilter.FILTER_REJECT;
+      }
+
+      if (this.elementChecker?.isElementBlacklisted(node.parentElement)) {
+        return NodeFilter.FILTER_REJECT;
       }
 
       if (node.nodeType === Node.TEXT_NODE && !this.isValidTextNode(node)) {
