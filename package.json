@@ -17,7 +17,8 @@
     "test:debug": "npm run test:start -- --singleRun=false",
     "test:watch": "echo \"not implemented\"",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
-    "watch": "npm run build:src -- -w"
+    "watch": "npm run build:src -- -w",
+    "format": "prettier --config .prettierrc --ignore-path .gitignore --write 'src/**/*.ts' 'test/**/*.ts'"
   },
   "keywords": [
     "Readium"
