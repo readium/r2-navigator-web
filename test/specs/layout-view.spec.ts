@@ -54,7 +54,7 @@ describe('LayoutView', () => {
 
     it('resize()', async () => {
       await layoutView.ensureContentLoadedAtSpineItemRange(0, 1);
-      await sleep(1000);
+      await sleep(100);
 
       layoutView.setPageSize(400, 400);
 
@@ -64,7 +64,7 @@ describe('LayoutView', () => {
 
     it('changeFontSize()', async () => {
       await layoutView.ensureContentLoadedAtSpineItemRange(3, 4);
-      await sleep(1000);
+      await sleep(100);
 
       assert.equal(layoutView.getLoadedStartPostion(), 0);
       assert.equal(layoutView.getLoadedEndPosition(), 15200);

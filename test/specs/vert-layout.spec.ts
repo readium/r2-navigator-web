@@ -66,7 +66,7 @@ describe('Vertical Layout', () => {
         [],
       );
       await navigator.gotoLocation(newLoc);
-      await sleep(1000);
+      await sleep(100);
 
       const loc = await navigator.getCurrentLocation();
 
