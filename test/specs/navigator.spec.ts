@@ -130,7 +130,7 @@ describe('Navigator', () => {
       assert.equal(loc!.getLocation(), '/4/2[chapter-ii]/2/4/1:0');
     });
 
-    it('getPrecedingElements()', async () => {
+    it('getFragments()', async () => {
 
       const loc = await navigator.getCurrentLocationAsync();
       assert.equal(loc!.getFragments()[0], 'title-page');
