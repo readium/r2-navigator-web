@@ -1,6 +1,0 @@
-{
-    "[typescript]": {
-      "editor.tabSize": 2
-    },
-    "eslint.enable": false
-}
