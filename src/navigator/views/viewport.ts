@@ -343,6 +343,10 @@ export class Viewport {
     return indices;
   }
 
+  public getContainerElement(): HTMLElement {
+    return this.bookView.containerElement();
+  }
+
   public getSpineItemView(spineItemIndex: number): SpineItemView | undefined {
     return this.bookView.getSpineItemView(spineItemIndex);
   }
