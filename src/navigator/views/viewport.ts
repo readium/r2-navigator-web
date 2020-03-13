@@ -343,7 +343,7 @@ export class Viewport {
     return indices;
   }
 
-  public getContainerElement(): HTMLElement {
+  public getBookViewElement(): HTMLElement {
     return this.bookView.containerElement();
   }
 
