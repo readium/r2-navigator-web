@@ -1,22 +1,16 @@
 import { Link } from '@readium/shared-models/lib/models/publication/link';
-import { IContentView, SelfResizeCallbackType } from './content-view/content-view';
+import { IContentView, SelfResizeCallback } from './content-view/content-view';
 import { IContentViewFactory } from './content-view/content-view-factory';
 import { ViewSettings } from './view-settings';
 
 import { CancellationToken, ZoomOptions } from './types';
 import { View } from './view';
-import {
-  getIdsFromElements,
-  getAllPrecedingElements,
-} from './content-view/dom-utils';
 
 export enum ContentLoadingStatus {
   NotLoaded,
   Loading,
   Loaded,
 }
-
-/* tslint:disable:no-any */
 
 export class SpineItemView extends View {
   protected host: HTMLElement;
@@ -95,19 +89,23 @@ export class SpineItemView extends View {
     return this.contentView.getPageIndexOffsetFromElementId(elementId);
   }
 
-  public async loadSpineItem(spineItem: Link,
-                             viewSettings: ViewSettings,
-                             token?: CancellationToken): Promise<void> {
+  public async loadSpineItem(
+    spineItem: Link,
+    viewSettings: ViewSettings,
+    token?: CancellationToken,
+  ): Promise<void> {
     this.contentView = this.cvFactory.createContentView(this.isFixedLayout, this.isVertical);
     this.contentView.attachToHost(this.host);
     this.contentView.onSelfResize((spIndex: number) => {
       this.onViewChanged();
     });
     this.contentStatus = ContentLoadingStatus.Loading;
-    await this.contentView.loadSpineItem(spineItem,
-                                         this.spine.indexOf(spineItem),
-                                         viewSettings,
-                                         token);
+    await this.contentView.loadSpineItem(
+      spineItem,
+      this.spine.indexOf(spineItem),
+      viewSettings,
+      token,
+    );
 
     this.contentStatus = ContentLoadingStatus.Loaded;
     this.onViewChanged();
@@ -252,20 +250,8 @@ export class SpineItemView extends View {
     return cfi ? cfi : '';
   }
 
-  public getFragments(cfi: string) : string[] {
-    const element = this.contentView.getElementByCfi(cfi);
-    const contextDocument = element?.ownerDocument;
-
-    if (!element || !contextDocument) {
-      return [];
-    }
-
-    let root = contextDocument.body;
-    if (!root) {
-      root = contextDocument.documentElement;
-    }
-
-    return getIdsFromElements(getAllPrecedingElements(root, element));
+  public getFragments(cfi: string): string[] {
+    return this.contentView.getFragments(cfi);
   }
 
   // public getVisibleElements(selector: string, includeSpineItems: boolean): any {
@@ -293,7 +279,7 @@ export class SpineItemView extends View {
     return this.contentView.getCfiFromElementId(elementId);
   }
 
-  public onSelfResize(callback: SelfResizeCallbackType): void {
+  public onSelfResize(callback: SelfResizeCallback): void {
     this.contentView.onSelfResize(callback);
   }
 

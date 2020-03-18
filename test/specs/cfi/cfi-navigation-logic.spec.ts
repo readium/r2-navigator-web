@@ -1,11 +1,9 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
-import {
-  CfiNavigationLogic,
-} from '../../../src/navigator/views/cfi/cfi-navigation-logic';
+import { CfiNavigationLogic } from '../../../src/navigator/views/cfi/cfi-navigation-logic';
 import { Rect } from '../../../src/navigator/views/cfi/rect';
 
 import { HostEnv } from '../../helpers/host-env';
+import { sleep } from '../../../src/utils/misc';
 
 describe('CfiNavigationLogic', () => {
   let hostEnv: HostEnv;
@@ -13,8 +11,7 @@ describe('CfiNavigationLogic', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -32,26 +29,30 @@ describe('CfiNavigationLogic', () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
+      await sleep(100);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const left = pageWidth;
       const right = left + pageWidth;
       const viewportRect = new Rect(left, 0, right, 800);
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
       const firstVisCfi = navLogic.getFirstVisibleCfi(viewportRect, false);
+      const lastVisCfi = navLogic.getFirstVisibleCfi(viewportRect, true);
 
       assert.equal(firstVisCfi, '/4/2[chapter-i]/4/8/1:118');
+      assert.equal(lastVisCfi, '/4/2[chapter-i]/4/12/1:172');
     });
 
     it('getElementByCfi()', async () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
+      await sleep(100);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
 
@@ -67,9 +68,10 @@ describe('CfiNavigationLogic', () => {
       const pageWidth = 400;
       const siv4 = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv4, 4);
+      await sleep(100);
 
       const iframe = hostEnv.getIframe();
-      const doc = <Document>(iframe.contentDocument);
+      const doc = <Document>iframe.contentDocument;
 
       const navLogic = new CfiNavigationLogic(doc, hostEnv.getElementChecker());
 

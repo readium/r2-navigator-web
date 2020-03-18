@@ -1,19 +1,16 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { LayoutView, SettingName } from '../../src/navigator';
-// tslint:disable-next-line:max-line-length
 import { HostEnv } from '../helpers/host-env';
+import { sleep } from '../../src/utils/misc';
 
-//TODO: Fix expected values before re-enabling. It used to use R1 instead of R2
-xdescribe('LayoutView', () => {
+describe('LayoutView', () => {
   let layoutView: LayoutView;
   let hostEnv: HostEnv;
 
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -36,7 +33,7 @@ xdescribe('LayoutView', () => {
       await layoutView.ensureConentLoadedAtRange(0, 250);
 
       assert.equal(layoutView.getLoadedStartPostion(), 0);
-      assert.equal(layoutView.getLoadedEndPosition(), 600);
+      assert.equal(layoutView.getLoadedEndPosition(), 400);
     });
 
     it('ensureContentLoadedAtSpineItemRange()', async () => {
@@ -48,12 +45,13 @@ xdescribe('LayoutView', () => {
       await layoutView.ensureConentLoadedAtRange(-100, 100);
       layoutView.removeOutOfRangeSpineItems(-100, 100);
 
-      assert.equal(layoutView.getLoadedStartPostion(), -400);
+      assert.equal(layoutView.getLoadedStartPostion(), -200);
       assert.equal(layoutView.getLoadedEndPosition(), 200);
     });
 
     it('resize()', async () => {
-      await layoutView.ensureConentLoadedAtRange(0, 400);
+      await layoutView.ensureContentLoadedAtSpineItemRange(0, 1);
+      await sleep(100);
 
       layoutView.setPageSize(400, 400);
 
@@ -63,15 +61,16 @@ xdescribe('LayoutView', () => {
 
     it('changeFontSize()', async () => {
       await layoutView.ensureContentLoadedAtSpineItemRange(3, 4);
+      await sleep(100);
 
       assert.equal(layoutView.getLoadedStartPostion(), 0);
-      assert.equal(layoutView.getLoadedEndPosition(), 17000);
+      assert.equal(layoutView.getLoadedEndPosition(), 15200);
 
       hostEnv.getViewSettings().updateSetting([{ name: SettingName.FontSize, value: 60 }]);
       layoutView.updateViewSettings();
 
       assert.equal(layoutView.getLoadedStartPostion(), 0);
-      assert.equal(layoutView.getLoadedEndPosition(), 6200);
+      assert.equal(layoutView.getLoadedEndPosition(), 5600);
     });
   });
 });

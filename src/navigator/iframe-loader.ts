@@ -1,8 +1,6 @@
 import { URL } from 'isomorphic-url-shim';
-import { applyResourcesToDocument, Resource } from '../utils/injection-resolver';
+import { Resource, applyResourcesToDocument } from '../utils/injection-resolver';
 import { IContentLoader, ILoaderConfig, ContentType } from './content-loader';
-// @ts-ignore
-// tslint:disable-next-line:no-submodule-imports
 
 interface IR1AttachedDataType {
   // tslint:disable-next-line:no-any
@@ -59,7 +57,6 @@ export class IFrameLoader implements IContentLoader {
     src: string,
     // tslint:disable-next-line:no-any
     callback: any,
-    // tslint:disable-next-line:no-any
     attachedData: string | IR1AttachedDataType,
   ): void {
     const baseURI = this.publicationURI || iframe.baseURI || document.baseURI || location.href;
@@ -70,13 +67,13 @@ export class IFrameLoader implements IContentLoader {
 
     let contentType = 'text/html';
     // tslint:disable-next-line:no-any
-    if ((<any>(attachedData)).spineItem !== undefined) {
-      const data = <IR1AttachedDataType>(attachedData);
+    if ((<any>attachedData).spineItem !== undefined) {
+      const data = <IR1AttachedDataType>attachedData;
       if (data.spineItem.media_type && data.spineItem.media_type.length) {
         contentType = data.spineItem.media_type;
       }
     } else {
-      contentType = <string>(attachedData);
+      contentType = <string>attachedData;
     }
 
     this.fetchContentDocument(contentUri).then((contentData: string) => {
@@ -101,13 +98,14 @@ export class IFrameLoader implements IContentLoader {
     this.injectableResources = resources;
   }
 
-  private inject(sourceText: string,
-                 contentType: string,
-                 href: string,
-                 config: IIframeLoaderConfig): string {
+  private inject(
+    sourceText: string,
+    contentType: string,
+    href: string,
+    config: IIframeLoaderConfig,
+  ): string {
     const parser = new DOMParser();
-    // @ts-ignore
-    const doc = parser.parseFromString(sourceText, <SupportedType>(contentType));
+    const doc = parser.parseFromString(sourceText, <SupportedType>contentType);
 
     const headElement = doc.querySelector('head');
     if (!doc.documentElement || !headElement) {
@@ -180,7 +178,7 @@ export class IFrameLoader implements IContentLoader {
     const el = document.createElement('script');
     el.setAttribute('type', 'text/javascript');
 
-    const blob = new Blob([href], { type : 'application/javascript' });
+    const blob = new Blob([href], { type: 'application/javascript' });
     const url = window.URL.createObjectURL(blob);
     el.setAttribute('src', url);
 
@@ -213,11 +211,8 @@ export class IFrameLoader implements IContentLoader {
     const basedContentData = this.inject(
       contentDocumentData,
       contentType,
-      new URL(
-        contentDocumentURI,
-        iframe.baseURI || document.baseURI || location.href,
-      ).href,
-      this.loaderConfig,
+      new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
+      this.loaderConfig
     );
 
     if (!this.isIE) {

@@ -6,7 +6,7 @@ import * as DomUtils from './dom-utils';
 
 type Size = [number, number];
 
-export class R2SinglePageContentView extends R2ContentView  {
+export class R2SinglePageContentView extends R2ContentView {
   private iframeScaler: HTMLElement;
 
   private ePubSvg: SVGElement | null = null;
@@ -244,7 +244,7 @@ export class R2SinglePageContentView extends R2ContentView  {
       return undefined;
     }
 
-    let width: number|undefined;
+    let width: number | undefined;
     const wAttr = docElement.getAttribute('width');
     const isWidthPercent = wAttr && wAttr.length >= 1 && wAttr[wAttr.length - 1] === '%';
     if (wAttr) {
@@ -261,7 +261,7 @@ export class R2SinglePageContentView extends R2ContentView  {
       width = undefined;
     }
 
-    let height: number|undefined;
+    let height: number | undefined;
     const hAttr = docElement.getAttribute('height');
     const isHeightPercent = hAttr && hAttr.length >= 1 && hAttr[hAttr.length - 1] === '%';
     if (hAttr) {
@@ -300,13 +300,15 @@ export class R2SinglePageContentView extends R2ContentView  {
     let scalerWidth = this.metaWidth();
     let scalerHeight = this.metaHeight();
     let scalerScale = scale;
-    if (this.ePubBody // not SVG spine item (otherwise fails in Safari OSX)
-        && needsFixedLayoutScalerWorkAround) {
-
-        // See https://github.com/readium/readium-shared-js/issues/285
+    if (
+      this.ePubBody && // not SVG spine item (otherwise fails in Safari OSX)
+      needsFixedLayoutScalerWorkAround
+    ) {
+      // See https://github.com/readium/readium-shared-js/issues/285
       if (this.ePubRoot) {
-        this.ePubRoot.style.transform = enable3D ? `scale3D(${scale}, ${scale}, 0)` :
-                                                   `scale(${scale})`;
+        this.ePubRoot.style.transform = enable3D
+          ? `scale3D(${scale}, ${scale}, 0)`
+          : `scale(${scale})`;
         this.ePubRoot.style.minWidth = `${this.metaWidth()}px`;
         this.ePubRoot.style.minHeight = `${this.metaHeight()}px`;
       }
@@ -321,8 +323,9 @@ export class R2SinglePageContentView extends R2ContentView  {
       scalerScale = 1;
     }
 
-    const transString = enable3D ? `scale3D(${scalerScale}, ${scalerScale}, 0)` :
-                                   `scale(${scalerScale})`;
+    const transString = enable3D
+      ? `scale3D(${scalerScale}, ${scalerScale}, 0)`
+      : `scale(${scalerScale})`;
     this.iframeScaler.style.transform = transString;
     this.iframeScaler.style.width = `${scalerWidth}px`;
     this.iframeScaler.style.height = `${scalerHeight}px`;
@@ -337,13 +340,10 @@ export class R2SinglePageContentView extends R2ContentView  {
 
     this.showIFrame();
 
-    setTimeout(
-      () => {
-        if (this.ePubRoot) {
-          this.ePubRoot.style.opacity = '1';
-        }
-      },
-      0);
+    setTimeout(() => {
+      if (this.ePubRoot) {
+        this.ePubRoot.style.opacity = '1';
+      }
+    }, 0);
   }
-
 }

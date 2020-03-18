@@ -1,6 +1,6 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { SpineItemView } from '../../src/navigator/views/spine-item-view';
+import { sleep } from '../../src/utils/misc';
 import { HostEnv } from '../helpers/host-env';
 
 describe('SpineItemView', () => {
@@ -9,8 +9,7 @@ describe('SpineItemView', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -33,6 +32,10 @@ describe('SpineItemView', () => {
       await hostEnv.loadSpineItem(siv4, 4);
     });
 
+    afterEach(() => {
+      siv4.unloadSpineItem();
+    });
+
     it('loadSpineItem()', async () => {
       const siv = hostEnv.createSpineItemView(pageWidth, 800, false, false);
       await hostEnv.loadSpineItem(siv, 0);
@@ -49,7 +52,6 @@ describe('SpineItemView', () => {
 
       const cfi2 = siv4.getCfi(600, 0, false);
       console.log(`R2 ${cfi2}`);
-
     });
   });
 
@@ -64,16 +66,20 @@ describe('SpineItemView', () => {
       await hostEnv.loadSpineItem(siv4, 4);
     });
 
+    afterEach(() => {
+      siv4.unloadSpineItem();
+    });
+
     it('loadSpineItem()', async () => {
       const siv = hostEnv.createSpineItemView(pageWidth, 800, true, false);
       await hostEnv.loadSpineItem(siv, 0);
+      // wait for auto-resize
+      await sleep(100);
       const pageSize = siv.getTotalSize(pageWidth);
-      //TODO: Fails sporadically with `AssertionError: expected 285 to equal 347`
-      // Suspected timing issue due to an image asset loading
-      assert.equal(pageSize, 347);
+      assert.equal(pageSize, 285);
 
       const page4Size = siv4.getTotalSize(pageWidth);
-      assert.approximately(page4Size, 15504, 1);
+      assert.approximately(page4Size, 14844, 1);
     });
 
     it('getCfi()', async () => {

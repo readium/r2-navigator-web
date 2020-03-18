@@ -32,17 +32,16 @@ export function triggerLayout(iframe: HTMLIFrameElement): void {
 
   let ss: CSSStyleSheet | null = null;
   try {
-    ss = doc.styleSheets && doc.styleSheets.length ? <CSSStyleSheet>(doc.styleSheets[0]) : null;
+    ss = doc.styleSheets && doc.styleSheets.length ? <CSSStyleSheet>doc.styleSheets[0] : null;
     if (!ss && doc.head) {
       const style = doc.createElement('style');
       doc.head.appendChild(style);
       style.appendChild(doc.createTextNode(''));
-      ss = <CSSStyleSheet>(style.sheet);
+      ss = <CSSStyleSheet>style.sheet;
     }
 
     if (ss) {
-      // tslint:disable-next-line:max-line-length
-      const cssRule = 'body:first-child::before {content:\'READIUM\';color: red;font-weight: bold;}';
+      const cssRule = "body:first-child::before {content:'READIUM';color: red;font-weight: bold;}";
       if (ss && ss.cssRules) {
         ss.insertRule(cssRule, ss.cssRules.length);
       } else {
@@ -76,16 +75,12 @@ export function triggerLayout(iframe: HTMLIFrameElement): void {
   }
 }
 
-export function getAllPrecedingElements(root: Element, element: Element | null) : Element[] {
-  const iterator = document.createNodeIterator(
-    root,
-    NodeFilter.SHOW_ELEMENT,
-    {
-      acceptNode(node: Node): number {
-        return NodeFilter.FILTER_ACCEPT;
-      },
+export function getAllPrecedingElements(root: Element, element: Element | null): Element[] {
+  const iterator = document.createNodeIterator(root, NodeFilter.SHOW_ELEMENT, {
+    acceptNode(node: Node): number {
+      return NodeFilter.FILTER_ACCEPT;
     },
-  );
+  });
 
   const elements = [];
   let next: Element | null = iterator.nextNode() as Element;
@@ -103,7 +98,7 @@ export function getAllPrecedingElements(root: Element, element: Element | null) 
   return elements;
 }
 
-export function getAllAncestors(element: Element | null) : Element[] {
+export function getAllAncestors(element: Element | null): Element[] {
   if (!element) {
     return [];
   }
@@ -111,8 +106,8 @@ export function getAllAncestors(element: Element | null) : Element[] {
   return [...getAllAncestors(element.parentElement), element];
 }
 
-export function getIdsFromElements(elements: Element[]) : string[] {
+export function getIdsFromElements(elements: Element[]): string[] {
   return elements
-    .filter(element => element.hasAttribute('id'))
-    .map(element => element.getAttribute('id')!);
+    .filter((element) => element.hasAttribute('id'))
+    .map((element) => element.getAttribute('id')!);
 }

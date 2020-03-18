@@ -1,6 +1,3 @@
-// tslint:disable:no-non-null-assertion
-
-// tslint:disable-next-line:no-implicit-dependencies
 import { assert } from 'chai';
 import { Location, Navigator, ScrollMode, SpreadMode } from '../../src/navigator';
 
@@ -39,8 +36,7 @@ describe('Navigator', () => {
   before(() => {
     const head = document.querySelector('head');
     if (head) {
-      head.innerHTML +=
-        '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
+      head.innerHTML += '<link rel="stylesheet" type="text/css" href="fixtures/window.css">';
     }
   });
 
@@ -98,13 +94,12 @@ describe('Navigator', () => {
 
     it('gotoLocation()', async () => {
       // TODO Fragments isn't used in Navigator yet, so it's empty at the moment
-      const newLoc =
-        new Location(
-          '/4/2[copyright-page]/2/2/1:32',
-          'text/html',
-          'OEBPS/copyright.html',
-          [],
-        );
+      const newLoc = new Location(
+        '/4/2[copyright-page]/2/2/1:32',
+        'text/html',
+        'OEBPS/copyright.html',
+        [],
+      );
       await navigator.gotoLocation(newLoc);
 
       const loc = await navigator.getCurrentLocation();
@@ -112,6 +107,39 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2[copyright-page]/2/2/1:0');
       assert.equal(loc!.getHref(), 'OEBPS/copyright.html');
+    });
+
+    it('gotoAnchorLocation()', async () => {
+      await navigator.gotoAnchorLocation('OEBPS/chapter-001-chapter-i.html');
+
+      let loc = await navigator.getCurrentLocation();
+
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2[chapter-i]/2/4/1:0');
+
+      await navigator.gotoAnchorLocation('OEBPS/chapter-002-chapter-ii.html', 'chapter-ii');
+
+      loc = await navigator.getCurrentLocation();
+
+      assert(loc);
+      assert.equal(loc!.getLocation(), '/4/2[chapter-ii]/2/4/1:0');
+    });
+
+    it('getFragments()', async () => {
+      const loc = await navigator.getCurrentLocationAsync();
+      assert.equal(loc!.getFragments()[0], 'title-page');
+
+      const newLoc = new Location(
+        '/4/2[chapter-i]/4/36/1:664',
+        'application/xhtml+xml',
+        'OEBPS/chapter-001-chapter-i.html',
+        [],
+      );
+
+      await navigator.gotoLocation(newLoc);
+
+      const loc2 = await navigator.getCurrentLocationAsync();
+      assert.equal(loc2!.getFragments()[0], 'chapter-i');
     });
 
     // it('gotoScreen()', async () => {
@@ -203,6 +231,21 @@ describe('Navigator', () => {
       assert(loc);
       assert.equal(loc!.getLocation(), '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0');
       assert.equal(loc!.getHref(), 'OPS/s005-Epigraph-01.xhtml');
+    });
+
+    it('getPrecedingIds()', async () => {
+      const newLoc = new Location(
+        '/4/2/2[Epigraph1]/2[title-block2]/2[h12]/1:0',
+        'application/xhtml+xml',
+        'OPS/s005-Epigraph-01.xhtml',
+        [],
+      );
+      await navigator.gotoLocation(newLoc);
+
+      const loc = await navigator.getCurrentLocation();
+      assert.equal(loc!.getFragments()[0], 'Epigraph1');
+      assert.equal(loc!.getFragments()[1], 'title-block2');
+      assert.equal(loc!.getFragments()[2], 'h12');
     });
 
     it('gotoAnchorLocation()', async () => {

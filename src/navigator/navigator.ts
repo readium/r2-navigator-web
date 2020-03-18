@@ -18,35 +18,27 @@ export class Navigator {
   }
 
   public async nextScreen(): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.nextScreen(token);
-      },
-    );
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.nextScreen(token);
+    });
   }
 
   public async previousScreen(): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.prevScreen(token);
-      },
-    );
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.prevScreen(token);
+    });
   }
 
   public async nextSpineItem(): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.nextSpineItem(token);
-      },
-    );
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.nextSpineItem(token);
+    });
   }
 
   public async previousSpineItem(): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.prevSpineItem(token);
-      },
-    );
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.prevSpineItem(token);
+    });
   }
 
   public async ensureLoaded(): Promise<void> {
@@ -62,27 +54,21 @@ export class Navigator {
   }
 
   public async gotoBegin(): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.renderAtSpineItem(0, token);
-      },
-    );
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.renderAtSpineItem(0, token);
+    });
   }
 
   public async gotoLocation(loc: Location): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.renderAtLocation(loc, token);
-      },
-    );
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.renderAtLocation(loc, token);
+    });
   }
 
-  public async gotoAnchorLocation(href: string, eleId: string): Promise<void> {
-    await this.requestManager.executeNavigationAction(
-      async (token) => {
-        await this.rendition.viewport.renderAtAnchorLocation(href, eleId, token);
-      },
-    );
+  public async gotoAnchorLocation(href: string, eleId?: string): Promise<void> {
+    await this.requestManager.executeNavigationAction(async (token) => {
+      await this.rendition.viewport.renderAtAnchorLocation(href, eleId, token);
+    });
   }
 
   public async getScreenBeginAsync(): Promise<Location | undefined | null> {
@@ -136,8 +122,9 @@ export class Navigator {
       return false;
     }
 
-    return pos.spineItemIndex + 1 >= this.pub.spine.length &&
-           pos.pageIndex + 1 >= pos.spineItemPageCount;
+    return (
+      pos.spineItemIndex + 1 >= this.pub.spine.length && pos.pageIndex + 1 >= pos.spineItemPageCount
+    );
   }
 
   public isFirstScreenSpine(): boolean {
@@ -175,8 +162,10 @@ export class Navigator {
   //   return -1;
   // }
 
-  // tslint:disable-next-line:max-line-length
-  private async locationFromPaginationAsync(pos: PaginationInfo, backward: boolean): Promise<Location> {
+  private async locationFromPaginationAsync(
+    pos: PaginationInfo,
+    backward: boolean,
+  ): Promise<Location> {
     await pos.view.ensureContentLoaded();
 
     return this.createLocation(pos, backward);

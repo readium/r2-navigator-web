@@ -1,10 +1,13 @@
 import { Link } from '@readium/shared-models/lib/models/publication/link';
+// tslint:disable-next-line: import-name
+import ResizeSensor from 'resize-sensor';
 import { IContentLoader } from '../../content-loader';
 import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
 import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { CancellationToken } from '../types';
 import { ViewSettings } from '../view-settings';
-import { IContentView, SelfResizeCallbackType } from './content-view';
+import { getAllPrecedingElements, getIdsFromElements } from './dom-utils';
+import { IContentView, SelfResizeCallback } from './content-view';
 
 type IframeLoadedCallback = (success: boolean) => void;
 
@@ -17,6 +20,7 @@ export class R2ContentView implements IContentView {
   protected iframe: HTMLIFrameElement;
 
   protected iframeLoadedCallbacks: IframeLoadedCallback[] = [];
+  protected selfResizeCallbacks: SelfResizeCallback[] = [];
 
   protected spineItem: Link;
   protected spineItemIndex: number;
@@ -32,6 +36,8 @@ export class R2ContentView implements IContentView {
   protected elementChecker: ElementBlacklistedChecker;
   protected cfiNavLogic: CfiNavigationLogic;
 
+  protected resizeSensor: any = null;
+
   public constructor(loader: IContentLoader, eleChecker: ElementBlacklistedChecker) {
     this.contentLoader = loader;
     this.elementChecker = eleChecker;
@@ -41,9 +47,12 @@ export class R2ContentView implements IContentView {
     throw new Error('Method not implemented.');
   }
 
-  public loadSpineItem(spineItem: Link, spineItemIndex: number,
-                       viewSettings: ViewSettings,
-                       token?: CancellationToken | undefined): Promise<void> {
+  public loadSpineItem(
+    spineItem: Link,
+    spineItemIndex: number,
+    viewSettings: ViewSettings,
+    token?: CancellationToken | undefined,
+  ): Promise<void> {
     this.spineItem = spineItem;
     this.spineItemIndex = spineItemIndex;
     this.vs = viewSettings;
@@ -63,10 +72,12 @@ export class R2ContentView implements IContentView {
 
     this.contentLoader.setConfig(loaderConfig);
 
-    this.contentLoader.loadContent(this.iframe,
-                                   spineItem.href,
-                                   onIframeContentLoaded,
-                                   spineItem.type);
+    this.contentLoader.loadContent(
+      this.iframe,
+      spineItem.href,
+      onIframeContentLoaded,
+      spineItem.type
+    );
 
     return this.iframeLoadedPromise();
   }
@@ -80,6 +91,10 @@ export class R2ContentView implements IContentView {
   }
 
   public unloadSpineItem(): void {
+    this.selfResizeCallbacks = [];
+    if (this.resizeSensor) {
+      this.resizeSensor.detach();
+    }
     this.host.removeChild(this.iframeContainer);
   }
 
@@ -144,6 +159,22 @@ export class R2ContentView implements IContentView {
     return cfi === null ? '' : cfi;
   }
 
+  public getFragments(cfi: string): string[] {
+    const element = this.getElementByCfi(cfi);
+    const contextDocument = element?.ownerDocument;
+
+    if (!element || !contextDocument) {
+      return [];
+    }
+
+    let root = contextDocument.body;
+    if (!root) {
+      root = contextDocument.documentElement;
+    }
+
+    return getIdsFromElements(getAllPrecedingElements(root, element));
+  }
+
   public getElementById(elementId: string): HTMLElement | null {
     return this.cfiNavLogic.getElementById(elementId);
   }
@@ -156,8 +187,8 @@ export class R2ContentView implements IContentView {
     return;
   }
 
-  public onSelfResize(callback: SelfResizeCallbackType): void {
-    return;
+  public onSelfResize(callback: SelfResizeCallback): void {
+    this.selfResizeCallbacks.push(callback);
   }
 
   protected setupIframe(): void {
@@ -194,6 +225,13 @@ export class R2ContentView implements IContentView {
 
     const doc = <Document>this.iframe.contentDocument;
     this.cfiNavLogic = new CfiNavigationLogic(doc, this.elementChecker);
+
+    this.resizeSensor = new ResizeSensor(doc.body, () => {
+      this.onResize();
+      for (const callback of this.selfResizeCallbacks) {
+        callback(this.spineItemIndex);
+      }
+    });
   }
 
   protected getHostSize(): [number, number] | null {

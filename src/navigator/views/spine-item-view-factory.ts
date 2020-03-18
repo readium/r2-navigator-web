@@ -12,8 +12,7 @@ export class SpineItemViewFactory {
   private isVertical: boolean = false;
 
   // tslint:disable-next-line:no-any
-  public constructor(pub: Publication, isFixedLayout: boolean,
-                     cvFactory: IContentViewFactory) {
+  public constructor(pub: Publication, isFixedLayout: boolean, cvFactory: IContentViewFactory) {
     this.publication = pub;
     this.isFixedLayout = isFixedLayout;
     this.contentViewFactory = cvFactory;
@@ -24,10 +23,12 @@ export class SpineItemViewFactory {
   }
 
   public createSpineItemView(pageWidth: number, pageHeight: number): [SpineItemView, HTMLElement] {
-    const spineItemView = new SpineItemView(this.publication.spine,
-                                            this.isVertical,
-                                            this.isFixedLayout,
-                                            this.contentViewFactory);
+    const spineItemView = new SpineItemView(
+      this.publication.spine,
+      this.isVertical,
+      this.isFixedLayout,
+      this.contentViewFactory,
+    );
     const spineItemViewContainer = document.createElement('div');
     spineItemViewContainer.style.position = 'absolute';
     spineItemViewContainer.style.width = `${pageWidth}px`;
