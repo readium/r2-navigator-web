@@ -7,7 +7,7 @@ export class RenditionContext {
   public requestManager: NavigationRequestManager;
   public rendition: Rendition;
   public navigator: Navigator;
-  private iframeLoader: IFrameLoader;
+  public iframeLoader: IFrameLoader;
 
   constructor(rendition: Rendition, iframeLoader: IFrameLoader) {
     this.rendition = rendition;

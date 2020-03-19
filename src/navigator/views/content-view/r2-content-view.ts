@@ -1,7 +1,7 @@
 import { Link } from '@readium/shared-models/lib/models/publication/link';
 // tslint:disable-next-line: import-name
 import ResizeSensor from 'resize-sensor';
-import { IFrameLoader } from '../../iframe-loader';
+import { IContentLoader } from '../../content-loader';
 import { CfiNavigationLogic } from '../cfi/cfi-navigation-logic';
 import { ElementBlacklistedChecker } from '../cfi/element-checker';
 import { CancellationToken } from '../types';
@@ -14,7 +14,7 @@ type IframeLoadedCallback = (success: boolean) => void;
 export class R2ContentView implements IContentView {
   protected host: HTMLElement;
 
-  protected iframeLoader: IFrameLoader;
+  protected contentLoader: IContentLoader;
 
   protected iframeContainer: HTMLElement;
   protected iframe: HTMLIFrameElement;
@@ -38,8 +38,8 @@ export class R2ContentView implements IContentView {
 
   protected resizeSensor: any = null;
 
-  public constructor(loader: IFrameLoader, eleChecker: ElementBlacklistedChecker) {
-    this.iframeLoader = loader;
+  public constructor(loader: IContentLoader, eleChecker: ElementBlacklistedChecker) {
+    this.contentLoader = loader;
     this.elementChecker = eleChecker;
   }
 
@@ -70,12 +70,13 @@ export class R2ContentView implements IContentView {
       useReadiumCssOverride: this.useReadiumCssOverride,
     };
 
-    this.iframeLoader.loadIframe(
+    this.contentLoader.setConfig(loaderConfig);
+
+    this.contentLoader.loadContent(
       this.iframe,
       spineItem.href,
       onIframeContentLoaded,
-      loaderConfig,
-      spineItem.type,
+      spineItem.type
     );
 
     return this.iframeLoadedPromise();
