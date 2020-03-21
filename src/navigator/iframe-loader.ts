@@ -16,6 +16,7 @@ export class IFrameLoader implements IContentLoader {
   private publicationURI?: string;
 
   private isIE: boolean;
+  private useSrcdoc: boolean = false;
  
   private readiumCssBasePath?: string;
   private loaderEvents: { [eventName: string]: Function[] } = {};
@@ -33,6 +34,10 @@ export class IFrameLoader implements IContentLoader {
 
   public setReadiumCssBasePath(path: string): void {
     this.readiumCssBasePath = path;
+  }
+
+  public enableUseSrcdoc(): void {
+    this.useSrcdoc = true;
   }
 
   public addContentLoadedListener(listener: Function): void {
@@ -210,7 +215,9 @@ export class IFrameLoader implements IContentLoader {
       this.loaderConfig,
     );
 
-    if (!this.isIE) {
+    if (this.useSrcdoc) {
+      iframe.setAttribute('srcdoc', basedContentData);
+    } else if (!this.isIE) {
       documentDataUri = window.URL.createObjectURL(
         new Blob([basedContentData], { type: contentType }),
       );
@@ -257,7 +264,9 @@ export class IFrameLoader implements IContentLoader {
       this.iframeUnloaded(iframe);
     });
 
-    if (!this.isIE) {
+    if (this.useSrcdoc) {
+      // intentionally blank
+    } else if (!this.isIE) {
       iframe.setAttribute('src', documentDataUri);
     } else if (iframe.contentWindow) {
       iframe.contentWindow.document.close();
