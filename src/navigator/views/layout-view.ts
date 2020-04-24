@@ -61,6 +61,8 @@ export class LayoutView extends View {
 
   private numOfPagesPerSpread: number = 0;
 
+  private enableNonSequentialIframeLoading: boolean = true;
+
   public constructor(pub: Publication, vs: ViewSettings, cvFactory: IContentViewFactory) {
     super();
     this.publication = pub;
@@ -166,6 +168,10 @@ export class LayoutView extends View {
       this.rePaginate();
       this.isPageSizeChanged = false;
     }
+  }
+
+  public setNonSequentialIframeLoading(val: boolean) {
+    this.enableNonSequentialIframeLoading = val;
   }
 
   public getPageWidth(): number {
@@ -882,7 +888,7 @@ export class LayoutView extends View {
     this.layoutRoot.appendChild(spineItemViewContainer);
 
     let viewLength = 0;
-    if (this.spineItemViewSizes[index] > 0) {
+    if (this.spineItemViewSizes[index] > 0 && this.enableNonSequentialIframeLoading) {
       viewLength = this.spineItemViewSizes[index];
       spineItemView.setTotalPageCount(this.spineItemViewPageCounts[index]);
       spineItemView.loadSpineItem(this.publication.spine[index], this.vs, token).then(() => {

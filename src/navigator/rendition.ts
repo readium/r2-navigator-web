@@ -227,6 +227,12 @@ export class Rendition {
     return Promise.resolve();
   }
 
+  public setNonSequentialIframeLoading(val: boolean) {
+    if (this.bookView) {
+      this.bookView.setNonSequentialIframeLoading(val);
+    }
+  }
+
   private initDefaultViewSettings(): void {
     const columnGapSetting = { name: SettingName.ColumnGap, value: 20 };
     const settings = [];
