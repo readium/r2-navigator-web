@@ -6,3 +6,4 @@ dist
 .rpt2_cache
 yarn-error.log
 .vscode
+test/fixtures/glue-js
