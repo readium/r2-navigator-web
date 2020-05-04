@@ -759,7 +759,6 @@ export class LayoutView extends View {
 
     const visibleViewStatus = this.visibleViewStatus();
     let offset = visibleViewStatus.offset;
-    this.loadedContentRange[0] = this.paginatedRange[0] = offset;
     const indexOfVisibleViewStatus = this.spineItemViewStatus.indexOf(visibleViewStatus);
     for (let i = indexOfVisibleViewStatus - 1; i >= 0; i = i - 1) {
       const vs = this.spineItemViewStatus[i];
@@ -768,6 +767,7 @@ export class LayoutView extends View {
       vs.offset = offset;
       this.postionSpineItemView(vs);
     }
+    this.loadedContentRange[0] = this.paginatedRange[0] = offset;
 
     offset = visibleViewStatus.offset;
     for (let i = indexOfVisibleViewStatus; i < this.spineItemViewStatus.length; i = i + 1) {
