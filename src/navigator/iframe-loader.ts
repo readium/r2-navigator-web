@@ -16,10 +16,12 @@ export class IFrameLoader implements IContentLoader {
   private publicationURI?: string;
 
   private isIE: boolean;
-
+  private useSrcdoc: boolean = false;
+ 
   private readiumCssBasePath?: string;
   private loaderEvents: { [eventName: string]: Function[] } = {};
-  private injectableResources: Resource[];
+  private injectableResources: Resource[] = [];
+  private readiumCssResources: Resource[];
 
   private loaderConfig: IIframeLoaderConfig;
 
@@ -32,6 +34,10 @@ export class IFrameLoader implements IContentLoader {
 
   public setReadiumCssBasePath(path: string): void {
     this.readiumCssBasePath = path;
+  }
+
+  public enableUseSrcdoc(): void {
+    this.useSrcdoc = true;
   }
 
   public addContentLoadedListener(listener: Function): void {
@@ -115,12 +121,13 @@ export class IFrameLoader implements IContentLoader {
     }
 
     this.injectBaseHref(doc, headElement, href);
+    let allResources = this.injectableResources;
     if (config.useReadiumCss === true) {
-      const useOverride = config.useReadiumCssOverride === true;
-      this.injectReadiumCss(headElement, useOverride);
+      this.injectReadiumCss(config.useReadiumCssOverride === true);
+      allResources = this.injectableResources.concat(this.readiumCssResources);
     }
 
-    applyResourcesToDocument(this.injectableResources, doc);
+    applyResourcesToDocument(allResources, doc);
 
     if (contentType.includes('xml')) {
       return new XMLSerializer().serializeToString(doc);
@@ -140,49 +147,42 @@ export class IFrameLoader implements IContentLoader {
     headEle.insertBefore(baseElement, headEle.firstChild);
   }
 
-  private injectReadiumCss(headEle: HTMLHeadElement, useOverride: boolean): void {
+  private injectReadiumCss(useOverride: boolean): void {
+    this.readiumCssResources = [];
+
     if (!this.readiumCssBasePath) {
       return;
     }
-    const beforeCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-before.css`);
-    const defaultCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-default.css`);
-    const afterCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-after.css`);
 
-    // Need to insert before any node except <base>
-    let refNode: Node | null = null;
-    if (headEle.firstChild) {
-      // firstChild should be <base>
-      refNode = headEle.firstChild.nextSibling;
-    }
+    this.readiumCssResources.push({
+      href: `${this.readiumCssBasePath}/ReadiumCSS-before.css`,
+      type: 'text/css',
+      target: 'head',
+      insertion: 'append',
+    });
 
-    headEle.insertBefore(beforeCss, refNode);
-    headEle.insertBefore(defaultCss, refNode);
-    headEle.appendChild(afterCss);
+    this.readiumCssResources.push({
+      href: `${this.readiumCssBasePath}/ReadiumCSS-default.css`,
+      type: 'text/css',
+      target: 'head',
+      insertion: 'append',
+    });
+
+    this.readiumCssResources.push({
+      href: `${this.readiumCssBasePath}/ReadiumCSS-after.css`,
+      type: 'text/css',
+      target: 'head',
+      insertion: 'append',
+    });
 
     if (useOverride) {
-      const overrideCss = this.creatCssLink(`${this.readiumCssBasePath}/ReadiumCSS-override.css`);
-      headEle.insertBefore(overrideCss, refNode);
-    }
+      this.readiumCssResources.push({
+        href: `${this.readiumCssBasePath}/ReadiumCSS-override.css`,
+        type: 'text/css',
+        target: 'head',
+        insertion: 'append',
+      });
   }
-
-  private creatCssLink(href: string): HTMLLinkElement {
-    const cssLink = document.createElement('link');
-    cssLink.rel = 'stylesheet';
-    cssLink.type = 'text/css';
-    cssLink.href = href;
-
-    return cssLink;
-  }
-
-  private createJSElement(href: string): HTMLScriptElement {
-    const el = document.createElement('script');
-    el.setAttribute('type', 'text/javascript');
-
-    const blob = new Blob([href], { type: 'application/javascript' });
-    const url = window.URL.createObjectURL(blob);
-    el.setAttribute('src', url);
-
-    return el;
   }
 
   private iframeLoaded(iframe: HTMLIFrameElement): void {
@@ -212,10 +212,12 @@ export class IFrameLoader implements IContentLoader {
       contentDocumentData,
       contentType,
       new URL(contentDocumentURI, iframe.baseURI || document.baseURI || location.href).href,
-      this.loaderConfig
+      this.loaderConfig,
     );
 
-    if (!this.isIE) {
+    if (this.useSrcdoc) {
+      iframe.setAttribute('srcdoc', basedContentData);
+    } else if (!this.isIE) {
       documentDataUri = window.URL.createObjectURL(
         new Blob([basedContentData], { type: contentType }),
       );
@@ -262,7 +264,9 @@ export class IFrameLoader implements IContentLoader {
       this.iframeUnloaded(iframe);
     });
 
-    if (!this.isIE) {
+    if (this.useSrcdoc) {
+      // intentionally blank
+    } else if (!this.isIE) {
       iframe.setAttribute('src', documentDataUri);
     } else if (iframe.contentWindow) {
       iframe.contentWindow.document.close();

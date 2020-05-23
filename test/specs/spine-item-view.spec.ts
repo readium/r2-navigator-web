@@ -76,7 +76,7 @@ describe('SpineItemView', () => {
       // wait for auto-resize
       await sleep(100);
       const pageSize = siv.getTotalSize(pageWidth);
-      assert.equal(pageSize, 285);
+      assert.equal(pageSize, 283);
 
       const page4Size = siv4.getTotalSize(pageWidth);
       assert.approximately(page4Size, 14844, 1);
