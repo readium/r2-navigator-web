@@ -22,6 +22,7 @@ export enum SettingName {
   FontOverride = 'font-override', // string
   AdvancedSettings = 'advanced-settings', // string
   LineHeight = 'line-height', // number
+  FontSelection = 'fontSelection', // string or number?
 }
 
 export interface ISettingEntry {
@@ -44,6 +45,7 @@ const SETTING_NAME_MAP: Map<string, SettingName> = new Map([
   [SettingName.SpreadMode, SettingName.SpreadMode],
   [SettingName.TextAlign, SettingName.TextAlign],
   [SettingName.TextColor, SettingName.TextColor],
+  [SettingName.FontSelection, SettingName.FontSelection],
 ]);
 
 export function stringToSettingName(val: string): SettingName | undefined {
